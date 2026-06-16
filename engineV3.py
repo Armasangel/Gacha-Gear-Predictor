@@ -107,7 +107,15 @@ def generate_artifact_report(artifact_input: dict):
     if not configs:
         print("\n❌ El artefacto analizado no tiene un pasado genético válido.")
         return
-        
+    
+    ## conjutno de RV
+    unique_rv = set()
+    for cfg in configs:
+        unique_rv.add(cfg["percent_rv"])
+
+    print(f"\n RBV únicos encontrados: {len(unique_rv)}")
+    print(f" Conjunto de RVs reales: {sorted(unique_rv)}")
+
     # 3. ORDENAR: Las clasificamos de mayor a menor porcentaje de RV
     # Así la "mejor historia posible" siempre estará al inicio.
     configs_sorted = sorted(configs, key=lambda x: x["percent_rv"], reverse=True)
