@@ -1,32 +1,30 @@
-public class Artifact{
-    private String type;
-    private String MainStat;
-    private String SubStat1;
-    private String SubStat2;
-    private String SubStat3;
-    private String SubStat4;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Artifact(String type, String MainStat, String SubStat1, String SubStat2, String SubStat3, String SubStat4){
-        this.type = type;
-        this.MainStat = MainStat;
-        this.SubStat1 = SubStat1;
-        this.SubStat2 = SubStat2;
-        this.SubStat3 = SubStat3;
-        this.SubStat4 = SubStat4;
+public class Artifact {
+    private final String    pieceType;   // "Corona", "Flor", etc.
+    private final StatType  mainStat;
+    private       int       level;       // 0, 4, 8, 12, 16, 20
+    private final List<Substat> substats; // 3 o 4 elementos
+
+    public Artifact(String pieceType, StatType mainStat, int level, List<Substat> substats) {
+        if (substats.size() < 3 || substats.size() > 4)
+            throw new IllegalArgumentException("Un artefacto debe tener 3 o 4 substats.");
+        if (substats.stream().anyMatch(s -> s.getType() == mainStat))
+            throw new IllegalArgumentException("Un substat no puede ser igual al main stat.");
+
+        this.pieceType = pieceType;
+        this.mainStat  = mainStat;
+        this.level     = level;
+        this.substats  = new ArrayList<>(substats);
     }
 
-    // Getters and Setters
-    public String getType() {return type;}
-    public String getMainStat() {return MainStat;}
-    public String getSubStat1() {return SubStat1;}
-    public String getSubStat2() {return SubStat2;}
-    public String getSubStat3() {return SubStat3;}
-    public String getSubStat4() {return SubStat4;}
+    public String       getPieceType() { return pieceType; }
+    public StatType     getMainStat()  { return mainStat; }
+    public int          getLevel()     { return level; }
+    public List<Substat> getSubstats() { return substats; }
+    public int          getSubstatCount() { return substats.size(); }
 
-    public void setType(String type) {this.type = type;}
-    public void setMainStat(String mainStat) {MainStat = mainStat;}
-    public void setSubStat1(String subStat1) {SubStat1 = subStat1;}
-    public void setSubStat2(String subStat2) {SubStat2 = subStat2;}
-    public void setSubStat3(String subStat3) {SubStat3 = subStat3;}
-    public void setSubStat4(String subStat4) {SubStat4 = subStat4;}
+    public void setLevel(int level)       { this.level = level; }
+    public void addSubstat(Substat s)     { substats.add(s); }  // para revelar el 4to en +4
 }
