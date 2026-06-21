@@ -36,24 +36,23 @@ public class GameRules {
         return pool;
     }
 
-    public static StatType rollFourthSubstat(Artifact artifact){
+    public static List<StatPrediction> predictFourthSubstat(Artifact artifact){
         List<StatType> pool = getAvailablePool(artifact);
-
+        
+        //Peso total del pool disponible
         int totalWeight = 0;
         for (StatType stat : pool){
             totalWeight += stat.getWeight();
         }
-
-        int roll = new Random().nextInt(totalWeight);
-
-        int accumulated = 0;
+        
+        List<StatPrediction> predictions = new ArrayList<>();
         for (StatType stat : pool){
-            accumulated += stat.getWeight();
-            if (roll < accumulated){
-                return stat;
-            }
+            double prob = stat.getWeight() * 100.00 / totalWeight;
+            predictions.add(new StatPrediction(stat, prob));
         }
 
-        throw new IllegalStateException("Error en selección ponderada.");
+        predictions.sort((a, b) -> Double.compare(b.getProbability(), a.getProbability()));
+        return predictions.subList(0, Math.min(3, predictions.size()));
+
     }
 }
