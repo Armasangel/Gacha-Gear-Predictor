@@ -36,26 +36,54 @@ public class GameRules {
                 pool.add(stat);
             }
         }
+        System.out.println("Pool real dentro del método: " + pool);
         return pool;
     }
 
-    public static List<StatPrediction> predictFourthSubstat(Artifact artifact){
-        List<StatType> pool = getAvailablePool(artifact);
-        
-        //Peso total del pool disponible
+    public static List<StatPrediction> predictFourthSubstat(Artifact artifact, BuildGoal goal) {
+    List<StatType> pool = getAvailablePool(artifact);
+
         int totalWeight = 0;
-        for (StatType stat : pool){
+        for (StatType stat : pool) {
             totalWeight += stat.getWeight();
         }
-        
-        List<StatPrediction> predictions = new ArrayList<>();
-        for (StatType stat : pool){
-            double prob = stat.getWeight() * 100.00 / totalWeight;
-            predictions.add(new StatPrediction(stat, prob));
+
+        List<StatPrediction> desired   = new ArrayList<>();
+        List<StatPrediction> undesired = new ArrayList<>();
+
+        for (StatType stat : pool) {
+            double prob = stat.getWeight() * 100.0 / totalWeight;
+            StatPrediction prediction = new StatPrediction(stat, prob);
+            if (goal.isDesired(stat)) {
+                desired.add(prediction);
+            } else {
+                undesired.add(prediction);
+            }
         }
 
-        predictions.sort((a, b) -> Double.compare(b.getProbability(), a.getProbability()));
-        return predictions.subList(0, Math.min(3, predictions.size()));
+        // Ordenar cada grupo por probabilidad descendente
+        desired.sort((a, b) -> Double.compare(b.getProbability(), a.getProbability()));
+        undesired.sort((a, b) -> Double.compare(b.getProbability(), a.getProbability()));
+
+        // Probabilidad acumulada de obtener AL MENOS UN stat deseado
+        double chanceOfGood = desired.stream()
+            .mapToDouble(StatPrediction::getProbability)
+            .sum();
+
+        System.out.println("Probabilidad de obtener algo útil: " + 
+            String.format("%.1f", chanceOfGood) + "%");
+        System.out.println("Probabilidad de obtener basura:    " + 
+            String.format("%.1f", 100 - chanceOfGood) + "%");
+        System.out.println();
+        System.out.println("Stats deseados:");
+            for (StatPrediction p : desired)   System.out.println("  ⭐ " + p);
+        System.out.println("Stats no deseados:");
+            for (StatPrediction p : undesired) System.out.println("  💀 " + p);
+
+        // Devolver primero los deseados, luego los no deseados
+        List<StatPrediction> result = new ArrayList<>(desired);
+        result.addAll(undesired);
+        return result;
 
     }
 }
