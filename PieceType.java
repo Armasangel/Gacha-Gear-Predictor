@@ -10,8 +10,8 @@ public enum PieceType {
             MainStatType.PYRO_DMG_BONUS, MainStatType.HYDRO_DMG_BONUS, MainStatType.CRYO_DMG_BONUS,
             MainStatType.ELECTRO_DMG_BONUS, MainStatType.ANEMO_DMG_BONUS, MainStatType.GEO_DMG_BONUS,
             MainStatType.DENDRO_DMG_BONUS, MainStatType.PHYSICAL_DMG_BONUS)),
-    CIRCLET (List.of(MainStatType.HP_PERCENT, MainStatType.ATK_PERCENT, MainStatType.DEF_PERCENT, MainStatType.CRIT_RATE,
-            MainStatType.CRIT_DMG, MainStatType.HEALING_BONUS, MainStatType.ELEMENTAL_MASTERY));
+    CIRCLET (List.of(MainStatType.HP_PERCENT, MainStatType.ATK_PERCENT, MainStatType.DEF_PERCENT, 
+            MainStatType.CRIT_RATE, MainStatType.CRIT_DMG, MainStatType.HEALING_BONUS, MainStatType.ELEMENTAL_MASTERY));
 
     private final List<MainStatType> validMainStats;
 

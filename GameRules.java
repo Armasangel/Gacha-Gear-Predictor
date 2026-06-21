@@ -3,17 +3,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class GameRules {
-    private static final Map<MainStatType, StatType> MAINSTAT_TO_SUBSTAT = Map.of(
+    public static final Map<MainStatType, StatType> MAINSTAT_TO_SUBSTAT = Map.of(
         MainStatType.HP_PERCENT, StatType.HP_PERCENT,
         MainStatType.ATK_PERCENT, StatType.ATK_PERCENT,
         MainStatType.DEF_PERCENT, StatType.DEF_PERCENT,
         MainStatType.ENERGY_RECHARGE, StatType.ENERGY_RECHARGE,
         MainStatType.ELEMENTAL_MASTERY, StatType.ELEMENTAL_MASTERY,
         MainStatType.HP_FLAT, StatType.HP_FLAT,
-        MainStatType.ATK_FLAT, StatType.ATK_FLAT
+        MainStatType.ATK_FLAT, StatType.ATK_FLAT,
+        MainStatType.CRIT_DMG, StatType.CRIT_DMG,
+        MainStatType.CRIT_RATE, StatType.CRIT_RATE
     );
     
     public static List<StatType> getAvailablePool(Artifact artifact){
@@ -23,8 +24,10 @@ public class GameRules {
         }
 
         StatType mainAsSubstat = MAINSTAT_TO_SUBSTAT.get(artifact.getMainStat());
+        System.out.println("mainAsSubstat: " + mainAsSubstat);
         if (mainAsSubstat != null){
             excluded.add(mainAsSubstat);
+                System.out.println("Agregado a excluidos: " + mainAsSubstat);
         }
 
         List<StatType> pool = new ArrayList<>();

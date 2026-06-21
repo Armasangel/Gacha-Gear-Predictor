@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,5 +27,23 @@ public class Main {
         for (StatPrediction p : predictions) {
             System.out.println("  " + p);
         }
+
+        //pool completo
+        System.out.println("Pool completo:");
+        for (StatType stat : StatType.values()){
+            System.out.println(" "+ stat + " peso: " + stat.getWeight());
+        }
+        
+        List<StatType> excluded = new ArrayList<>();
+        for (Substat s : artifact.getSubstats()){
+            excluded.add(s.getType());
+        }
+        System.out.println("Excluidos: " + excluded);
+
+        System.out.println("Mapa: " + GameRules.MAINSTAT_TO_SUBSTAT);
+
+        System.out.println("MainStat: " + artifact.getMainStat());
+        System.out.println("Mapeo: " + GameRules.MAINSTAT_TO_SUBSTAT.get(artifact.getMainStat()));
+
     }
 }
