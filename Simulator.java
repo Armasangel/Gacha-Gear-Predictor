@@ -24,18 +24,14 @@ public class Simulator {
         return maxUpgrades - upgradesDone(level, substatCount);
     }
 
-    private static double calcCV(Map<StatType, Double> substats, Artifact artifact) {
-    double cr = substats.getOrDefault(StatType.CRIT_RATE, 0.0);
-    double cd = substats.getOrDefault(StatType.CRIT_DMG, 0.0);
-
-    // Agregar el valor del mainstat si es CRIT_RATE o CRIT_DMG
-    if (artifact.getMainStat() == MainStatType.CRIT_RATE) {
-        cr += artifact.getMainStat().getValueAtMax();
-    } else if (artifact.getMainStat() == MainStatType.CRIT_DMG) {
-        cd += artifact.getMainStat().getValueAtMax();
-    }
-
-    return Math.round((cd + cr * 2) * 10.0) / 10.0;
+     static double calcCVTotal(Map<StatType, Double> substats, Artifact artifact) {
+        double cr = substats.getOrDefault(StatType.CRIT_RATE, 0.0);
+        double cd = substats.getOrDefault(StatType.CRIT_DMG, 0.0);
+        if (artifact.getMainStat() == MainStatType.CRIT_RATE)
+            cr += artifact.getMainStat().getValueAtMax();
+        else if (artifact.getMainStat() == MainStatType.CRIT_DMG)
+            cd += artifact.getMainStat().getValueAtMax();
+        return Math.round((cd + cr * 2) * 10.0) / 10.0;
     }
 
     // Calcula RV% dado un mapa de substats y el total de rolls
@@ -47,6 +43,12 @@ public class Simulator {
         }
         double maxRV = totalRolls * 100.0;
         return Math.round((earned / maxRV) * 1000.0) / 10.0;
+    }
+
+    private static double calcCVSubstats(Map<StatType, Double> substats) {
+        double cr = substats.getOrDefault(StatType.CRIT_RATE, 0.0);
+        double cd = substats.getOrDefault(StatType.CRIT_DMG, 0.0);
+        return Math.round((cd + cr * 2) * 10.0) / 10.0;
     }
 
     // Copia un mapa de substats para no modificar el original
@@ -175,32 +177,37 @@ public class Simulator {
     }
 
     // MÉTODO PRINCIPAL — une todo
-    public static SimulationResult simulate(Artifact artifact, BuildGoal goal) {
-        int substatCount   = artifact.getSubstatCount();
-        int level          = artifact.getLevel();
-        int done           = upgradesDone(level, substatCount);
-        int remaining      = upgradesRemaining(level, substatCount);
-        int totalRolls     = substatCount + done + remaining;
+public static SimulationResult simulate(Artifact artifact, BuildGoal goal) {
+    int substatCount = artifact.getSubstatCount();
+    int level        = artifact.getLevel();
+    int done         = upgradesDone(level, substatCount);
+    int remaining    = upgradesRemaining(level, substatCount);
+    int totalRolls   = substatCount + done + remaining;
 
-        Map<StatType, Double> best  = simulateBest(artifact, goal, remaining);
-        Map<StatType, Double> worst = simulateWorst(artifact, goal, remaining);
-        Map<StatType, Double> avg   = simulateAvg(artifact, remaining);
+    Map<StatType, Double> best  = simulateBest(artifact, goal, remaining);
+    Map<StatType, Double> worst = simulateWorst(artifact, goal, remaining);
+    Map<StatType, Double> avg   = simulateAvg(artifact, remaining);
 
-        double bestCV  = calcCV(best,  artifact);
-        double worstCV = calcCV(worst, artifact);
-        double avgCV   = calcCV(avg,   artifact);
+    double bestCV  = calcCVTotal(best,  artifact);
+    double worstCV = calcCVTotal(worst, artifact);
+    double avgCV   = calcCVTotal(avg,   artifact);
 
-        double bestRV  = calcRV(best, totalRolls);
-        double worstRV = calcRV(worst, totalRolls);
-        double avgRV   = calcRV(avg, totalRolls);
+    double bestCVSub  = calcCVSubstats(best);
+    double worstCVSub = calcCVSubstats(worst);
+    double avgCVSub   = calcCVSubstats(avg);
 
-        String[] v = verdict(avgCV, avgRV);
+    double bestRV  = calcRV(best,  totalRolls);
+    double worstRV = calcRV(worst, totalRolls);
+    double avgRV   = calcRV(avg,   totalRolls);
 
-        return new SimulationResult(
-            best, worst, avg,
-            bestCV, worstCV, avgCV,
-            bestRV, worstRV, avgRV,
-            v[0], v[1]
-        );
-    }
+    String[] v = verdict(avgCV, avgRV);
+
+    return new SimulationResult(
+        best, worst, avg,
+        bestCV,    worstCV,    avgCV,
+        bestCVSub, worstCVSub, avgCVSub,
+        bestRV,    worstRV,    avgRV,
+        v[0], v[1]
+    );
+}
 }

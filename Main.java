@@ -4,15 +4,14 @@ public class Main {
     public static void main(String[] args) {
 
         Artifact artifact = new Artifact(
-            PieceType.CIRCLET,
-            MainStatType.CRIT_RATE,
+            PieceType.SANDS,
+            MainStatType.ENERGY_RECHARGE,
             0,
             List.of(
+                new Substat(StatType.CRIT_RATE, 3.5),
                 new Substat(StatType.CRIT_DMG, 7.0),
-                new Substat(StatType.ATK_PERCENT, 4.7),
-                new Substat(StatType.HP_FLAT, 209.0),
-                new Substat(StatType.ENERGY_RECHARGE, 5.2)
-            )
+                new Substat(StatType.ATK_PERCENT,4.7)
+                )
         );
 
         BuildGoal goal = new BuildGoal(List.of(
@@ -21,6 +20,33 @@ public class Main {
             StatType.ATK_PERCENT,
             StatType.ENERGY_RECHARGE
         ));
+
+        // Antes de la simulación, detectar si tiene 3 substats
+        if (artifact.getSubstatCount() == 3) {
+            System.out.println("=".repeat(55));
+            System.out.println("  4TO SUBSTAT (aun no revelado)");
+            System.out.println("-".repeat(55));
+    
+            List<StatPrediction> predictions = 
+                GameRules.predictFourthSubstat(artifact, goal);
+    
+            System.out.println("  Probabilidad de obtener algo util: " +
+                String.format("%.1f", predictions.stream()
+                .filter(p -> goal.isDesired(p.getstat()))
+                .mapToDouble(StatPrediction::getProbability)
+                .sum()) + "%");
+            System.out.println();
+            System.out.println("  [WANT]:");
+            for (StatPrediction p : predictions) {
+                if (goal.isDesired(p.getstat()))
+                    System.out.println("    " + p);
+            }
+            System.out.println("  [SKIP]:");
+            for (StatPrediction p : predictions) {
+                if (!goal.isDesired(p.getstat()))
+                    System.out.println("    " + p);
+            }
+        }
 
         SimulationResult result = Simulator.simulate(artifact, goal);
 
@@ -44,12 +70,24 @@ public class Main {
 
         System.out.println("-".repeat(55));
         System.out.printf("%-22s %8.1f %8.1f %8.1f%n",
-            "CV", result.getBestCV(), result.getAvgCV(), result.getWorstCV());
+            "CV (substats)",
+            result.getBestCVSubstats(),
+            result.getAvgCVSubstats(),
+            result.getWorstCVSubstats());
+        System.out.printf("%-22s %8.1f %8.1f %8.1f%n",
+            "CV (con mainstat)",
+            result.getBestCV(),
+            result.getAvgCV(),
+            result.getWorstCV());
         System.out.printf("%-22s %7.1f%% %7.1f%% %7.1f%%%n",
-            "RV%", result.getBestRV(), result.getAvgRV(), result.getWorstRV());
+            "RV%",
+            result.getBestRV(),
+            result.getAvgRV(),
+            result.getWorstRV());
         System.out.println("=".repeat(55));
         System.out.println("VEREDICTO: " + result.getVerdict());
         System.out.println("  " + result.getVerdictReason());
         System.out.println("=".repeat(55));
-    }
-}
+
+    }  // fin de main
+}  // fin de clase
