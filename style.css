@@ -1,0 +1,176 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: sans-serif;
+    background: #0f0f0f;
+    color: #e0e0e0;
+    padding: 2rem;
+}
+
+header {
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    color: #f0c040;
+}
+
+header p {
+    color: #888;
+    margin-top: 0.3rem;
+}
+
+/* FORM */
+#form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 500px;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+label {
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+select, input {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    color: #e0e0e0;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+/* SUBSTATS */
+.substat-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.substat-type {
+    flex: 2;
+}
+
+.substat-value {
+    flex: 1;
+}
+
+/* GOAL CHECKBOXES */
+#goal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+#goal-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+#goal-checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #e0e0e0;
+}
+
+/* BUTTON */
+#analyze-btn {
+    background: #f0c040;
+    color: #0f0f0f;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+#analyze-btn:hover {
+    background: #ffd050;
+}
+
+/* RESULTS */
+#results-section {
+    margin-top: 2rem;
+    max-width: 600px;
+}
+
+#results-section h2 {
+    color: #f0c040;
+    margin-bottom: 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+th, td {
+    padding: 0.6rem 0.8rem;
+    text-align: right;
+    border-bottom: 1px solid #222;
+}
+
+th:first-child, td:first-child {
+    text-align: left;
+}
+
+th {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+/* VERDICT */
+#verdict-block {
+    padding: 1rem;
+    border-radius: 4px;
+    background: #1e1e1e;
+    border-left: 4px solid #f0c040;
+}
+
+#verdict-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #f0c040;
+}
+
+#verdict-reason {
+    color: #aaa;
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+}
+
+/* 4TO SUBSTAT */
+#fourth-substat-block {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #1e1e1e;
+    border-radius: 4px;
+    border-left: 4px solid #888;
+}
+
+.pred-want { color: #7ec87e; }
+.pred-skip { color: #888; }
