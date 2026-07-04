@@ -65,15 +65,30 @@ function simulateBest(artifact, goal, remaining) {
     const result = copySubstats(artifact.substats);
 
     let bestTarget = null;
-    for (const desired of goal.desiredStats) {
-        const key = getStatKey(desired);
-        if (result[key] !== undefined) {
-            bestTarget = key;
-            break;
+    let highestT4  = -Infinity;
+
+    // Buscar stat deseado con mayor T4
+    for (const s of artifact.substats) {
+        const key = getStatKey(s.type);
+        if (goal.desiredStats.includes(s.type)) {
+            const t4 = StatType[key].tiers[3];
+            if (t4 > highestT4) {
+                highestT4  = t4;
+                bestTarget = key;
+            }
         }
     }
+
+    // Si ningún stat deseado está en el artefacto, usar el de mayor T4 disponible
     if (bestTarget === null) {
-        bestTarget = getStatKey(artifact.substats[0].type);
+        for (const s of artifact.substats) {
+            const key = getStatKey(s.type);
+            const t4  = StatType[key].tiers[3];
+            if (t4 > highestT4) {
+                highestT4  = t4;
+                bestTarget = key;
+            }
+        }
     }
 
     for (let i = 0; i < remaining; i++) {
@@ -90,6 +105,8 @@ function simulateWorst(artifact, goal, remaining) {
     const result = copySubstats(artifact.substats);
 
     let worstTarget = null;
+
+    // Primero buscar un stat NO deseado
     for (let i = artifact.substats.length - 1; i >= 0; i--) {
         const key = getStatKey(artifact.substats[i].type);
         if (!goal.desiredStats.includes(artifact.substats[i].type)) {
@@ -97,8 +114,18 @@ function simulateWorst(artifact, goal, remaining) {
             break;
         }
     }
+
+    // Si todos son deseados, caer en el de menor T4 (menor impacto)
     if (worstTarget === null) {
-        worstTarget = getStatKey(artifact.substats[artifact.substats.length - 1].type);
+        let lowestT4 = Infinity;
+        for (const s of artifact.substats) {
+            const key = getStatKey(s.type);
+            const t4  = StatType[key].tiers[3];
+            if (t4 < lowestT4) {
+                lowestT4    = t4;
+                worstTarget = key;
+            }
+        }
     }
 
     for (let i = 0; i < remaining; i++) {
