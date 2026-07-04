@@ -1,5 +1,4 @@
 export const MainStatType = Object.freeze({
-    HP_FLAT: (4780),
     HP_FLAT:          (4780),      // valor absoluto
     ATK_FLAT:         (311),
     HP_PERCENT:       (46.6),
