@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const { artifact, goal } = readForm();
 
+            console.log('artifact:', artifact);
+            console.log('goal:', goal);
+
             // Limpiar resultados anteriores
             document.getElementById('fourth-substat-block').style.display = 'none';
             document.getElementById('results-section').style.display = 'none';

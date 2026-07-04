@@ -11,15 +11,15 @@ export function displayResults(artifact, result) {
 
     // Filas de substats
     for (const substat of artifact.substats) {
-        const key  = Object.keys(StatType).find(k => StatType[k] === substat.type);
+const key = Object.keys(StatType).find(k => StatType[k] === substat.type);
         const label = STAT_LABELS[key] ?? key;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${label}</td>
-            <td>${result.bestCase[substat.type]?.toFixed(1) ?? '-'}</td>
-            <td>${result.avgCase[substat.type]?.toFixed(1)  ?? '-'}</td>
-            <td>${result.worstCase[substat.type]?.toFixed(1) ?? '-'}</td>
+            <td>${result.bestCase[key]?.toFixed(1)  ?? '-'}</td>
+            <td>${result.avgCase[key]?.toFixed(1)   ?? '-'}</td>
+            <td>${result.worstCase[key]?.toFixed(1) ?? '-'}</td>
         `;
         tbody.appendChild(tr);
     }

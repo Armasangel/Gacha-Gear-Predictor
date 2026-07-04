@@ -1,5 +1,6 @@
-import { PieceType } from '../enums/PieceType.js';
-import { MainStatType } from '../enums/MainStatType.js';
+// Artifact.js
+import { PieceType } from '../data/PieceType.js';
+import { MainStatType } from '../data/MainStatType.js';
 
 export class Artifact {
     constructor(pieceType, mainStat, level, substats){
@@ -15,6 +16,6 @@ export class Artifact {
         this.substats = [...substats];
     }
 
-    getSubstatsCount(){return this.substats.length;}
+    getSubstatCount() { return this.substats.length; }  // ← ¿existe esto?
     addSubstat(substat){this.substats.push(substat);}
 }

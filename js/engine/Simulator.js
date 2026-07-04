@@ -1,12 +1,17 @@
-import {StatType} from '../data/StatType.js';
-import {MainStatType} from '../data/MainStatType.js';
-import {SimulationResult} from '../models/SimulationResult.js';
+import { StatType } from '../data/StatType.js';
+import { MainStatType } from '../data/MainStatType.js';
+import { SimulationResult } from '../models/SimulationResult.js';
 
 const UPGRADE_LEVELS = [4, 8, 12, 16, 20];
 
-function upgradesDone(level, substatCount){
+// Helper: encuentra el key string de un objeto StatType
+function getStatKey(stat) {
+    return Object.keys(StatType).find(k => StatType[k] === stat);
+}
+
+function upgradesDone(level, substatCount) {
     let upgrades = 0;
-    for (const lvl of UPGRADE_LEVELS){
+    for (const lvl of UPGRADE_LEVELS) {
         if (lvl > level) break;
         if (substatCount === 3 && lvl === 4) continue;
         upgrades++;
@@ -14,64 +19,69 @@ function upgradesDone(level, substatCount){
     return upgrades;
 }
 
-function upgradesRemaining(level, substatCount){
+function upgradesRemaining(level, substatCount) {
     const maxUpgrades = substatCount === 4 ? 5 : 4;
     return maxUpgrades - upgradesDone(level, substatCount);
 }
 
-function copySubstats(substats){
+// Copia substats usando string keys
+function copySubstats(substats) {
     const map = {};
-    for (const s of substats){
-        map[s.type] = s.value;
+    for (const s of substats) {
+        map[getStatKey(s.type)] = s.value;
     }
     return map;
 }
 
-function calcCVSubstats(substats){
-    const cr = substats[StatType.CRIT_RATE] ?? 0;
-    const cd = substats[StatType.CRIT_DAMAGE] ?? 0;
+function calcCVSubstats(substats) {
+    const cr = substats['CRIT_RATE'] ?? 0;
+    const cd = substats['CRIT_DMG']  ?? 0;
     return Math.round((cd + cr * 2) * 10) / 10;
 }
 
-function calcCVTotal(substats, artifact){
-    let cr = substats[StatType.CRIT_RATE] ?? 0;
-    let cd = substats[StatType.CRIT_DAMAGE] ?? 0;
+function calcCVTotal(substats, artifact) {
+    let cr = substats['CRIT_RATE'] ?? 0;
+    let cd = substats['CRIT_DMG']  ?? 0;
 
-    //buscar mainstat por nombre de key
-    const mainKey = Object.keys(MainStatType).find(k => MainStatType[k] === artifact.mainStat);
+    const mainKey = Object.keys(MainStatType)
+        .find(k => MainStatType[k] === artifact.mainStat);
 
     if (mainKey === 'CRIT_RATE') cr += artifact.mainStat;
-    if (mainKey === 'CRIT_DAMAGE') cd += artifact.mainStat;
+    if (mainKey === 'CRIT_DMG')  cd += artifact.mainStat;
 
     return Math.round((cd + cr * 2) * 10) / 10;
 }
 
-function calcRV(substats, totalRolls){
+function calcRV(substats, totalRolls) {
     let earned = 0;
-    for (const [stat, value] of Object.entries(substats)){
-        const t4 = stat.tiers[3];
+    for (const [key, value] of Object.entries(substats)) {
+        const t4 = StatType[key].tiers[3];
         earned += (value / t4) * 100;
     }
     return Math.round((earned / (totalRolls * 100)) * 1000) / 10;
 }
 
-
-function simulateBest(artifact, goal, remaining){
+function simulateBest(artifact, goal, remaining) {
     const result = copySubstats(artifact.substats);
 
     let bestTarget = null;
-    for (const desired of goal.desiredSubstats){
-        if (result[desired] !== undefined){
-            bestTarget = desired;
+    for (const desired of goal.desiredStats) {
+        const key = getStatKey(desired);
+        if (result[key] !== undefined) {
+            bestTarget = key;
             break;
         }
     }
-    if (bestTarget === null){
-        bestTarget = artifact.substats[0].type;
+    if (bestTarget === null) {
+        bestTarget = getStatKey(artifact.substats[0].type);
     }
 
-    for (let i = 0; i < remaining; i++){
-        result[bestTarget] = (result[bestTarget] + bestTarget.tiers[3]);
+    for (let i = 0; i < remaining; i++) {
+        result[bestTarget] = result[bestTarget] + StatType[bestTarget].tiers[3];
+    }
+
+    for (const key of Object.keys(result)) {
+        result[key] = Math.round(result[key] * 10) / 10;
     }
     return result;
 }
@@ -81,34 +91,35 @@ function simulateWorst(artifact, goal, remaining) {
 
     let worstTarget = null;
     for (let i = artifact.substats.length - 1; i >= 0; i--) {
-        const candidate = artifact.substats[i].type;
-        if (!goal.isDesired(candidate)) {
-            worstTarget = candidate;
+        const key = getStatKey(artifact.substats[i].type);
+        if (!goal.desiredStats.includes(artifact.substats[i].type)) {
+            worstTarget = key;
             break;
         }
     }
     if (worstTarget === null) {
-        worstTarget = artifact.substats[artifact.substats.length - 1].type;
+        worstTarget = getStatKey(artifact.substats[artifact.substats.length - 1].type);
     }
 
     for (let i = 0; i < remaining; i++) {
-        result[worstTarget] = (result[worstTarget] + worstTarget.tiers[0]);
+        result[worstTarget] = result[worstTarget] + StatType[worstTarget].tiers[0];
     }
 
-    for (const stat of Object.keys(result)) {
-        result[stat] = Math.round(result[stat] * 10) / 10;
+    for (const key of Object.keys(result)) {
+        result[key] = Math.round(result[key] * 10) / 10;
     }
     return result;
 }
 
 function simulateAvg(artifact, remaining) {
-    const result = copySubstats(artifact.substats);
+    const result  = copySubstats(artifact.substats);
     const numStats = artifact.substats.length;
     const upgradesPerStat = remaining / numStats;
 
-    for (const stat of Object.keys(result)) {
-        const expected = (stat.tiers[0] + stat.tiers[1] + stat.tiers[2] + stat.tiers[3]) / 4;
-        result[stat] = Math.round((result[stat] + upgradesPerStat * expected) * 10) / 10;
+    for (const key of Object.keys(result)) {
+        const tiers   = StatType[key].tiers;
+        const expected = (tiers[0] + tiers[1] + tiers[2] + tiers[3]) / 4;
+        result[key] = Math.round((result[key] + upgradesPerStat * expected) * 10) / 10;
     }
     return result;
 }
