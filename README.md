@@ -1,58 +1,61 @@
 # Gacha Gear Predictor
-> Motor de análisis y proyección de artefactos para Genshin Impact (5★)
+> Herramienta de análisis y proyección de artefactos para Genshin Impact (5★)
 
-Un jugador promedio de Genshin Impact pasa horas farmeando artefactos sin saber si vale la pena invertir en uno. Este proyecto responde esa pregunta con matemáticas reales del juego.
+Un jugador promedio de Genshin Impact pasa horas farmeando artefactos sin saber si vale la pena invertir en uno. Esta herramienta responde esa pregunta con matemáticas reales del juego — sin instalaciones, directo en el navegador.
 
 ---
 
 ## ¿Qué hace?
 
-Dado un artefacto en cualquier nivel (0, 4, 8, 12, 16 o 20), el motor calcula cómo podría terminar al +20 bajo tres escenarios:
+Dado un artefacto en cualquier nivel (0, 4, 8, 12, 16 o 20), proyecta cómo podría terminar al +20 bajo tres escenarios:
 
-- **Mejor caso** — todos los upgrades caen en el stat que más te importa, con el tier máximo (T4)
-- **Peor caso** — todos los upgrades caen en el stat que menos te importa, con el tier mínimo (T1)
-- **Caso promedio** — distribución equitativa entre los 4 substats con el valor esperado de tier
+- **Mejor caso** — todos los upgrades caen en tu stat prioritario con tier máximo (T4)
+- **Peor caso** — todos los upgrades caen en el stat menos útil con tier mínimo (T1)
+- **Caso promedio** — distribución equitativa con valor esperado de tier
 
-Si el artefacto tiene 3 substats, también predice el 4to substat con sus probabilidades reales ponderadas y te dice qué tan probable es obtener algo útil.
+Si el artefacto tiene 3 substats, predice el 4to con probabilidades reales ponderadas y muestra qué tan probable es obtener algo útil para tu build.
+
+---
+
+## Demo
+
+🔗 **[Abrir Gacha Gear Predictor](https://armasangel.github.io/Gacha-Gear-Predictor/)**
 
 ---
 
 ## Ejemplo de output
 
 ```
-=======================================================
-  CIRCLET | Main: CRIT_RATE | +0
-=======================================================
-STAT                      MEJOR     PROM     PEOR
--------------------------------------------------------
-CRIT_DMG                   45.9     15.3      7.0
-ATK_PERCENT                 4.7     10.9      4.7
-HP_FLAT                   209.0    526.5   1254.0
-ENERGY_RECHARGE             5.2     12.1      5.2
--------------------------------------------------------
-CV (substats)              45.9     15.3      7.0
-CV (con mainstat)         108.1     77.5     69.2
-RV%                       91.2%    83.0%    74.5%
-=======================================================
-VEREDICTO: INVERTIR
-  CV promedio de 77.5 es bueno (>=50).
-=======================================================
+Corona | Main: Prob. Crítica | +0
+
+STAT               MEJOR    PROM    PEOR
+─────────────────────────────────────────
+Daño Crítico        45.9    15.3     7.0
+ATK%                 4.7    10.9     4.7
+HP Plano           209.0   526.5  1254.0
+Recarga de Energía   5.2    12.1     5.2
+
+CV (substats)       45.9    15.3     7.0
+CV (con mainstat)  108.1    77.5    69.2
+RV%                91.2%   83.0%   74.5%
+
+✅ INVERTIR — CV promedio de 77.5 es bueno (>=50).
 ```
 
 ---
 
 ## Mecánicas implementadas
 
-Las reglas están basadas en datos extraídos del juego y verificados contra la [Genshin Impact Wiki](https://genshin-impact.fandom.com/wiki/Artifact/Distribution).
+Basadas en datos extraídos del juego y verificados contra la [Genshin Impact Wiki](https://genshin-impact.fandom.com/wiki/Artifact/Distribution).
 
 **Substats y tiers (5★)**
 
-Cada substat tiene 4 tiers de valor posibles, con 25% de probabilidad cada uno:
+Cada substat tiene 4 tiers de valor con 25% de probabilidad cada uno:
 
 | Stat | T1 | T2 | T3 | T4 |
 |------|----|----|----|----|
-| CRIT_RATE | 2.722 | 3.111 | 3.500 | 3.889 |
-| CRIT_DMG | 5.444 | 6.222 | 7.000 | 7.778 |
+| CRIT Rate | 2.722 | 3.111 | 3.500 | 3.889 |
+| CRIT DMG | 5.444 | 6.222 | 7.000 | 7.778 |
 | ATK% | 4.083 | 4.667 | 5.250 | 5.833 |
 | HP% | 4.083 | 4.667 | 5.250 | 5.833 |
 | DEF% | 5.104 | 5.833 | 6.562 | 7.292 |
@@ -62,9 +65,7 @@ Cada substat tiene 4 tiers de valor posibles, con 25% de probabilidad cada uno:
 | ATK Flat | 14 | 16 | 18 | 19 |
 | DEF Flat | 16 | 19 | 21 | 23 |
 
-**Pesos de aparición de substats**
-
-No todos los substats tienen la misma probabilidad de aparecer. Los stats de crítico son los más raros:
+**Pesos de aparición**
 
 | Peso | Stats |
 |------|-------|
@@ -74,14 +75,14 @@ No todos los substats tienen la misma probabilidad de aparecer. Los stats de cr�
 
 **Reglas de upgrades**
 
-- Artefacto con 4 substats iniciales: 5 upgrades al llegar a +20
-- Artefacto con 3 substats iniciales: el +4 revela el 4to substat (no es un upgrade de valor), luego 4 upgrades
-- Cada upgrade: 25% de probabilidad por cada uno de los 4 slots
+- 4 substats iniciales → 5 upgrades al +20
+- 3 substats iniciales → +4 revela el 4to (sin upgrade de valor), luego 4 upgrades
+- Cada upgrade: 25% por slot, equiprobable
 
 **Métricas**
 
-- **CV (Crit Value)** = CRIT_DMG + (CRIT_RATE × 2) — métrica estándar de la comunidad
-- **RV% (Roll Value)** = eficiencia de los rolls respecto al máximo teórico posible
+- **CV** = CRIT_DMG + (CRIT_RATE × 2)
+- **RV%** = eficiencia de rolls respecto al máximo teórico
 
 ---
 
@@ -89,54 +90,42 @@ No todos los substats tienen la misma probabilidad de aparecer. Los stats de cr�
 
 ```
 Gacha-Gear-Predictor/
-├── enums/
-│   ├── StatType.java          # Substats con tiers T1-T4 y pesos de aparición
-│   ├── MainStatType.java      # Mainstats con valor al +20
-│   └── PieceType.java         # Tipos de pieza con mainstats válidos
 │
-├── models/
-│   ├── Substat.java           # Un substat con su tipo y valor actual
-│   ├── Artifact.java          # Pieza completa con validaciones en constructor
-│   ├── BuildGoal.java         # Stats que el jugador quiere obtener
-│   ├── StatPrediction.java    # Predicción de un stat con su probabilidad
-│   └── SimulationResult.java  # Resultados de los tres escenarios
+├── index.html
+├── style.css
 │
-└── engine/
-    ├── GameRules.java         # Pool disponible y predicción del 4to substat
-    └── Simulator.java         # Proyección forward: mejor/peor/promedio
+└── js/
+    ├── data/
+    │   ├── StatType.js         # Substats con tiers y pesos
+    │   ├── MainStatType.js     # Mainstats con valor al +20
+    │   └── PieceType.js        # Piezas con mainstats válidos
+    │
+    ├── models/
+    │   ├── Substat.js
+    │   ├── Artifact.js
+    │   ├── BuildGoal.js        # Stats prioritarios del jugador
+    │   ├── StatPrediction.js
+    │   └── SimulationResult.js
+    │
+    ├── engine/
+    │   ├── GameRules.js        # Pool disponible + predicción 4to substat
+    │   └── Simulator.js        # Proyección mejor/peor/promedio
+    │
+    └── ui/
+        ├── form.js             # Lee inputs y construye modelos
+        ├── display.js          # Renderiza resultados en el DOM
+        └── main.js             # Orquesta todo
 ```
 
 ---
 
-## Cómo usarlo (por ahora)
+## Cómo usarlo
 
-El proyecto está en fase de motor — sin interfaz gráfica todavía. Para probarlo:
-
-1. Clona el repo
-2. Abre en tu IDE favorito (VS Code + Extension Pack for Java recomendado)
-3. Edita `Main.java` con tu artefacto:
-
-```java
-Artifact artifact = new Artifact(
-    PieceType.CIRCLET,
-    MainStatType.CRIT_RATE,
-    0,
-    List.of(
-        new Substat(StatType.CRIT_DMG, 7.0),
-        new Substat(StatType.ATK_PERCENT, 4.7),
-        new Substat(StatType.HP_FLAT, 209.0),
-        new Substat(StatType.ENERGY_RECHARGE, 5.2)
-    )
-);
-
-BuildGoal goal = new BuildGoal(List.of(
-    StatType.CRIT_RATE,
-    StatType.CRIT_DMG,
-    StatType.ATK_PERCENT
-));
-```
-
-4. Corre `Main.java`
+1. Abre la herramienta en el navegador
+2. Selecciona el tipo de pieza y el main stat
+3. Ingresa tus substats y sus valores
+4. Marca qué substats te importan y ordénalos por prioridad (▲▼)
+5. Haz clic en **Analizar**
 
 ---
 
@@ -144,11 +133,13 @@ BuildGoal goal = new BuildGoal(List.of(
 
 - [x] Motor de proyección forward (mejor/peor/promedio)
 - [x] Predicción del 4to substat con probabilidades ponderadas
-- [x] Cálculo de CV y RV%
-- [x] Soporte para artefactos en niveles intermedios (0, 4, 8, 12, 16, 20)
-- [ ] Interfaz gráfica (webapp / app de escritorio)
-- [ ] Perfiles de personaje (BuildGoal predefinidos por personaje)
-- [ ] Soporte para otros juegos (Honkai: Star Rail, Zenless Zone Zero)
+- [x] BuildGoal con prioridades ordenables por el usuario
+- [x] CV doble (substats + mainstat) y RV%
+- [x] Soporte para niveles intermedios (0, 4, 8, 12, 16, 20)
+- [x] Webapp desplegable en GitHub Pages
+- [ ] Diseño visual pulido
+- [ ] Perfiles de personaje (BuildGoal predefinidos)
+- [ ] Soporte multi-juego (Star Rail, ZZZ)
 
 ---
 
@@ -161,4 +152,4 @@ BuildGoal goal = new BuildGoal(List.of(
 
 ## Autor
 
-**Armasangel** — proyecto personal de un fan de los juegos gacha que se cansó de no entender el RNG y espera ser útil para otros jugadores :D. 
+**Armasangel** — proyecto personal de un fan de los juegos gacha que se cansó de no entender el RNG.
