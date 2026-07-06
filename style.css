@@ -174,3 +174,26 @@ th {
 
 .pred-want { color: #7ec87e; }
 .pred-skip { color: #888; }
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+
+.move-up, .move-down {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0;
+}
+
+.move-up:hover, .move-down:hover {
+    color: #f0c040;
+}

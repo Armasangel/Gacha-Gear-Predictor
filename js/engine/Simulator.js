@@ -4,7 +4,6 @@ import { SimulationResult } from '../models/SimulationResult.js';
 
 const UPGRADE_LEVELS = [4, 8, 12, 16, 20];
 
-// Helper: encuentra el key string de un objeto StatType
 function getStatKey(stat) {
     return Object.keys(StatType).find(k => StatType[k] === stat);
 }
@@ -24,7 +23,6 @@ function upgradesRemaining(level, substatCount) {
     return maxUpgrades - upgradesDone(level, substatCount);
 }
 
-// Copia substats usando string keys
 function copySubstats(substats) {
     const map = {};
     for (const s of substats) {
@@ -42,13 +40,10 @@ function calcCVSubstats(substats) {
 function calcCVTotal(substats, artifact) {
     let cr = substats['CRIT_RATE'] ?? 0;
     let cd = substats['CRIT_DMG']  ?? 0;
-
     const mainKey = Object.keys(MainStatType)
         .find(k => MainStatType[k] === artifact.mainStat);
-
     if (mainKey === 'CRIT_RATE') cr += artifact.mainStat;
     if (mainKey === 'CRIT_DMG')  cd += artifact.mainStat;
-
     return Math.round((cd + cr * 2) * 10) / 10;
 }
 
@@ -65,36 +60,25 @@ function simulateBest(artifact, goal, remaining) {
     const result = copySubstats(artifact.substats);
 
     let bestTarget = null;
-    let highestT4  = -Infinity;
-
-    // Buscar stat deseado con mayor T4
-    for (const s of artifact.substats) {
-        const key = getStatKey(s.type);
-        if (goal.desiredStats.includes(s.type)) {
-            const t4 = StatType[key].tiers[3];
-            if (t4 > highestT4) {
-                highestT4  = t4;
-                bestTarget = key;
-            }
+    for (const desired of goal.desiredStats) {
+        const key = getStatKey(desired);
+        if (result[key] !== undefined) {
+            bestTarget = key;
+            break;
         }
     }
-
-    // Si ningún stat deseado está en el artefacto, usar el de mayor T4 disponible
     if (bestTarget === null) {
+        let highestT4 = -Infinity;
         for (const s of artifact.substats) {
             const key = getStatKey(s.type);
             const t4  = StatType[key].tiers[3];
-            if (t4 > highestT4) {
-                highestT4  = t4;
-                bestTarget = key;
-            }
+            if (t4 > highestT4) { highestT4 = t4; bestTarget = key; }
         }
     }
 
     for (let i = 0; i < remaining; i++) {
-        result[bestTarget] = result[bestTarget] + StatType[bestTarget].tiers[3];
+        result[bestTarget] += StatType[bestTarget].tiers[3];
     }
-
     for (const key of Object.keys(result)) {
         result[key] = Math.round(result[key] * 10) / 10;
     }
@@ -105,8 +89,6 @@ function simulateWorst(artifact, goal, remaining) {
     const result = copySubstats(artifact.substats);
 
     let worstTarget = null;
-
-    // Primero buscar un stat NO deseado
     for (let i = artifact.substats.length - 1; i >= 0; i--) {
         const key = getStatKey(artifact.substats[i].type);
         if (!goal.desiredStats.includes(artifact.substats[i].type)) {
@@ -114,24 +96,18 @@ function simulateWorst(artifact, goal, remaining) {
             break;
         }
     }
-
-    // Si todos son deseados, caer en el de menor T4 (menor impacto)
     if (worstTarget === null) {
         let lowestT4 = Infinity;
         for (const s of artifact.substats) {
             const key = getStatKey(s.type);
             const t4  = StatType[key].tiers[3];
-            if (t4 < lowestT4) {
-                lowestT4    = t4;
-                worstTarget = key;
-            }
+            if (t4 < lowestT4) { lowestT4 = t4; worstTarget = key; }
         }
     }
 
     for (let i = 0; i < remaining; i++) {
-        result[worstTarget] = result[worstTarget] + StatType[worstTarget].tiers[0];
+        result[worstTarget] += StatType[worstTarget].tiers[0];
     }
-
     for (const key of Object.keys(result)) {
         result[key] = Math.round(result[key] * 10) / 10;
     }
@@ -139,12 +115,11 @@ function simulateWorst(artifact, goal, remaining) {
 }
 
 function simulateAvg(artifact, remaining) {
-    const result  = copySubstats(artifact.substats);
-    const numStats = artifact.substats.length;
-    const upgradesPerStat = remaining / numStats;
+    const result      = copySubstats(artifact.substats);
+    const upgradesPerStat = remaining / artifact.substats.length;
 
     for (const key of Object.keys(result)) {
-        const tiers   = StatType[key].tiers;
+        const tiers    = StatType[key].tiers;
         const expected = (tiers[0] + tiers[1] + tiers[2] + tiers[3]) / 4;
         result[key] = Math.round((result[key] + upgradesPerStat * expected) * 10) / 10;
     }
@@ -174,17 +149,15 @@ export function simulate(artifact, goal) {
     const worst = simulateWorst(artifact, goal, remaining);
     const avg   = simulateAvg(artifact, remaining);
 
-    const bestCV  = calcCVTotal(best,  artifact);
-    const worstCV = calcCVTotal(worst, artifact);
-    const avgCV   = calcCVTotal(avg,   artifact);
-
+    const bestCV     = calcCVTotal(best,  artifact);
+    const worstCV    = calcCVTotal(worst, artifact);
+    const avgCV      = calcCVTotal(avg,   artifact);
     const bestCVSub  = calcCVSubstats(best);
     const worstCVSub = calcCVSubstats(worst);
     const avgCVSub   = calcCVSubstats(avg);
-
-    const bestRV  = calcRV(best,  totalRolls);
-    const worstRV = calcRV(worst, totalRolls);
-    const avgRV   = calcRV(avg,   totalRolls);
+    const bestRV     = calcRV(best,  totalRolls);
+    const worstRV    = calcRV(worst, totalRolls);
+    const avgRV      = calcRV(avg,   totalRolls);
 
     const [v, reason] = verdict(avgCV, avgRV);
 
