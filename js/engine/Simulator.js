@@ -43,8 +43,8 @@ function calcCVTotal(substats, artifact) {
     let cd = substats['CRIT_DMG']  ?? 0;
     const mainKey = Object.keys(MainStatType)
         .find(k => MainStatType[k] === artifact.mainStat);
-    if (mainKey === 'CRIT_RATE') cr += artifact.mainStat;
-    if (mainKey === 'CRIT_DMG')  cd += artifact.mainStat;
+    if (mainKey === 'CRIT_RATE') cr += artifact.mainStat.value;
+    if (mainKey === 'CRIT_DMG')  cd += artifact.mainStat.value;
     return Math.round((cd + cr * 2) * 10) / 10;
 }
 
@@ -128,12 +128,13 @@ function simulateAvg(artifact, remaining) {
 }
 
 function verdict(artifact, avgCV, avgCVSub, avgRV) {
-    const isFixedMain = 
-        artifact.pieceType === PieceType.FLOWER || 
+    const isFixedMain =
+        artifact.pieceType === PieceType.FLOWER ||
         artifact.pieceType === PieceType.PLUME;
 
     if (isFixedMain) {
-        // Flor y Pluma: solo substats importan
+        // Flor y Pluma: el mainstat es fijo (HP/ATK plano) y no aporta a CV,
+        // así que el veredicto se basa solo en los substats.
         if (avgCVSub >= 30) return ["INVERTIR",   `CV de substats ${avgCVSub} es bueno (>=30).`];
         if (avgCVSub >= 15) return ["CONSIDERAR", `CV de substats ${avgCVSub} es moderado.`];
         if (avgCVSub === 0) {
@@ -144,7 +145,7 @@ function verdict(artifact, avgCV, avgCVSub, avgRV) {
         }
         return ["DESCARTAR", `CV de substats ${avgCVSub} es bajo (<15).`];
     } else {
-        // Reloj, Copa, Corona: mainstat incluido
+        // Reloj, Copa, Corona: el mainstat sí puede ser crit/DMG bonus, se incluye
         if (avgCV >= 50) return ["INVERTIR",   `CV promedio de ${avgCV} es bueno (>=50).`];
         if (avgCV >= 35) return ["CONSIDERAR", `CV promedio de ${avgCV} es moderado.`];
         if (avgCV === 0) {
@@ -154,4 +155,36 @@ function verdict(artifact, avgCV, avgCVSub, avgRV) {
         }
         return ["DESCARTAR", `CV promedio de ${avgCV} es bajo (<35).`];
     }
+}
+
+export function simulate(artifact, goal) {
+    const substatCount = artifact.getSubstatCount();
+    const level        = artifact.level;
+    const done         = upgradesDone(level, substatCount);
+    const remaining    = upgradesRemaining(level, substatCount);
+    const totalRolls   = substatCount + done + remaining;
+
+    const best  = simulateBest(artifact, goal, remaining);
+    const worst = simulateWorst(artifact, goal, remaining);
+    const avg   = simulateAvg(artifact, remaining);
+
+    const bestCV     = calcCVTotal(best,  artifact);
+    const worstCV    = calcCVTotal(worst, artifact);
+    const avgCV      = calcCVTotal(avg,   artifact);
+    const bestCVSub  = calcCVSubstats(best);
+    const worstCVSub = calcCVSubstats(worst);
+    const avgCVSub   = calcCVSubstats(avg);
+    const bestRV     = calcRV(best,  totalRolls);
+    const worstRV    = calcRV(worst, totalRolls);
+    const avgRV      = calcRV(avg,   totalRolls);
+
+    const [v, reason] = verdict(artifact, avgCV, avgCVSub, avgRV);
+
+    return new SimulationResult(
+        best, worst, avg,
+        bestCV,    worstCV,    avgCV,
+        bestCVSub, worstCVSub, avgCVSub,
+        bestRV,    worstRV,    avgRV,
+        v, reason
+    );
 }

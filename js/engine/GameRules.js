@@ -2,18 +2,18 @@ import { StatType } from '../data/StatType.js';
 import { MainStatType } from '../data/MainStatType.js';
 import { StatPrediction } from '../models/StatPrediction.js';
 
-// Mapeo de MainStatType a StatType cuando coinciden
-const MAINSTAT_TO_SUBSTAT = {
-    [MainStatType.HP_PERCENT]:        StatType.HP_PERCENT,
-    [MainStatType.ATK_PERCENT]:       StatType.ATK_PERCENT,
-    [MainStatType.DEF_PERCENT]:       StatType.DEF_PERCENT,
-    [MainStatType.ENERGY_RECHARGE]:   StatType.ENERGY_RECHARGE,
-    [MainStatType.ELEMENTAL_MASTERY]: StatType.ELEMENTAL_MASTERY,
-    [MainStatType.HP_FLAT]:           StatType.HP_FLAT,
-    [MainStatType.ATK_FLAT]:          StatType.ATK_FLAT,
-    [MainStatType.CRIT_RATE]:         StatType.CRIT_RATE,
-    [MainStatType.CRIT_DMG]:          StatType.CRIT_DMG,
-};
+// Mapeo de MainStatType a StatType cuando coinciden.
+const MAINSTAT_TO_SUBSTAT = new Map([
+    [MainStatType.HP_PERCENT,        StatType.HP_PERCENT],
+    [MainStatType.ATK_PERCENT,       StatType.ATK_PERCENT],
+    [MainStatType.DEF_PERCENT,       StatType.DEF_PERCENT],
+    [MainStatType.ENERGY_RECHARGE,   StatType.ENERGY_RECHARGE],
+    [MainStatType.ELEMENTAL_MASTERY, StatType.ELEMENTAL_MASTERY],
+    [MainStatType.HP_FLAT,           StatType.HP_FLAT],
+    [MainStatType.ATK_FLAT,          StatType.ATK_FLAT],
+    [MainStatType.CRIT_RATE,         StatType.CRIT_RATE],
+    [MainStatType.CRIT_DMG,          StatType.CRIT_DMG],
+]);
 
 export function getAvailablePool(artifact) {
     const excluded = new Set();
@@ -24,7 +24,7 @@ export function getAvailablePool(artifact) {
     }
 
     // Excluir el mainstat si tiene equivalente en substat
-    const mainAsSubstat = MAINSTAT_TO_SUBSTAT[artifact.mainStat];
+    const mainAsSubstat = MAINSTAT_TO_SUBSTAT.get(artifact.mainStat);
     if (mainAsSubstat !== undefined) {
         excluded.add(mainAsSubstat);
     }

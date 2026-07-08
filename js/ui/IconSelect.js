@@ -1,15 +1,3 @@
-// Dropdown personalizado que sí puede mostrar iconos (los <option> nativos de
-// HTML no lo permiten). Espera un wrapper con esta estructura mínima en el HTML:
-//
-// <div class="custom-select-wrapper" data-role="algo">
-//     <div class="custom-select-trigger"></div>
-//     <div class="custom-options"></div>
-// </div>
-//
-// El contenido de trigger/options se genera todo desde JS a partir de las
-// opciones que le pases, así evitamos que las rutas/nombres de archivo se
-// desincronicen entre el HTML y los assets reales (que fue justo el bug original).
-
 let globalCloseBound = false;
 
 export class IconSelect {
