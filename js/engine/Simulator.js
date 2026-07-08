@@ -59,7 +59,6 @@ function calcRV(substats, totalRolls) {
 
 function simulateBest(artifact, goal, remaining) {
     const result = copySubstats(artifact.substats);
-    const [v, reason] = verdict(artifact, avgCV, avgCVSub, avgRV);
 
     let bestTarget = null;
     for (const desired of goal.desiredStats) {
@@ -89,7 +88,6 @@ function simulateBest(artifact, goal, remaining) {
 
 function simulateWorst(artifact, goal, remaining) {
     const result = copySubstats(artifact.substats);
-    const [v, reason] = verdict(artifact, avgCV, avgCVSub, avgRV);
 
     let worstTarget = null;
     for (let i = artifact.substats.length - 1; i >= 0; i--) {
@@ -120,7 +118,6 @@ function simulateWorst(artifact, goal, remaining) {
 function simulateAvg(artifact, remaining) {
     const result      = copySubstats(artifact.substats);
     const upgradesPerStat = remaining / artifact.substats.length;
-    const [v, reason] = verdict(artifact, avgCV, avgCVSub, avgRV);
 
     for (const key of Object.keys(result)) {
         const tiers    = StatType[key].tiers;
