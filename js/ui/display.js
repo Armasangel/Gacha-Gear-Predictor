@@ -1,63 +1,59 @@
 import { STAT_LABELS } from './form.js';
 import { StatType } from '../data/StatType.js';
 
+const VERDICT_CONFIG = {
+    'INVERTIR':   { icon: '✅', color: '#5FCB8A', potential: 'Alto' },
+    'CONSIDERAR': { icon: '⚖️', color: '#D5D96B', potential: 'Medio' },
+    'DESCARTAR':  { icon: '❌', color: '#D96B6B', potential: 'Bajo' },
+};
+
+function getStatKey(stat) {
+    return Object.keys(StatType).find(k => StatType[k] === stat);
+}
+
 export function displayResults(artifact, result) {
-    document.getElementById('results-section').style.display = 'block';
+    // ─── Veredicto ───────────────────────────────
+    const cfg = VERDICT_CONFIG[result.verdict] ?? VERDICT_CONFIG['CONSIDERAR'];
+    document.getElementById('verdict-icon').textContent  = cfg.icon;
+    document.getElementById('verdict-label').textContent = result.verdict;
+    document.getElementById('verdict-label').style.color = cfg.color;
+    document.getElementById('verdict-potential-text').textContent = cfg.potential;
+    document.getElementById('verdict-reason').textContent = result.verdictReason;
 
-    const tbody = document.getElementById('results-body');
-    const tfoot = document.getElementById('results-foot');
-    tbody.innerHTML = '';
-    tfoot.innerHTML = '';
+    // ─── Detalles técnicos ────────────────────────
+    document.getElementById('d-best-cv-sub').textContent  = result.bestCVSub.toFixed(1);
+    document.getElementById('d-avg-cv-sub').textContent   = result.avgCVSub.toFixed(1);
+    document.getElementById('d-worst-cv-sub').textContent = result.worstCVSub.toFixed(1);
+    document.getElementById('d-best-cv').textContent      = result.bestCV.toFixed(1);
+    document.getElementById('d-avg-cv').textContent       = result.avgCV.toFixed(1);
+    document.getElementById('d-worst-cv').textContent     = result.worstCV.toFixed(1);
+    document.getElementById('d-best-rv').textContent      = result.bestRV.toFixed(1) + '%';
+    document.getElementById('d-avg-rv').textContent       = result.avgRV.toFixed(1) + '%';
+    document.getElementById('d-worst-rv').textContent     = result.worstRV.toFixed(1) + '%';
 
-    // Filas de substats
+    // ─── Cards de escenarios ──────────────────────
+    renderScenario('best-substats',  artifact, result.bestCase);
+    renderScenario('avg-substats',   artifact, result.avgCase);
+    renderScenario('worst-substats', artifact, result.worstCase);
+}
+
+function renderScenario(containerId, artifact, caseData) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+
     for (const substat of artifact.substats) {
-const key = Object.keys(StatType).find(k => StatType[k] === substat.type);
+        const key   = getStatKey(substat.type);
         const label = STAT_LABELS[key] ?? key;
+        const value = caseData[key]?.toFixed(1) ?? '-';
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${label}</td>
-            <td>${result.bestCase[key]?.toFixed(1)  ?? '-'}</td>
-            <td>${result.avgCase[key]?.toFixed(1)   ?? '-'}</td>
-            <td>${result.worstCase[key]?.toFixed(1) ?? '-'}</td>
+        const row = document.createElement('div');
+        row.className = 'scenario-substat';
+        row.innerHTML = `
+            <span class="scenario-substat-name">${label}</span>
+            <span class="scenario-substat-value">${value}</span>
         `;
-        tbody.appendChild(tr);
+        container.appendChild(row);
     }
-
-    // Footer: CV y RV
-    tfoot.innerHTML = `
-        <tr class="separator"><td colspan="4"></td></tr>
-        <tr>
-            <td>CV (substats)</td>
-            <td>${result.bestCVSub.toFixed(1)}</td>
-            <td>${result.avgCVSub.toFixed(1)}</td>
-            <td>${result.worstCVSub.toFixed(1)}</td>
-        </tr>
-        <tr>
-            <td>CV (con mainstat)</td>
-            <td>${result.bestCV.toFixed(1)}</td>
-            <td>${result.avgCV.toFixed(1)}</td>
-            <td>${result.worstCV.toFixed(1)}</td>
-        </tr>
-        <tr>
-            <td>RV%</td>
-            <td>${result.bestRV.toFixed(1)}%</td>
-            <td>${result.avgRV.toFixed(1)}%</td>
-            <td>${result.worstRV.toFixed(1)}%</td>
-        </tr>
-    `;
-
-    // Veredicto
-    const verdictColors = {
-        'INVERTIR':   '#7ec87e',
-        'CONSIDERAR': '#f0c040',
-        'DESCARTAR':  '#e06060',
-    };
-    const label = document.getElementById('verdict-label');
-    const reason = document.getElementById('verdict-reason');
-    label.textContent = result.verdict;
-    label.style.color = verdictColors[result.verdict] ?? '#f0c040';
-    reason.textContent = result.verdictReason;
 }
 
 export function displayFourthSubstat(predictions, goal) {
@@ -70,22 +66,33 @@ export function displayFourthSubstat(predictions, goal) {
         .filter(p => goal.isDesired(p.stat))
         .reduce((sum, p) => sum + p.probability, 0);
 
+    // Resumen de probabilidad
     const summary = document.createElement('p');
-    summary.innerHTML = `
-        Probabilidad de obtener algo útil: 
-        <strong style="color:#7ec87e">${chanceGood.toFixed(1)}%</strong>
-    `;
+    summary.className = 'fourth-chance';
+    const chanceColor = chanceGood >= 25 ? '#5FCB8A' : chanceGood >= 10 ? '#D5D96B' : '#D96B6B';
+    summary.innerHTML = `Probabilidad de obtener algo útil: 
+        <strong style="color:${chanceColor}">${chanceGood.toFixed(1)}%</strong>`;
     content.appendChild(summary);
 
-    const list = document.createElement('ul');
+    // Barras
     for (const p of predictions) {
-        const key   = Object.keys(StatType).find(k => StatType[k] === p.stat);
-        const label = STAT_LABELS[key] ?? key;
+        const key    = getStatKey(p.stat);
+        const label  = STAT_LABELS[key] ?? key;
         const isGood = goal.isDesired(p.stat);
-        const li = document.createElement('li');
-        li.className = isGood ? 'pred-want' : 'pred-skip';
-        li.textContent = `${label}: ${p.probability.toFixed(1)}%`;
-        list.appendChild(li);
+        const isMid  = p.probability >= 15;
+
+        const barClass = isGood ? 'good' : isMid ? 'mid' : 'bad';
+
+        const item = document.createElement('div');
+        item.className = 'fourth-bar-item';
+        item.innerHTML = `
+            <span class="fourth-bar-label">${label}</span>
+            <div class="fourth-bar-track">
+                <div class="fourth-bar-fill fourth-bar-fill--${barClass}"
+                     style="width: ${p.probability.toFixed(1)}%"></div>
+            </div>
+            <span class="fourth-bar-pct fourth-bar-pct--${barClass}">${p.probability.toFixed(1)}%</span>
+        `;
+        content.appendChild(item);
     }
-    content.appendChild(list);
 }
