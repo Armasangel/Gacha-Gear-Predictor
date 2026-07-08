@@ -606,23 +606,49 @@ body {
 .custom-select-trigger {
     display: flex;
     align-items: center;
-    padding: 10px;
-    border: 1px solid #ccc;
-    background: #fff;
+    min-height: 1.4em;
+    padding: .65rem .9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--panel2);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
     cursor: pointer;
-    border-radius: 4px;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.custom-select-trigger::after {
+    content: '';
+    width: 12px;
+    height: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B9C3D1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.custom-select-trigger:hover { border-color: var(--gold2); }
+
+.custom-select-wrapper.open .custom-select-trigger {
+    border-color: rgba(95,203,138,.5);
+    box-shadow: 0 0 0 3px rgba(95,203,138,.1);
 }
 
 .custom-options {
     position: absolute;
     display: none; /* Oculto por defecto */
-    top: 100%;
+    top: calc(100% + 4px);
     left: 0;
     right: 0;
-    border: 1px solid #ccc;
-    background: #fff;
-    z-index: 2;
-    border-radius: 0 0 4px 4px;
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    box-shadow: var(--shadow-gold);
+    z-index: 20;
+    border-radius: var(--radius);
 }
 
 /* Cuando se abre el menú */
@@ -631,20 +657,26 @@ body {
 }
 
 .custom-option {
-    padding: 10px;
+    padding: .6rem .9rem;
     display: flex;
     align-items: center;
+    color: var(--text2);
     cursor: pointer;
 }
 
 .custom-option:hover {
-    background-color: #f3f3f3;
+    background-color: var(--hover);
+    color: var(--text);
 }
 
-/* Aquí controlas y domas tus imágenes culeras de 360px */
+.custom-option.selected {
+    color: var(--gold3);
+}
+
 .select-icon {
     width: 24px;
     height: 24px;
     object-fit: contain;
     margin-right: 10px;
+    flex-shrink: 0;
 }

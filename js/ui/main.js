@@ -1,4 +1,4 @@
-import { populateMainStats, populateSubstatSelects, populateGoalCheckboxes, readForm } from './form.js';
+import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm } from './form.js';
 import { displayResults, displayFourthSubstat } from './display.js';
 import { simulate } from '../engine/Simulator.js';
 import { predictFourthSubstat } from '../engine/GameRules.js';
@@ -24,7 +24,7 @@ window.toggleDetails = function() {
 window.resetAndGoForm = function() {
     // Limpiar inputs de valor
     document.querySelectorAll('.substat-value').forEach(i => i.value = '');
-    document.querySelectorAll('.substat-type').forEach(s => s.value = '');
+    resetSubstatSelects();
     document.getElementById('goal-checkboxes').innerHTML = '';
     document.getElementById('fourth-substat-block').style.display = 'none';
     document.getElementById('details-block').style.display = 'none';
@@ -33,18 +33,8 @@ window.resetAndGoForm = function() {
 
 // ─── Init ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    initCustomSelects();
     populateMainStats();
-    populateSubstatSelects();
-
-    document.getElementById('pieceType').addEventListener('change', () => {
-        populateMainStats();
-    });
-
-    document.querySelectorAll('.substat-type').forEach(select => {
-        select.addEventListener('change', () => {
-            populateGoalCheckboxes();
-        });
-    });
 
     document.getElementById('analyze-btn').addEventListener('click', () => {
         const errorEl = document.getElementById('form-error');

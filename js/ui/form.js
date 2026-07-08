@@ -4,6 +4,8 @@ import { PieceType } from '../data/PieceType.js';
 import { Artifact } from '../models/Artifact.js';
 import { Substat } from '../models/Substat.js';
 import { BuildGoal } from '../models/BuildGoal.js';
+import { IconSelect } from './IconSelect.js';
+import { PIECE_ICONS, PIECE_LABELS, STAT_ICONS } from '../data/Icons.js';
 
 // Nombres legibles para el usuario
 export const STAT_LABELS = {
@@ -16,7 +18,7 @@ export const STAT_LABELS = {
     ELEMENTAL_MASTERY:  'Maestría Elemental',
     HP_FLAT:            'HP Plano',
     ATK_FLAT:           'ATK Plano',
-    DEF_FLAT:           'DEF Plano',
+    DEF_FLAT:            'DEF Plano',
     HEALING_BONUS:      'Bono de Curación',
     PYRO_DMG_BONUS:     'Bono DMG Pyro',
     HYDRO_DMG_BONUS:    'Bono DMG Hydro',
@@ -28,8 +30,47 @@ export const STAT_LABELS = {
     PHYSICAL_DMG_BONUS: 'Bono DMG Físico',
 };
 
+// ─── Instancias de los dropdowns con icono ─────────
+let pieceSelect = null;
+const substatSelects = [];
+
+// Se llama una sola vez al cargar la página.
+export function initCustomSelects() {
+    // Dropdown de pieza
+    const pieceWrapper = document.getElementById('pieceType-select');
+    const pieceOptions = Object.keys(PieceType).map(key => ({
+        value: key,
+        label: PIECE_LABELS[key] ?? key,
+        icon: PIECE_ICONS[key],
+    }));
+    pieceSelect = new IconSelect(pieceWrapper, {
+        options: pieceOptions,
+        value: pieceOptions[0].value,
+        onChange: () => populateMainStats(),
+    });
+
+    // Dropdowns de substats (uno por fila)
+    const substatOptions = [
+        { value: '', label: '-- Selecciona --', icon: null },
+        ...Object.keys(StatType).map(key => ({
+            value: key,
+            label: STAT_LABELS[key] ?? key,
+            icon: STAT_ICONS[key],
+        })),
+    ];
+
+    document.querySelectorAll('.substat-type-select').forEach(wrapper => {
+        const select = new IconSelect(wrapper, {
+            options: substatOptions,
+            value: '',
+            onChange: () => populateGoalCheckboxes(),
+        });
+        substatSelects.push(select);
+    });
+}
+
 export function populateMainStats() {
-    const pieceKey   = document.getElementById('pieceType').value;
+    const pieceKey   = pieceSelect.value;
     const mainSelect = document.getElementById('mainStat');
     const piece      = PieceType[pieceKey];
 
@@ -44,33 +85,17 @@ export function populateMainStats() {
     }
 }
 
-export function populateSubstatSelects() {
-    const selects = document.querySelectorAll('.substat-type');
-    for (const select of selects) {
-        const current = select.value;
-        select.innerHTML = '<option value="">-- Selecciona --</option>';
-        for (const key of Object.keys(StatType)) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = STAT_LABELS[key] ?? key;
-            select.appendChild(option);
-        }
-        select.value = current;
-    }
-}
-
 export function populateGoalCheckboxes() {
     const container = document.getElementById('goal-checkboxes');
-    const selects   = document.querySelectorAll('.substat-type');
 
     // Guardar orden actual antes de limpiar
     const currentOrder = Array.from(
         container.querySelectorAll('.goal-item')
     ).map(item => item.dataset.key);
 
-    const selectedKeys = Array.from(selects)
+    const selectedKeys = substatSelects
         .map(s => s.value)
-        .filter(v => v !== '');
+        .filter(v => v !== '' && v !== null);
 
     container.innerHTML = '';
 
@@ -106,7 +131,7 @@ export function populateGoalCheckboxes() {
 }
 
 export function readForm() {
-    const pieceKey = document.getElementById('pieceType').value;
+    const pieceKey = pieceSelect.value;
     const mainKey  = document.getElementById('mainStat').value;
     const level    = parseInt(document.getElementById('level').value);
 
@@ -116,13 +141,13 @@ export function readForm() {
     // Leer substats
     const substatRows = document.querySelectorAll('.substat-row');
     const substats = [];
-    for (const row of substatRows) {
-        const typeKey = row.querySelector('.substat-type').value;
+    substatRows.forEach((row, i) => {
+        const typeKey = substatSelects[i].value;
         const value   = parseFloat(row.querySelector('.substat-value').value);
         if (typeKey && !isNaN(value)) {
             substats.push(new Substat(StatType[typeKey], value));
         }
-    }
+    });
 
     // Leer BuildGoal EN ORDEN DE PRIORIDAD
     const items = document.querySelectorAll('#goal-checkboxes .goal-item');
@@ -138,4 +163,8 @@ export function readForm() {
     const goal     = new BuildGoal(desiredStats);
 
     return { artifact, goal };
+}
+
+export function resetSubstatSelects() {
+    substatSelects.forEach(s => { s.value = ''; });
 }

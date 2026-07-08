@@ -33,28 +33,9 @@
 
                 <div class="form-group">
                     <label class="form-label">Pieza</label>
-                    <div class="custom-select-wrapper">>
-                        <div class="custom-select-trigger">
-                            <img src="images/Icon_Flower_of_Life.png" alt="Flor" class="select-icon">
-                            <span>Flor de la Vida</span>
-                        </div>
-                        <div class="custom-options">
-                            <div class="custom-option selected" data-value="FLOWER">
-                                <img src="images/Icon_Flower_of_Life.png" alt="Flor" class="select-icon">Flor de la Vida
-                            </div>
-                            <div class="custom-option" data-value="PLUME">
-                                <img src="images/Icon_Plume_of_the_Concealed.png" alt="Pluma" class="select-icon">Pluma de la Muerte
-                            </div>
-                            <div class="custom-option" data-value="SANDS">
-                                <img src="images/Icon_Sands_of_Eon.png" alt="Arenas" class="select-icon">Arenas del Eón
-                            </div>
-                            <div class="custom-option" data-value="GOBLET">
-                                <img src="images/Icon_Goblet_of_the_Eonothem.png" alt="Cáliz" class="select-icon">Cáliz del Eonothem
-                            </div>
-                            <div class="custom-option" data-value="CIRCLET">
-                                <img src="images/Icon_Circlet_of_the_Logos.png" alt="Corona" class="select-icon">Corona de los Logos
-                            </div>
-                        </div>
+                    <div class="custom-select-wrapper" id="pieceType-select">
+                        <div class="custom-select-trigger"></div>
+                        <div class="custom-options"></div>
                     </div>
                 </div>
 
@@ -79,19 +60,31 @@
                     <label class="form-label">Substats</label>
                     <div class="substats-grid">
                         <div class="substat-row">
-                            <select class="substat-type form-select"></select>
+                            <div class="custom-select-wrapper substat-type-select">
+                                <div class="custom-select-trigger"></div>
+                                <div class="custom-options"></div>
+                            </div>
                             <input class="substat-value form-input" type="number" step="0.1" placeholder="Valor">
                         </div>
                         <div class="substat-row">
-                            <select class="substat-type form-select"></select>
+                            <div class="custom-select-wrapper substat-type-select">
+                                <div class="custom-select-trigger"></div>
+                                <div class="custom-options"></div>
+                            </div>
                             <input class="substat-value form-input" type="number" step="0.1" placeholder="Valor">
                         </div>
                         <div class="substat-row">
-                            <select class="substat-type form-select"></select>
+                            <div class="custom-select-wrapper substat-type-select">
+                                <div class="custom-select-trigger"></div>
+                                <div class="custom-options"></div>
+                            </div>
                             <input class="substat-value form-input" type="number" step="0.1" placeholder="Valor">
                         </div>
                         <div class="substat-row">
-                            <select class="substat-type form-select"></select>
+                            <div class="custom-select-wrapper substat-type-select">
+                                <div class="custom-select-trigger"></div>
+                                <div class="custom-options"></div>
+                            </div>
                             <input class="substat-value form-input" type="number" step="0.1" placeholder="Valor">
                         </div>
                     </div>
@@ -194,7 +187,7 @@
             </div>
 
             <div class="results-actions">
-                <button class="btn-primary" onclick="resetAndGoForm()">🔄 Predecir otro Artefacto</button>
+                <button class="btn-primary" onclick="resetAndGoForm()">Predecir otro Artefacto</button>
             </div>
 
         </div>
