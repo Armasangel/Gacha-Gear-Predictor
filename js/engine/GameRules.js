@@ -1,19 +1,7 @@
 import { StatType } from '../data/StatType.js';
 import { MainStatType } from '../data/MainStatType.js';
 import { StatPrediction } from '../models/StatPrediction.js';
-
-// Mapeo de MainStatType a StatType cuando coinciden.
-const MAINSTAT_TO_SUBSTAT = new Map([
-    [MainStatType.HP_PERCENT,        StatType.HP_PERCENT],
-    [MainStatType.ATK_PERCENT,       StatType.ATK_PERCENT],
-    [MainStatType.DEF_PERCENT,       StatType.DEF_PERCENT],
-    [MainStatType.ENERGY_RECHARGE,   StatType.ENERGY_RECHARGE],
-    [MainStatType.ELEMENTAL_MASTERY, StatType.ELEMENTAL_MASTERY],
-    [MainStatType.HP_FLAT,           StatType.HP_FLAT],
-    [MainStatType.ATK_FLAT,          StatType.ATK_FLAT],
-    [MainStatType.CRIT_RATE,         StatType.CRIT_RATE],
-    [MainStatType.CRIT_DMG,          StatType.CRIT_DMG],
-]);
+import { MAINSTAT_TO_SUBSTAT } from '../data/StatMapping.js';
 
 export function getAvailablePool(artifact) {
     const excluded = new Set();
@@ -55,4 +43,20 @@ export function predictFourthSubstat(artifact, goal) {
     undesired.sort((a, b) => b.probability - a.probability);
 
     return [...desired, ...undesired];
+}
+
+export function predictFourthSubstatDistribution(artifact) {
+    const pool = getAvailablePool(artifact);
+
+    const totalWeight = pool.reduce((sum, stat)=> sum + stat.weight, 0);
+
+    return pool.map(stat =>
+        new StatPrediction(stat, (stat.weight * 100.0) / totalWeight)
+    );
+}
+
+export function getMostLikelyFourthSubstat(artifact) {
+    const distribution = getFourthSubstatDistribution(artifact);
+    return distribution.reduce((max, p) => p.probability > max.probability ? p: max).stat;
+    
 }
