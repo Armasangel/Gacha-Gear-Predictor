@@ -60,3 +60,19 @@ export function getMostLikelyFourthSubstat(artifact) {
     return distribution.reduce((max, p) => p.probability > max.probability ? p: max).stat;
     
 }
+
+// Qué tan confiable es asumir "el más probable" como el 4to substat real.
+// Si domina claramente sobre el resto (gap grande con el 2do lugar), confianza alta;
+// si hay varias opciones casi empatadas, confianza baja.
+export function getProjectionConfidence(artifact) {
+    const sorted = [...predictFourthSubstatDistribution(artifact)].sort((a, b) => b.probability - a.probability);
+    const top    = sorted[0];
+    const gap    = top.probability - (sorted[1]?.probability ?? 0);
+
+    let level;
+    if (gap >= 15) level = 'alta';
+    else if (gap >= 6) level = 'media';
+    else level = 'baja';
+
+    return { level, top, gap };
+}

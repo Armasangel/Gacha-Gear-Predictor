@@ -383,10 +383,98 @@ body {
     font-weight: 600;
 }
 
-.verdict-reason {
-    font-size: 15px;
+.verdict-action {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: .75rem;
+}
+
+.verdict-reasons {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+    margin-bottom: 1rem;
+}
+
+.verdict-reasons li {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.5;
+    padding-left: 1.1rem;
+    position: relative;
+}
+
+.verdict-reasons li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--gold2);
+}
+
+.verdict-reason-technical {
+    font-size: 13px;
     color: var(--text2);
     line-height: 1.6;
+    margin-bottom: 1rem;
+    opacity: .85;
+}
+
+/* Badge de confianza de la proyección del 4to substat */
+.confidence-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: .25rem .65rem;
+    border-radius: 99px;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
+
+.confidence-badge--high { background: rgba(95,203,138,.15);  color: var(--green); }
+.confidence-badge--mid  { background: rgba(213,217,107,.15); color: var(--yellow); }
+.confidence-badge--low  { background: rgba(217,107,107,.15); color: var(--red); }
+
+.fourth-assumption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    flex-wrap: wrap;
+    background: var(--panel2);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: .75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.fourth-assumption-text {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+    flex: 1;
+    min-width: 200px;
+}
+
+.fourth-assumption-text strong { color: var(--text); }
+
+/* Substat proyectado dentro de las cards de escenario */
+.scenario-substat--projected {
+    border-bottom-style: dashed;
+    opacity: .85;
+}
+
+.projected-tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--gold2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 1px 6px;
+    margin-left: .4rem;
+    vertical-align: middle;
 }
 
 /* Detalles técnicos accordion */

@@ -125,7 +125,8 @@
                     <span id="verdict-label" class="verdict-label"></span>
                 </div>
                 <p class="verdict-potential">Potencial: <span id="verdict-potential-text"></span></p>
-                <p id="verdict-reason" class="verdict-reason"></p>
+                <p id="verdict-action" class="verdict-action"></p>
+                <ul id="verdict-reasons" class="verdict-reasons"></ul>
                 <button class="btn-details" id="details-toggle" onclick="toggleDetails()">
                     Ver detalles técnicos ▼
                 </button>
@@ -133,6 +134,7 @@
 
             <!-- Detalles técnicos (accordion) -->
             <div id="details-block" class="details-block" style="display:none">
+                <p id="verdict-reason-technical" class="verdict-reason-technical"></p>
                 <div class="details-grid">
                     <div class="detail-item">
                         <span class="detail-label">CV (substats)</span>

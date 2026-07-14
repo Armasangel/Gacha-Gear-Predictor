@@ -1,7 +1,7 @@
 import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm } from './form.js';
 import { displayResults, displayFourthSubstat } from './display.js';
 import { simulate } from '../engine/Simulator.js';
-import { predictFourthSubstat } from '../engine/GameRules.js';
+import { predictFourthSubstat, getMostLikelyFourthSubstat, getProjectionConfidence } from '../engine/GameRules.js';
 
 // ─── Navegación entre pantallas ───────────────────
 window.showScreen = function(id) {
@@ -43,16 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const { artifact, goal } = readForm();
 
-            // 4to substat
+            // 4to substat: se calcula UNA vez y se reusa tanto para lo que
+            // se muestra como para lo que realmente simula el motor, para
+            // que nunca queden desincronizados.
             document.getElementById('fourth-substat-block').style.display = 'none';
+            let projectedStat = null;
             if (artifact.getSubstatCount() === 3) {
+                projectedStat = getMostLikelyFourthSubstat(artifact);
                 const predictions = predictFourthSubstat(artifact, goal);
-                displayFourthSubstat(predictions, goal);
+                const confidence  = getProjectionConfidence(artifact);
+                displayFourthSubstat(predictions, goal, confidence);
             }
 
             // Simular
-            const result = simulate(artifact, goal);
-            displayResults(artifact, result);
+            const result = simulate(artifact, goal, projectedStat);
+            displayResults(artifact, result, projectedStat);
 
             showScreen('screen-results');
 
