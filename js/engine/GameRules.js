@@ -56,7 +56,7 @@ export function predictFourthSubstatDistribution(artifact) {
 }
 
 export function getMostLikelyFourthSubstat(artifact) {
-    const distribution = getFourthSubstatDistribution(artifact);
+    const distribution = predictFourthSubstatDistribution(artifact);
     return distribution.reduce((max, p) => p.probability > max.probability ? p: max).stat;
     
 }

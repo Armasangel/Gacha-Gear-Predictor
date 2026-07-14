@@ -215,7 +215,7 @@ function buildEffectiveSubstats(artifact, projectedStat, revealValue) {
     ];
 }
 
-export function simulate(artifact, goal, projectedFourthStat = nulls) {
+export function simulate(artifact, goal, projectedFourthStat = null) {
     const substatCount = artifact.getSubstatCount();
     const remaining    = upgradesRemaining(
         artifact.level,
