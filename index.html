@@ -118,6 +118,20 @@
                 <div class="divider"></div>
             </div>
 
+            <!-- Pendiente de revelar 4to substat (solo si el artefacto tiene 3) -->
+            <div id="pending-block" class="verdict-card verdict-card--pending" style="display:none">
+                <div class="verdict-header">
+                    <span class="verdict-icon">🎲</span>
+                    <span class="verdict-label" style="color:var(--gold2)">Aún no hay veredicto final</span>
+                </div>
+                <p class="verdict-action">
+                    Este artefacto salió con 3 substats — el 4to se revela al llegar a +4.
+                    Subir hasta ahí es relativamente barato, así que vale la pena intentarlo.
+                    Las cards de abajo son una referencia con el stat más probable, no el resultado real.
+                </p>
+                <button class="btn-primary" id="reveal-cta">Ya se reveló el 4to substat →</button>
+            </div>
+
             <!-- Veredicto -->
             <div id="verdict-block" class="verdict-card">
                 <div class="verdict-header">

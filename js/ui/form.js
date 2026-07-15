@@ -168,3 +168,42 @@ export function readForm() {
 export function resetSubstatSelects() {
     substatSelects.forEach(s => { s.value = ''; });
 }
+
+// Rellena el form con un artefacto que YA se analizó como "3 substats",
+// dejando la 4ta fila vacía para que el usuario solo meta lo que se reveló
+// al llegar a +4. No inventa nada -- reusa exactamente lo que el usuario
+// ya había tecleado, así no tiene que volver a escribir todo desde cero.
+export function prefillForm(snapshot) {
+    pieceSelect.value = snapshot.pieceKey;
+    populateMainStats();
+    document.getElementById('mainStat').value = snapshot.mainKey;
+    document.getElementById('level').value     = snapshot.level;
+
+    const rows = document.querySelectorAll('.substat-row');
+    rows.forEach((row, i) => {
+        const entry = snapshot.substats[i];
+        substatSelects[i].value = entry ? entry.key : '';
+        row.querySelector('.substat-value').value = entry ? entry.value : '';
+    });
+
+    populateGoalCheckboxes();
+
+    // Restaurar exactamente qué tenía marcado y en qué orden -- no solo
+    // "todo marcado por default", que es lo que populateGoalCheckboxes
+    // asume la primera vez que aparecen los checkboxes.
+    const container = document.getElementById('goal-checkboxes');
+    const items = Array.from(container.querySelectorAll('.goal-item'));
+    items.forEach(item => {
+        item.querySelector('input[type="checkbox"]').checked =
+            snapshot.desiredKeys.includes(item.dataset.key);
+    });
+    const ordered = [
+        ...snapshot.desiredKeys.map(k => items.find(i => i.dataset.key === k)).filter(Boolean),
+        ...items.filter(i => !snapshot.desiredKeys.includes(i.dataset.key)),
+    ];
+    ordered.forEach(item => container.appendChild(item));
+
+    // La 4ta fila es la única que falta -- llevar el foco ahí.
+    const fourthSelect = rows[snapshot.substats.length]?.querySelector('.custom-select-trigger');
+    fourthSelect?.focus();
+}

@@ -1,8 +1,28 @@
-import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm } from './form.js';
+import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm, prefillForm } from './form.js';
 import { displayResults, displayFourthSubstat } from './display.js';
 import { simulate } from '../engine/Simulator.js';
 import { predictFourthSubstat, getMostLikelyFourthSubstat, getProjectionConfidence } from '../engine/GameRules.js';
 import { initTooltips } from './tooltip.js';
+import { PieceType } from '../data/PieceType.js';
+import { MainStatType } from '../data/MainStatType.js';
+import { StatType } from '../data/StatType.js';
+
+function keyOf(dict, value) {
+    return Object.keys(dict).find(k => dict[k] === value);
+}
+
+// Snapshot de lo que el usuario ya ingresó, para cuando vuelva a completar
+// el 4to substat tras subir el artefacto real a +4. No se recalcula nada
+// que el usuario ya escribió, solo se reusa.
+function buildSnapshot(artifact, goal) {
+    return {
+        pieceKey: keyOf(PieceType, artifact.pieceType),
+        mainKey:  keyOf(MainStatType, artifact.mainStat),
+        level:    artifact.level,
+        substats: artifact.substats.map(s => ({ key: keyOf(StatType, s.type), value: s.value })),
+        desiredKeys: goal.desiredStats.map(s => keyOf(StatType, s)),
+    };
+}
 
 // ─── Navegación entre pantallas ───────────────────
 window.showScreen = function(id) {
@@ -28,6 +48,7 @@ window.resetAndGoForm = function() {
     resetSubstatSelects();
     document.getElementById('goal-checkboxes').innerHTML = '';
     document.getElementById('fourth-substat-block').style.display = 'none';
+    document.getElementById('pending-block').style.display = 'none';
     document.getElementById('details-block').style.display = 'none';
     showScreen('screen-form');
 };
@@ -38,28 +59,50 @@ document.addEventListener('DOMContentLoaded', () => {
     populateMainStats();
     initTooltips();
 
+    let lastSnapshot = null;
+
+    document.getElementById('reveal-cta').addEventListener('click', () => {
+        if (!lastSnapshot) return;
+        prefillForm(lastSnapshot);
+        showScreen('screen-form');
+    });
+
     document.getElementById('analyze-btn').addEventListener('click', () => {
         const errorEl = document.getElementById('form-error');
         errorEl.style.display = 'none';
 
         try {
             const { artifact, goal } = readForm();
+            const isPending = artifact.getSubstatCount() === 3;
 
             // 4to substat: se calcula UNA vez y se reusa tanto para lo que
             // se muestra como para lo que realmente simula el motor, para
             // que nunca queden desincronizados.
             document.getElementById('fourth-substat-block').style.display = 'none';
             let projectedStat = null;
-            if (artifact.getSubstatCount() === 3) {
+            if (isPending) {
                 projectedStat = getMostLikelyFourthSubstat(artifact);
                 const predictions = predictFourthSubstat(artifact, goal);
                 const confidence  = getProjectionConfidence(artifact);
                 displayFourthSubstat(predictions, goal, confidence);
+                lastSnapshot = buildSnapshot(artifact, goal);
             }
 
-            // Simular
-            const result = simulate(artifact, goal, projectedStat);
-            displayResults(artifact, result, projectedStat);
+            // Con 3 substats no hay veredicto final: las cards de abajo son
+            // referencia con el stat más probable, no el resultado real.
+            document.getElementById('pending-block').style.display = isPending ? 'block' : 'none';
+            document.getElementById('verdict-block').style.display = isPending ? 'none'  : 'block';
+
+            if (!isPending) {
+                const result = simulate(artifact, goal, null);
+                displayResults(artifact, result, null);
+            } else {
+                // Igual corremos la simulación de referencia para las cards
+                // mejor/promedio/peor -- son útiles para decidir si vale la
+                // pena llegar a +4, solo que ya no se llaman "veredicto".
+                const result = simulate(artifact, goal, projectedStat);
+                displayResults(artifact, result, projectedStat);
+            }
 
             showScreen('screen-results');
 

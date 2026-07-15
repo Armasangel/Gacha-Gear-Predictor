@@ -822,3 +822,12 @@ body {
         max-width: 70vw;
     }
 }
+
+/* Estado "pendiente": distinto de un veredicto final de verdad */
+.verdict-card--pending {
+    border-style: dashed;
+}
+
+.verdict-card--pending .btn-primary {
+    margin-top: .25rem;
+}
