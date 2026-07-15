@@ -768,3 +768,57 @@ body {
     margin-right: 10px;
     flex-shrink: 0;
 }
+
+/* ─── Fase 3: microexplicaciones (?) ────────────── */
+.info-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    vertical-align: middle;
+    padding: 0;
+    margin-left: 2px;
+}
+
+.info-tip:hover,
+.info-tip:focus-visible {
+    color: var(--gold2);
+    border-color: var(--gold2);
+    outline: none;
+}
+
+.tooltip-bubble {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    max-width: 60vw;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: .6rem .75rem;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text2);
+    text-align: left;
+    z-index: 20;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+    cursor: default;
+}
+
+@media (max-width: 583px) {
+    .tooltip-bubble {
+        width: 180px;
+        max-width: 70vw;
+    }
+}

@@ -2,6 +2,7 @@ import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm } f
 import { displayResults, displayFourthSubstat } from './display.js';
 import { simulate } from '../engine/Simulator.js';
 import { predictFourthSubstat, getMostLikelyFourthSubstat, getProjectionConfidence } from '../engine/GameRules.js';
+import { initTooltips } from './tooltip.js';
 
 // ─── Navegación entre pantallas ───────────────────
 window.showScreen = function(id) {
@@ -35,6 +36,7 @@ window.resetAndGoForm = function() {
 document.addEventListener('DOMContentLoaded', () => {
     initCustomSelects();
     populateMainStats();
+    initTooltips();
 
     document.getElementById('analyze-btn').addEventListener('click', () => {
         const errorEl = document.getElementById('form-error');

@@ -63,7 +63,7 @@ export function displayResults(artifact, result, projectedStat = null) {
     document.getElementById('verdict-label').textContent = cfg.headline;
     document.getElementById('verdict-label').style.color = cfg.color;
     document.getElementById('verdict-potential-text').textContent = cfg.potential;
-    document.getElementById('verdict-action').textContent = cfg.action;
+    document.getElementById('verdict-action-text').textContent = cfg.action;
 
     const reasonsList = document.getElementById('verdict-reasons');
     reasonsList.innerHTML = '';
@@ -139,6 +139,7 @@ export function displayFourthSubstat(predictions, goal, confidence) {
             (${confidence.top.probability.toFixed(1)}%) como 4to substat — es la opción más probable.
         </p>
         <span class="confidence-badge confidence-badge--${conf.cls}">${conf.label}</span>
+        <button type="button" class="info-tip" data-tip-key="confidence" aria-label="Más información">?</button>
     `;
     content.appendChild(assumption);
 

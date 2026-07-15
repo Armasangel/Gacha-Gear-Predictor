@@ -112,7 +112,7 @@
 
             <!-- 4to substat (solo si tiene 3) -->
             <div id="fourth-substat-block" style="display:none">
-                <h2 class="screen-title">4to Substat</h2>
+                <h2 class="screen-title">4to Substat <button type="button" class="info-tip" data-tip-key="fourth" aria-label="Más información">?</button></h2>
                 <p class="section-hint">Aún no revelado — aparece al llegar a +4</p>
                 <div id="fourth-substat-content" class="fourth-content"></div>
                 <div class="divider"></div>
@@ -125,7 +125,10 @@
                     <span id="verdict-label" class="verdict-label"></span>
                 </div>
                 <p class="verdict-potential">Potencial: <span id="verdict-potential-text"></span></p>
-                <p id="verdict-action" class="verdict-action"></p>
+                <p class="verdict-action">
+                    <span id="verdict-action-text"></span>
+                    <button type="button" class="info-tip" data-tip-key="crit" aria-label="Más información">?</button>
+                </p>
                 <ul id="verdict-reasons" class="verdict-reasons"></ul>
                 <button class="btn-details" id="details-toggle" onclick="toggleDetails()">
                     Ver detalles técnicos ▼
@@ -137,7 +140,7 @@
                 <p id="verdict-reason-technical" class="verdict-reason-technical"></p>
                 <div class="details-grid">
                     <div class="detail-item">
-                        <span class="detail-label">CV (substats)</span>
+                        <span class="detail-label">CV (substats) <button type="button" class="info-tip" data-tip-key="cv-sub" aria-label="Más información">?</button></span>
                         <div class="detail-values">
                             <span class="val-best" id="d-best-cv-sub"></span>
                             <span class="val-avg"  id="d-avg-cv-sub"></span>
@@ -145,7 +148,7 @@
                         </div>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">CV (con mainstat)</span>
+                        <span class="detail-label">CV (con mainstat) <button type="button" class="info-tip" data-tip-key="cv-main" aria-label="Más información">?</button></span>
                         <div class="detail-values">
                             <span class="val-best" id="d-best-cv"></span>
                             <span class="val-avg"  id="d-avg-cv"></span>
@@ -153,7 +156,7 @@
                         </div>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Roll Value %</span>
+                        <span class="detail-label">Roll Value % <button type="button" class="info-tip" data-tip-key="rv" aria-label="Más información">?</button></span>
                         <div class="detail-values">
                             <span class="val-best" id="d-best-rv"></span>
                             <span class="val-avg"  id="d-avg-rv"></span>
