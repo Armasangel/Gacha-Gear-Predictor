@@ -30,9 +30,16 @@ export const STAT_LABELS = {
     PHYSICAL_DMG_BONUS: 'Bono DMG Físico',
 };
 
+// Valores de substat legibles para el usuario
+export const SUBSTAT_VALUE_LABELS = {
+
+
+};
+
 // ─── Instancias de los dropdowns con icono ─────────
 let pieceSelect = null;
 const substatSelects = [];
+const substatValueSelects = [];
 
 // Se llama una sola vez al cargar la página.
 export function initCustomSelects() {
@@ -59,14 +66,58 @@ export function initCustomSelects() {
         })),
     ];
 
-    document.querySelectorAll('.substat-type-select').forEach(wrapper => {
-        const select = new IconSelect(wrapper, {
-            options: substatOptions,
+    document.querySelectorAll('.substat-row').forEach((row, i) => {
+        const typeWrapper  = row.querySelector('.substat-type-select');
+        const valueWrapper = row.querySelector('.substat-value-select');
+
+        // Select de valor: arranca vacío, se llena cuando eligen el tipo
+        const valueSelect = new IconSelect(valueWrapper, {
+            options: [{ value: '', label: '--', icon: null }],
             value: '',
             onChange: () => populateGoalCheckboxes(),
         });
-        substatSelects.push(select);
+        substatValueSelects.push(valueSelect);
+
+        // Select de tipo: al cambiar, repuebla el de valor de LA MISMA fila
+        const typeSelect = new IconSelect(typeWrapper, {
+            options: substatOptions,
+            value: '',
+            onChange: () => {
+                populateValueOptions(i);
+                populateGoalCheckboxes();
+            },
+        });
+        substatSelects.push(typeSelect);
     });
+}
+
+//Llena el select de valor de la fila i con los tiers reales del stat
+function populateValueOptions(rowIndex) {
+    const typeKey     = substatSelects[rowIndex].value;
+    const valueSelect = substatValueSelects[rowIndex];
+
+    if (!typeKey) {
+        valueSelect.setOptions([{ value: '', label: '--', icon: null }]);
+        return;
+    }
+
+    const { tiers } = StatType[typeKey];
+    const options = tiers.map(tier => ({
+        value: String(tier),
+        label: formatStatValue(typeKey, tier),
+    }));
+
+    valueSelect.setOptions(options); // ya selecciona options[0] solo
+}
+
+function formatStatValue(typeKey, tier){
+    const esPorcentaje = 
+        typeKey.endsWith('_PERCENT') || 
+        typeKey.endsWith('CRIT_RATE') ||
+        typeKey.endsWith('CRIT_DMG') || 
+        typeKey === 'ENERGY_RECHARGE' || 
+        typeKey === 'HEALING_BONUS';
+    return esPorcentaje ? `${tier.toFixed(4)}%` : `${tier}`;
 }
 
 export function populateMainStats() {
@@ -143,8 +194,8 @@ export function readForm() {
     const substats = [];
     substatRows.forEach((row, i) => {
         const typeKey = substatSelects[i].value;
-        const value   = parseFloat(row.querySelector('.substat-value').value);
-        if (typeKey && !isNaN(value)) {
+        const value = parseFloat(substatValueSelects[i].value);
+        if (typeKey && !isNaN(value)){
             substats.push(new Substat(StatType[typeKey], value));
         }
     });
@@ -166,7 +217,11 @@ export function readForm() {
 }
 
 export function resetSubstatSelects() {
-    substatSelects.forEach(s => { s.value = ''; });
+    substatSelects.forEach((s, i) => {
+        s.value = '';
+        substatValueSelects[i].setOptions([{ value: '', label: '--', icon: null }]);
+        substatValueSelects[i].value = '';
+    });
 }
 
 // Rellena el form con un artefacto que YA se analizó como "3 substats",
@@ -181,9 +236,12 @@ export function prefillForm(snapshot) {
 
     const rows = document.querySelectorAll('.substat-row');
     rows.forEach((row, i) => {
-        const entry = snapshot.substats[i];
-        substatSelects[i].value = entry ? entry.key : '';
-        row.querySelector('.substat-value').value = entry ? entry.value : '';
+    const entry = snapshot.substats[i];
+    substatSelects[i].value = entry ? entry.key : '';
+        if (entry) {
+            populateValueOptions(i);                          // llena opciones
+            substatValueSelects[i].value = String(entry.value); // pisa con el valor real guardado
+        }
     });
 
     populateGoalCheckboxes();

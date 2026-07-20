@@ -543,6 +543,7 @@ body {
     border-radius: var(--radius);
     padding: 1.25rem;
     animation: fadeUp 200ms ease forwards;
+    overflow: hidden;
 }
 
 .scenario-card--best  { border-color: rgba(95,203,138,.35); }
@@ -811,9 +812,10 @@ body {
     line-height: 1.5;
     color: var(--text2);
     text-align: left;
-    z-index: 20;
+    z-index: 9999;
     box-shadow: 0 8px 20px rgba(0,0,0,.35);
     cursor: default;
+    overflow: visible;
 }
 
 @media (max-width: 583px) {
