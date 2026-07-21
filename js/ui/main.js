@@ -43,9 +43,7 @@ window.toggleDetails = function() {
 };
 
 window.resetAndGoForm = function() {
-    // Limpiar inputs de valor
-    document.querySelectorAll('.substat-value').forEach(i => i.value = '');
-    resetSubstatSelects();
+    resetSubstatSelects(); // ya limpia type-selects y value-selects
     document.getElementById('goal-checkboxes').innerHTML = '';
     document.getElementById('fourth-substat-block').style.display = 'none';
     document.getElementById('pending-block').style.display = 'none';

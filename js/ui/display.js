@@ -56,6 +56,44 @@ function buildHumanReasons(artifact, result) {
     return reasons.slice(0, 3);
 }
 
+// Barra de probabilidad real de Montecarlo -- reusa las mismas clases
+// visuales que ya usa la distribución del 4to substat (good/mid/bad),
+// así no depende de CSS nuevo.
+function renderProbabilityBar(result) {
+    const container = document.getElementById('verdict-probability');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (result.successRate == null) return; // resultado sin datos de Montecarlo
+
+    const rows = [
+        { label: 'Invertir',   value: result.successRate,  cls: 'good' },
+        { label: 'Considerar', value: result.considerRate, cls: 'mid'  },
+        { label: 'Descartar',  value: result.discardRate,  cls: 'bad'  },
+    ];
+
+    for (const r of rows) {
+        const item = document.createElement('div');
+        item.className = 'fourth-bar-item';
+        item.innerHTML = `
+            <span class="fourth-bar-label">${r.label}</span>
+            <div class="fourth-bar-track">
+                <div class="fourth-bar-fill fourth-bar-fill--${r.cls}"
+                     style="width: ${r.value.toFixed(1)}%"></div>
+            </div>
+            <span class="fourth-bar-pct fourth-bar-pct--${r.cls}">${r.value.toFixed(1)}%</span>
+        `;
+        container.appendChild(item);
+    }
+
+    if (result.iterations) {
+        const note = document.createElement('p');
+        note.className = 'fourth-assumption-text';
+        note.textContent = `Basado en ${result.iterations.toLocaleString('es')} simulaciones.`;
+        container.appendChild(note);
+    }
+}
+
 export function displayResults(artifact, result, projectedStat = null) {
     // ─── Veredicto (lenguaje humano primero) ──────
     const cfg = VERDICT_CONFIG[result.verdict] ?? VERDICT_CONFIG['CONSIDERAR'];
@@ -64,6 +102,8 @@ export function displayResults(artifact, result, projectedStat = null) {
     document.getElementById('verdict-label').style.color = cfg.color;
     document.getElementById('verdict-potential-text').textContent = cfg.potential;
     document.getElementById('verdict-action-text').textContent = cfg.action;
+    document.getElementById('verdict-action-text').textContent = cfg.action;
+    renderProbabilityBar(result); // ← nuevo
 
     const reasonsList = document.getElementById('verdict-reasons');
     reasonsList.innerHTML = '';

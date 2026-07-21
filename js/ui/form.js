@@ -117,7 +117,7 @@ function formatStatValue(typeKey, tier){
         typeKey.endsWith('CRIT_DMG') || 
         typeKey === 'ENERGY_RECHARGE' || 
         typeKey === 'HEALING_BONUS';
-    return esPorcentaje ? `${tier.toFixed(4)}%` : `${tier}`;
+    return esPorcentaje ? `${tier.toFixed(1)}%` : `${tier}`;
 }
 
 export function populateMainStats() {

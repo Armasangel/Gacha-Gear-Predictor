@@ -4,7 +4,8 @@ export class SimulationResult {
         bestCV, worstCV, avgCV,
         bestCVSub, worstCVSub, avgCVSub,
         bestRV, worstRV, avgRV,
-        verdict, verdictReason
+        verdict, verdictReason,
+        successRate = null, considerRate = null, discardRate = null, iterations = null
     ){
         this.bestCase = bestCase;
         this.worstCase = worstCase;
@@ -24,5 +25,11 @@ export class SimulationResult {
 
         this.verdict = verdict;
         this.verdictReason = verdictReason;
+
+        // Nuevo: resultado agregado de las N corridas de Montecarlo.
+        this.successRate  = successRate;  // % de corridas que dieron INVERTIR
+        this.considerRate = considerRate; // % CONSIDERAR
+        this.discardRate  = discardRate;  // % DESCARTAR
+        this.iterations   = iterations;
     }
 }
