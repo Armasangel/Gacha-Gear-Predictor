@@ -7,12 +7,14 @@ Un jugador promedio de Genshin Impact pasa horas farmeando artefactos sin saber 
 
 ## ¿Qué hace?
 
-Dado un artefacto en cualquier nivel (0, 4, 8, 12, 16 o 20), proyecta cómo podría terminar al +20 bajo tres escenarios:
+Dado un artefacto en cualquier nivel (0, 4, 8, 12, 16 o 20), corre una simulación de Monte Carlo (10,000 tiradas) que replica el RNG real del juego, y muestra tres escenarios representativos:
 
-- **Mejor caso** — todos los upgrades caen en tu stat prioritario con tier máximo (T4)
-- **Peor caso** — todos los upgrades caen en el stat menos útil con tier mínimo (T1)
-- **Caso promedio** — distribución equitativa con valor esperado de tier
+- **Mejor caso** — percentil 90 de las tiradas simuladas
+- **Caso promedio** — mediana de las tiradas simuladas
+- **Peor caso** — percentil 10 de las tiradas simuladas
 
+Cada escenario es una tirada *completa y coherente* (no se mezclan los mejores rolls individuales de stats distintos como si vinieran del mismo artefacto). Además del veredicto, la app muestra el **% real de probabilidad** de que el artefacto termine siendo INVERTIR / CONSIDERAR / DESCARTAR, calculado sobre las 10,000 corridas.
+ 
 Si el artefacto tiene 3 substats, predice el 4to con probabilidades reales ponderadas y muestra qué tan probable es obtener algo útil para tu build.
 
 ---
@@ -77,7 +79,11 @@ Cada substat tiene 4 tiers de valor con 25% de probabilidad cada uno:
 
 - 4 substats iniciales → 5 upgrades al +20
 - 3 substats iniciales → +4 revela el 4to (sin upgrade de valor), luego 4 upgrades
-- Cada upgrade: 25% por slot, equiprobable
+- Cada upgrade sube un substat elegido al azar entre los existentes (equiprobable), con un tier también al azar (25% cada uno) — igual que en el juego real
+
+**Simulación**
+
+El motor (`Simulator.js`) usa **Monte Carlo** en vez de fórmulas cerradas: en cada corrida, simula la secuencia real de upgrades del artefacto (substat al azar → tier al azar, repetido tantas veces como upgrades falten). Por defecto corre 10,000 iteraciones. De ahí salen tanto los tres escenarios (percentiles 10/50/90) como el % de probabilidad de cada veredicto.
 
 **Métricas**
 
