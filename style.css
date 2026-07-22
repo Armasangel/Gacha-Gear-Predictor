@@ -629,6 +629,8 @@ body {
 .fourth-bar-fill--good   { background: var(--green); }
 .fourth-bar-fill--mid    { background: var(--yellow); }
 .fourth-bar-fill--bad    { background: rgba(185,195,209,.3); }
+.fourth-bar-fill--danger { background: var(--red); }
+.fourth-bar-pct--danger  { color: var(--red); }
 
 .fourth-bar-pct {
     font-size: 13px;

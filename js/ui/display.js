@@ -69,7 +69,7 @@ function renderProbabilityBar(result) {
     const rows = [
         { label: 'Invertir',   value: result.successRate,  cls: 'good' },
         { label: 'Considerar', value: result.considerRate, cls: 'mid'  },
-        { label: 'Descartar',  value: result.discardRate,  cls: 'bad'  },
+        { label: 'Descartar',  value: result.discardRate,  cls: 'danger'  },
     ];
 
     for (const r of rows) {
