@@ -1,12 +1,23 @@
-import { STAT_LABELS } from './form.js';
 import { StatType } from '../data/StatType.js';
 import { MainStatType } from '../data/MainStatType.js';
+import { statLabel } from './form.js';
+import { t } from '../i18n/i18n.js';
 
-const VERDICT_CONFIG = {
-    'INVERTIR':   { icon: '🔥', color: '#5FCB8A', potential: 'Alto',  headline: 'Excelente inversión', action: 'Vale la pena subirlo hasta +20.' },
-    'CONSIDERAR': { icon: '👍', color: '#D5D96B', potential: 'Medio', headline: 'Prometedor',           action: 'Súbelo un poco más y vuelve a evaluar.' },
-    'DESCARTAR':  { icon: '🗑️', color: '#D96B6B', potential: 'Bajo',  headline: 'Descártalo',           action: 'Es poco probable que termine siendo bueno.' },
+const VERDICT_META = {
+    'INVERTIR':   { icon: '🔥', color: '#5FCB8A', key: 'invest'   },
+    'CONSIDERAR': { icon: '👍', color: '#D5D96B', key: 'consider' },
+    'DESCARTAR':  { icon: '🗑️', color: '#D96B6B', key: 'discard'  },
 };
+
+function verdictConfig(verdict) {
+    const m = VERDICT_META[verdict] ?? VERDICT_META['CONSIDERAR'];
+    return {
+        icon: m.icon, color: m.color,
+        potential: t(`verdict.potential.${m.key === 'invest' ? 'high' : m.key === 'consider' ? 'mid' : 'low'}`),
+        headline: t(`verdict.${m.key}.headline`),
+        action: t(`verdict.${m.key}.action`),
+    };
+}
 
 const CONFIDENCE_CONFIG = {
     alta:  { label: 'Confianza: Alta',  cls: 'high' },

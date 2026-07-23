@@ -6,6 +6,8 @@ import { initTooltips } from './tooltip.js';
 import { PieceType } from '../data/PieceType.js';
 import { MainStatType } from '../data/MainStatType.js';
 import { StatType } from '../data/StatType.js';
+import { initI18n, setLanguage, getLanguage } from '../i18n/i18n.js';
+import { renderStaticTexts } from './i18nRender.js';
 
 function keyOf(dict, value) {
     return Object.keys(dict).find(k => dict[k] === value);
@@ -56,6 +58,19 @@ document.addEventListener('DOMContentLoaded', () => {
     initCustomSelects();
     populateMainStats();
     initTooltips();
+    initI18n();
+    renderStaticTexts();
+
+    document.getElementById('lang-switch').addEventListener('click', () => {
+        const next = getLanguage() === 'es' ? 'en' : 'es';
+        setLanguage(next);
+    });
+
+    window.addEventListener('languagechange', (e) => {
+        renderStaticTexts();
+        document.getElementById('lang-switch-label').textContent = e.dtail.lang === 'es' ? 'EN' : 'ES';
+        // si ya hay resultados en pantalla, re-renderizarlos en el nuevo idioma
+    })
 
     let lastSnapshot = null;
 

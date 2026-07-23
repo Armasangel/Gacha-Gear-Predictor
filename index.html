@@ -10,14 +10,15 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <button id="lang-switch" class="lang-switch" aria-label="Cambiar idioma">🌐 <span>EN</span></button>
 
     <!-- SCREEN 1: LANDING -->
     <section class="screen active" id="screen-landing">
         <div class="stars"></div>
         <div class="landing-content">
-            <p class="landing-eyebrow">Genshin Impact · Análisis de Artefactos</p>
+            <p class="landing-eyebrow" data-i18n="landing.eyebrow"></p>
             <h1 class="landing-title">Gacha<br>Gear<br>Predictor</h1>
-            <p class="landing-sub">Adivina cuál será tu artefacto<br>antes de que el RNG acabe con tus esperanzas.</p>
+            <p class="landing-sub" data-i18n-html="landint.sub"></p>
             <button class="btn-primary" onclick="showScreen('screen-form')">
                 Analizar Artefacto
             </button>

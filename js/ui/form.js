@@ -6,29 +6,13 @@ import { Substat } from '../models/Substat.js';
 import { BuildGoal } from '../models/BuildGoal.js';
 import { IconSelect } from './IconSelect.js';
 import { PIECE_ICONS, PIECE_LABELS, STAT_ICONS } from '../data/Icons.js';
+import {t} from '../i18n/i18n.js';
 
-// Nombres legibles para el usuario
-export const STAT_LABELS = {
-    CRIT_RATE:          'Prob. Crítica',
-    CRIT_DMG:           'Daño Crítico',
-    ATK_PERCENT:        'ATK%',
-    HP_PERCENT:         'HP%',
-    DEF_PERCENT:        'DEF%',
-    ENERGY_RECHARGE:    'Recarga de Energía',
-    ELEMENTAL_MASTERY:  'Maestría Elemental',
-    HP_FLAT:            'HP Plano',
-    ATK_FLAT:           'ATK Plano',
-    DEF_FLAT:            'DEF Plano',
-    HEALING_BONUS:      'Bono de Curación',
-    PYRO_DMG_BONUS:     'Bono DMG Pyro',
-    HYDRO_DMG_BONUS:    'Bono DMG Hydro',
-    CRYO_DMG_BONUS:     'Bono DMG Cryo',
-    ELECTRO_DMG_BONUS:  'Bono DMG Electro',
-    ANEMO_DMG_BONUS:    'Bono DMG Anemo',
-    GEO_DMG_BONUS:      'Bono DMG Geo',
-    DENDRO_DMG_BONUS:   'Bono DMG Dendro',
-    PHYSICAL_DMG_BONUS: 'Bono DMG Físico',
-};
+
+//Ya no es un diccionario estático -- se resuelve en el idioma activo.
+export function statLabel(key){
+    return t(`stat.${key}`);
+}
 
 // Valores de substat legibles para el usuario
 export const SUBSTAT_VALUE_LABELS = {
