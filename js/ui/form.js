@@ -5,13 +5,17 @@ import { Artifact } from '../models/Artifact.js';
 import { Substat } from '../models/Substat.js';
 import { BuildGoal } from '../models/BuildGoal.js';
 import { IconSelect } from './IconSelect.js';
-import { PIECE_ICONS, PIECE_LABELS, STAT_ICONS } from '../data/Icons.js';
+import { PIECE_ICONS, STAT_ICONS } from '../data/Icons.js';
 import {t} from '../i18n/i18n.js';
 
 
 //Ya no es un diccionario estático -- se resuelve en el idioma activo.
 export function statLabel(key){
     return t(`stat.${key}`);
+}
+
+export function pieceLabel(key){
+    return t(`piece.${key}`);
 }
 
 // Valores de substat legibles para el usuario
@@ -31,7 +35,7 @@ export function initCustomSelects() {
     const pieceWrapper = document.getElementById('pieceType-select');
     const pieceOptions = Object.keys(PieceType).map(key => ({
         value: key,
-        label: PIECE_LABELS[key] ?? key,
+        label: pieceLabel(key),
         icon: PIECE_ICONS[key],
     }));
     pieceSelect = new IconSelect(pieceWrapper, {
@@ -42,10 +46,10 @@ export function initCustomSelects() {
 
     // Dropdowns de substats (uno por fila)
     const substatOptions = [
-        { value: '', label: '-- Selecciona --', icon: null },
+        {value: '', label: t('form.select.placeholder'), icon : null},
         ...Object.keys(StatType).map(key => ({
             value: key,
-            label: STAT_LABELS[key] ?? key,
+            label: statLabel(key),
             icon: STAT_ICONS[key],
         })),
     ];

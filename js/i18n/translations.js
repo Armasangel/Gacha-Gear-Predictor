@@ -6,6 +6,26 @@ export const TRANSLATIONS = {
         'landing.sub': 'Adivina cuál será tu artefacto<br>antes de que el RNG acabe con tus esperanzas.',
         'landing.cta': 'Analizar Artefacto',
 
+        'piece.FLOWER':  'Flor de la Vida',
+        'piece.PLUME':   'Pluma de la Muerte',
+        'piece.SANDS':   'Arenas del Eón',
+        'piece.GOBLET':  'Cáliz del Eonothem',
+        'piece.CIRCLET': 'Corona de los Logos',
+
+        'tip.cv-sub':  'El CV mide qué tan cargado de crítico está el artefacto usando solo sus substats. Referencia: 30+ es bueno, entre 15 y 30 es moderado, menos de 15 es bajo.',
+        'tip.cv-main': 'Igual que el CV de substats, pero sumando también el mainstat cuando puede ser crítico (Reloj, Copa, Corona). Referencia: 50+ es bueno, entre 35 y 50 es moderado, menos de 35 es bajo.',
+        'tip.rv':      'Qué tan bien salieron los rolls comparado con el máximo posible para este artefacto. Referencia: 85%+ es excelente, entre 70% y 85% es aceptable, menos de 70% es flojo.',
+        'tip.crit':    'CRIT Rate y CRIT DMG son los substats más valiosos para hacer daño. Tener dos en el mismo artefacto —o también en el mainstat— se conoce como doble o triple crítico, y es poco común.',
+        'tip.fourth':  'Si el artefacto salió con solo 3 substats, el 4to se revela al llegar a +4 con un valor aleatorio (a esa mejora aleatoria se le llama "roll"). Hasta que sube a +4, no hay forma de saberlo con certeza — solo probabilidades.',
+        'tip.confidence': 'Qué tan clara es la apuesta sobre el 4to substat. Alta: una opción domina claramente al resto. Baja: varias opciones están casi empatadas y el resultado real podría cambiar bastante.',
+
+        'error.substatCount':   'Un artefacto debe tener 3 o 4 substats.',
+        'error.invalidMain':    'El main stat no es válido para esta pieza.',
+        'error.invalidLevel':   'Nivel inválido: {level}. Debe ser uno de {levels}.',
+        'error.duplicateSub':   'Un artefacto no puede tener el mismo substat repetido.',
+        'error.mainMatchesSub': 'Un substat no puede coincidir con el mainstat del artefacto.',
+        'error.maxSubstats':    'Un artefacto no puede tener más de 4 substats.',
+
         'form.title': 'Ingresa tu Artefacto',
         'form.label.piece': 'Pieza',
         'form.label.mainstat': 'Main Stat',
@@ -104,6 +124,26 @@ export const TRANSLATIONS = {
         'form.select.placeholder': '-- Select --',
         'form.button.back': '← Back',
         'form.button.analyze': 'Predict Artifact',
+
+        'piece.FLOWER':  'Flower of Life',
+        'piece.PLUME':   'Plume of Death',
+        'piece.SANDS':   'Sands of Eon',
+        'piece.GOBLET':  'Goblet of Eonothem',
+        'piece.CIRCLET': 'Circlet of Logos',
+
+        'tip.cv-sub':  'CV measures how crit-heavy an artifact is using only its substats. Reference: 30+ is good, 15-30 is moderate, under 15 is low.',
+        'tip.cv-main': 'Same as substat CV, but also adding the mainstat when it can be crit (Sands, Goblet, Circlet). Reference: 50+ is good, 35-50 is moderate, under 35 is low.',
+        'tip.rv':      'How good the rolls turned out compared to the theoretical max for this artifact. Reference: 85%+ is excellent, 70-85% is acceptable, under 70% is weak.',
+        'tip.crit':    'CRIT Rate and CRIT DMG are the most valuable substats for damage. Having both on one artifact — or also on the mainstat — is called double or triple crit, and is rare.',
+        'tip.fourth':  "If the artifact came with only 3 substats, the 4th reveals at +4 with a random value (that random upgrade is called a \"roll\"). Until it reaches +4, there's no way to know for sure — only probabilities.",
+        'tip.confidence': "How clear the bet on the 4th substat is. High: one option clearly dominates the rest. Low: several options are nearly tied and the real result could change a lot.",
+
+        'error.substatCount':   'An artifact must have 3 or 4 substats.',
+        'error.invalidMain':    'The main stat is not valid for this piece.',
+        'error.invalidLevel':   'Invalid level: {level}. Must be one of {levels}.',
+        'error.duplicateSub':   'An artifact cannot have the same substat repeated.',
+        'error.mainMatchesSub': "A substat can't match the artifact's mainstat.",
+        'error.maxSubstats':    'An artifact cannot have more than 4 substats.',
 
         'results.fourth.title': '4th Substat',
         'results.fourth.hint': 'Not revealed yet — appears at +4',

@@ -1,13 +1,5 @@
 // Rutas de iconos de la wiki de Genshin Impact (Fandom).
 
-export const PIECE_ICONS = {
-    FLOWER:  'js/images/Icon_Flower_of_Life.png',
-    PLUME:   'js/images/Icon_Plume_of_Death.png',
-    SANDS:   'js/images/Icon_Sands_of_Eon.png',
-    GOBLET:  'js/images/Icon_Goblet_of_Eonothem.png',
-    CIRCLET: 'js/images/Icon_Circlet_of_Logos.png',
-};
-
 export const PIECE_LABELS = {
     FLOWER:  'Flor de la Vida',
     PLUME:   'Pluma de la Muerte',
