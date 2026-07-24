@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLanguage(next);
     });
 
-    window.addEventListener('languagechange', (e) => {
+    window.addEventListener('app:languagechange', (e) => {
         renderStaticTexts();
         document.getElementById('lang-switch-label').textContent = e.dtail.lang === 'es' ? 'EN' : 'ES';
         // si ya hay resultados en pantalla, re-renderizarlos en el nuevo idioma

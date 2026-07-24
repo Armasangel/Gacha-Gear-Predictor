@@ -118,7 +118,7 @@ export function populateMainStats() {
         if (piece.validMainStats.includes(value)) {
             const option = document.createElement('option');
             option.value = key;
-            option.textContent = STAT_LABELS[key] ?? key;
+            option.textContent = statLabel(key);
             mainSelect.appendChild(option);
         }
     }
@@ -150,7 +150,7 @@ export function populateGoalCheckboxes() {
         item.dataset.key = key;
         item.innerHTML = `
             <input type="checkbox" value="${key}" checked>
-            <span>${STAT_LABELS[key] ?? key}</span>
+            <span>${statLabel(key)}</span>
             <button class="move-up"   title="Mayor prioridad">▲</button>
             <button class="move-down" title="Menor prioridad">▼</button>
         `;
