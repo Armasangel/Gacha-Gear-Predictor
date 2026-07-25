@@ -18,8 +18,8 @@
         <div class="landing-content">
             <p class="landing-eyebrow" data-i18n="landing.eyebrow"></p>
             <h1 class="landing-title">Gacha<br>Gear<br>Predictor</h1>
-            <p class="landing-sub" data-i18n-html="landint.sub"></p>
-            <button class="btn-primary" onclick="showScreen('screen-form')">
+            <p class="landing-sub" data-i18n-html="landing.sub"></p>
+            <button class="btn-primary" onclick="showScreen('screen-form')" data-i18n="landing.cta">
                 Analizar Artefacto
             </button>
         </div>
@@ -28,12 +28,12 @@
     <!-- SCREEN 2: FORM -->
     <section class="screen" id="screen-form">
         <div class="screen-inner">
-            <h2 class="screen-title">Ingresa tu Artefacto</h2>
+            <h2 class="screen-title" data-i18n="form.title">Ingresa tu Artefacto</h2>
 
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label class="form-label">Pieza</label>
+                    <label class="form-label" data-i18n="form.label.piece">Pieza</label>
                     <div class="custom-select-wrapper" id="pieceType-select">
                         <div class="custom-select-trigger"></div>
                         <div class="custom-options"></div>
@@ -41,12 +41,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Main Stat</label>
+                    <label class="form-label" data-i18n="form.label.mainstat">Main Stat</label>
                     <select id="mainStat" class="form-select"></select>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Nivel</label>
+                    <label class="form-label" data-i18n="form.label.level">Nivel</label>
                     <select id="level" class="form-select">
                         <option value="0">+0</option>
                         <option value="4">+4</option>
@@ -58,7 +58,7 @@
                 </div>
 
                 <div class="form-group form-group--full">
-                    <label class="form-label">Substats</label>
+                    <label class="form-label" data-i18n="form.label.substats">Substats</label>
                     <div class="substats-grid">
                         <div class="substat-row">
                             <div class="custom-select-wrapper substat-type-select">
@@ -104,15 +104,15 @@
                 </div>
 
                 <div class="form-group form-group--full" id="goal-section">
-                    <label class="form-label">¿Qué substats te importan? <span class="form-hint">Ordena por prioridad</span></label>
+                    <label class="form-label"><span data-i18n="form.label.goal">¿Qué substats te importan?</span> <span class="form-hint" data-i18n="form.hint.goal">Ordena por prioridad</span></label>
                     <div id="goal-checkboxes" class="goal-list"></div>
                 </div>
 
             </div>
 
             <div class="form-actions">
-                <button class="btn-secondary" onclick="showScreen('screen-landing')">← Volver</button>
-                <button class="btn-primary" id="analyze-btn">Predecir Artefacto</button>
+                <button class="btn-secondary" onclick="showScreen('screen-landing')" data-i18n="form.button.back">← Volver</button>
+                <button class="btn-primary" id="analyze-btn" data-i18n="form.button.analyze">Predecir Artefacto</button>
             </div>
 
             <div id="form-error" class="form-error" style="display:none"></div>
@@ -125,8 +125,8 @@
 
             <!-- 4to substat (solo si tiene 3) -->
             <div id="fourth-substat-block" style="display:none">
-                <h2 class="screen-title">4to Substat <button type="button" class="info-tip" data-tip-key="fourth" aria-label="Más información">?</button></h2>
-                <p class="section-hint">Aún no revelado — aparece al llegar a +4</p>
+                <h2 class="screen-title"><span data-i18n="results.fourth.title">4to Substat</span> <button type="button" class="info-tip" data-tip-key="fourth" aria-label="Más información">?</button></h2>
+                <p class="section-hint" data-i18n="results.fourth.hint">Aún no revelado — aparece al llegar a +4</p>
                 <div id="fourth-substat-content" class="fourth-content"></div>
                 <div class="divider"></div>
             </div>
@@ -135,14 +135,14 @@
             <div id="pending-block" class="verdict-card verdict-card--pending" style="display:none">
                 <div class="verdict-header">
                     <span class="verdict-icon">🎲</span>
-                    <span class="verdict-label" style="color:var(--gold2)">Aún no hay veredicto final</span>
+                    <span class="verdict-label" style="color:var(--gold2)" data-i18n="results.pending.label">Aún no hay veredicto final</span>
                 </div>
-                <p class="verdict-action">
+                <p class="verdict-action" data-i18n="results.pending.text">
                     Este artefacto salió con 3 substats — el 4to se revela al llegar a +4.
                     Subir hasta ahí es relativamente barato, así que vale la pena intentarlo.
                     Las cards de abajo son una referencia con el stat más probable, no el resultado real.
                 </p>
-                <button class="btn-primary" id="reveal-cta">Ya se reveló el 4to substat →</button>
+                <button class="btn-primary" id="reveal-cta" data-i18n="results.pending.cta">Ya se reveló el 4to substat →</button>
             </div>
 
             <!-- Veredicto -->
@@ -151,13 +151,14 @@
                     <span id="verdict-icon" class="verdict-icon"></span>
                     <span id="verdict-label" class="verdict-label"></span>
                 </div>
-                <p class="verdict-potential">Potencial: <span id="verdict-potential-text"></span></p>
+                <p class="verdict-potential"><span data-i18n="results.potential">Potencial</span>: <span id="verdict-potential-text"></span></p>
                 <p class="verdict-action">
                     <span id="verdict-action-text"></span>
                     <button type="button" class="info-tip" data-tip-key="crit" aria-label="Más información">?</button>
                 </p>
                 <ul id="verdict-reasons" class="verdict-reasons"></ul>
-                <button class="btn-details" id="details-toggle" onclick="toggleDetails()">
+                <div id="verdict-probability" class="verdict-probability"></div>
+                <button class="btn-details" id="details-toggle" onclick="toggleDetails()" data-i18n="results.details.show">
                     Ver detalles técnicos ▼
                 </button>
             </div>
@@ -167,7 +168,7 @@
                 <p id="verdict-reason-technical" class="verdict-reason-technical"></p>
                 <div class="details-grid">
                     <div class="detail-item">
-                        <span class="detail-label">CV (substats) <button type="button" class="info-tip" data-tip-key="cv-sub" aria-label="Más información">?</button></span>
+                        <span class="detail-label"><span data-i18n="results.detail.cvSub">CV (substats)</span> <button type="button" class="info-tip" data-tip-key="cv-sub" aria-label="Más información">?</button></span>
                         <div class="detail-values">
                             <span class="val-best" id="d-best-cv-sub"></span>
                             <span class="val-avg"  id="d-avg-cv-sub"></span>
@@ -175,7 +176,7 @@
                         </div>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">CV (con mainstat) <button type="button" class="info-tip" data-tip-key="cv-main" aria-label="Más información">?</button></span>
+                        <span class="detail-label"><span data-i18n="results.detail.cvMain">CV (con mainstat)</span> <button type="button" class="info-tip" data-tip-key="cv-main" aria-label="Más información">?</button></span>
                         <div class="detail-values">
                             <span class="val-best" id="d-best-cv"></span>
                             <span class="val-avg"  id="d-avg-cv"></span>
@@ -183,7 +184,7 @@
                         </div>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Roll Value % <button type="button" class="info-tip" data-tip-key="rv" aria-label="Más información">?</button></span>
+                        <span class="detail-label"><span data-i18n="results.detail.rv">Roll Value %</span> <button type="button" class="info-tip" data-tip-key="rv" aria-label="Más información">?</button></span>
                         <div class="detail-values">
                             <span class="val-best" id="d-best-rv"></span>
                             <span class="val-avg"  id="d-avg-rv"></span>
@@ -192,9 +193,9 @@
                     </div>
                 </div>
                 <div class="detail-legend">
-                    <span class="legend-best">● Mejor</span>
-                    <span class="legend-avg">● Promedio</span>
-                    <span class="legend-worst">● Peor</span>
+                    <span class="legend-best" data-i18n="results.legend.best">● Mejor</span>
+                    <span class="legend-avg" data-i18n="results.legend.avg">● Promedio</span>
+                    <span class="legend-worst" data-i18n="results.legend.worst">● Peor</span>
                 </div>
             </div>
 
@@ -202,24 +203,24 @@
             <div class="scenarios-grid" id="scenarios-grid">
 
                 <div class="scenario-card scenario-card--best">
-                    <h3 class="scenario-title">✨ Mejor Caso</h3>
+                    <h3 class="scenario-title" data-i18n="results.scenario.best">✨ Mejor Caso</h3>
                     <div class="scenario-substats" id="best-substats"></div>
                 </div>
 
                 <div class="scenario-card scenario-card--avg">
-                    <h3 class="scenario-title">⚖️ Caso Promedio</h3>
+                    <h3 class="scenario-title" data-i18n="results.scenario.avg">⚖️ Caso Promedio</h3>
                     <div class="scenario-substats" id="avg-substats"></div>
                 </div>
 
                 <div class="scenario-card scenario-card--worst">
-                    <h3 class="scenario-title">💀 Peor Caso</h3>
+                    <h3 class="scenario-title" data-i18n="results.scenario.worst">💀 Peor Caso</h3>
                     <div class="scenario-substats" id="worst-substats"></div>
                 </div>
 
             </div>
 
             <div class="results-actions">
-                <button class="btn-primary" onclick="resetAndGoForm()">Predecir otro Artefacto</button>
+                <button class="btn-primary" onclick="resetAndGoForm()" data-i18n="results.button.another">Predecir otro Artefacto</button>
             </div>
 
         </div>

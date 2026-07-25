@@ -66,10 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setLanguage(next);
     });
 
-    window.addEventListener('app:languagechange', (e) => {
+    window.addEventListener('languagechange', (e) => {
         renderStaticTexts();
-        document.getElementById('lang-switch-label').textContent = e.dtail.lang === 'es' ? 'EN' : 'ES';
-        // si ya hay resultados en pantalla, re-renderizarlos en el nuevo idioma
+        document.querySelector('#lang-switch span').textContent = e.detail.lang === 'es' ? 'EN' : 'ES';
     })
 
     let lastSnapshot = null;

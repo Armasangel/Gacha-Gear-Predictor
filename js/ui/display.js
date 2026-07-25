@@ -107,12 +107,11 @@ function renderProbabilityBar(result) {
 
 export function displayResults(artifact, result, projectedStat = null) {
     // ─── Veredicto (lenguaje humano primero) ──────
-    const cfg = VERDICT_CONFIG[result.verdict] ?? VERDICT_CONFIG['CONSIDERAR'];
+    const cfg = verdictConfig(result.verdict);
     document.getElementById('verdict-icon').textContent  = cfg.icon;
     document.getElementById('verdict-label').textContent = cfg.headline;
     document.getElementById('verdict-label').style.color = cfg.color;
     document.getElementById('verdict-potential-text').textContent = cfg.potential;
-    document.getElementById('verdict-action-text').textContent = cfg.action;
     document.getElementById('verdict-action-text').textContent = cfg.action;
     renderProbabilityBar(result); // ← nuevo
 
@@ -151,7 +150,7 @@ function renderScenario(containerId, caseData, projectedKey) {
     container.innerHTML = '';
 
     for (const key of Object.keys(caseData)) {
-        const label       = STAT_LABELS[key] ?? key;
+        const label       = statLabel(key);
         const value        = caseData[key]?.toFixed(1) ?? '-';
         const isProjected = key === projectedKey;
 
@@ -179,7 +178,7 @@ export function displayFourthSubstat(predictions, goal, confidence) {
     // Esto es lo que conecta esta pantalla con las cards de resultado:
     // el mismo dato, mostrado, no un cálculo aparte.
     const usedKey   = getStatKey(confidence.top.stat);
-    const usedLabel = STAT_LABELS[usedKey] ?? usedKey;
+    const usedLabel = statLabel(usedKey);
     const conf      = CONFIDENCE_CONFIG[confidence.level] ?? CONFIDENCE_CONFIG.media;
 
     const assumption = document.createElement('div');
@@ -205,7 +204,7 @@ export function displayFourthSubstat(predictions, goal, confidence) {
     // Barras de distribución completa
     for (const p of predictions) {
         const key    = getStatKey(p.stat);
-        const label  = STAT_LABELS[key] ?? key;
+        const label  = statLabel(key);
         const isGood = goal.isDesired(p.stat);
         const isMid  = p.probability >= 15;
 

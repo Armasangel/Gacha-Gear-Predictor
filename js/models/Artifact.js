@@ -12,7 +12,7 @@ export class Artifact {
         if (!pieceType.validMainStats.includes(mainStat))
             throw new Error(t('error.invalidMain'));
         if (!VALID_LEVELS.includes(level))
-            throw new Error('error.invalidLevel', {level, levels: VALID_LEVELS.join(', ')});
+            throw new Error(t('error.invalidLevel', {level, levels: VALID_LEVELS.join(', ')}));
 
         const seen = new Set();
         for (const s of substats) {
@@ -37,7 +37,7 @@ export class Artifact {
         if (this.substats.length >= 4)
             throw new Error(t('error.maxSubstats'));
         if (this.substats.some(s => s.type === substat.type))
-            throw new Error("Un artefacto no puede tener el mismo substat repetido.");
-        this.substats.push(t('error.duplicateSub'));
+            throw new Error(t('error.duplicateSub'));
+        this.substats.push(substat);
     }
 }
