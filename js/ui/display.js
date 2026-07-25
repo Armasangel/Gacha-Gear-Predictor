@@ -20,9 +20,9 @@ function verdictConfig(verdict) {
 }
 
 const CONFIDENCE_CONFIG = {
-    alta:  { label: 'Confianza: Alta',  cls: 'high' },
-    media: { label: 'Confianza: Media', cls: 'mid'  },
-    baja:  { label: 'Confianza: Baja',  cls: 'low'  },
+    alta:  { key: 'confidence.high', cls: 'high' },
+    media: { key: 'confidence.mid',  cls: 'mid'  },
+    baja:  { key: 'confidence.low',  cls: 'low'  },
 };
 
 function getStatKey(stat) {
@@ -45,23 +45,23 @@ function buildHumanReasons(artifact, result) {
     const critSubstats = artifact.substats.filter(s => isCritStat(s.type)).length;
 
     if (critSubstats >= 2) {
-        reasons.push('Tiene doble crítico en substats: es poco común y muy valioso.');
+        reasons.push(t('reason.doubleCrit'));
     } else if (critSubstats === 1 && mainStatIsCrit(artifact)) {
-        reasons.push('Combina un substat crítico con un mainstat crítico.');
+        reasons.push(t('reason.critWithMain'));
     } else if (critSubstats === 1) {
-        reasons.push('Tiene un substat crítico, buena base para escalar.');
+        reasons.push(t('reason.oneCrit'));
     } else if (!mainStatIsCrit(artifact)) {
-        reasons.push('Todavía no tiene ningún stat crítico.');
+        reasons.push(t('reason.noCrit'));
     }
 
     if (result.worstRV >= 60) {
-        reasons.push('Incluso en el peor escenario posible, se mantiene decente.');
+        reasons.push(t('reason.worstOk'));
     } else if (result.worstRV < 35) {
-        reasons.push('En el peor escenario, este artefacto se queda corto.');
+        reasons.push(t('reason.worstBad'));
     }
 
     if (result.avgRV >= 85) {
-        reasons.push('En promedio, apunta a quedar entre los mejores rolls posibles.');
+        reasons.push(t('reason.avgGreat'));
     }
 
     return reasons.slice(0, 3);
@@ -78,9 +78,9 @@ function renderProbabilityBar(result) {
     if (result.successRate == null) return; // resultado sin datos de Montecarlo
 
     const rows = [
-        { label: 'Invertir',   value: result.successRate,  cls: 'good' },
-        { label: 'Considerar', value: result.considerRate, cls: 'mid'  },
-        { label: 'Descartar',  value: result.discardRate,  cls: 'danger'  },
+        { label: t('probability.invest'),   value: result.successRate,  cls: 'good' },
+        { label: t('probability.consider'), value: result.considerRate, cls: 'mid'  },
+        { label: t('probability.discard'),  value: result.discardRate,  cls: 'danger'  },
     ];
 
     for (const r of rows) {
@@ -100,7 +100,7 @@ function renderProbabilityBar(result) {
     if (result.iterations) {
         const note = document.createElement('p');
         note.className = 'fourth-assumption-text';
-        note.textContent = `Basado en ${result.iterations.toLocaleString('es')} simulaciones.`;
+        note.textContent = t('probability.basedOn', { n: result.iterations.toLocaleString() });
         container.appendChild(note);
     }
 }
@@ -157,7 +157,7 @@ function renderScenario(containerId, caseData, projectedKey) {
         const row = document.createElement('div');
         row.className = 'scenario-substat' + (isProjected ? ' scenario-substat--projected' : '');
         row.innerHTML = `
-            <span class="scenario-substat-name">${label}${isProjected ? ' <span class="projected-tag">supuesto</span>' : ''}</span>
+            <span class="scenario-substat-name">${label}${isProjected ? ` <span class="projected-tag">${t('fourth.projected')}</span>` : ''}</span>
             <span class="scenario-substat-value">${value}</span>
         `;
         container.appendChild(row);
@@ -185,11 +185,10 @@ export function displayFourthSubstat(predictions, goal, confidence) {
     assumption.className = 'fourth-assumption';
     assumption.innerHTML = `
         <p class="fourth-assumption-text">
-            Los escenarios de abajo asumen <strong>${usedLabel}</strong>
-            (${confidence.top.probability.toFixed(1)}%) como 4to substat — es la opción más probable.
+            ${t('fourth.assumption', { stat: `<strong>${usedLabel}</strong>`, pct: confidence.top.probability.toFixed(1) })}
         </p>
-        <span class="confidence-badge confidence-badge--${conf.cls}">${conf.label}</span>
-        <button type="button" class="info-tip" data-tip-key="confidence" aria-label="Más información">?</button>
+        <span class="confidence-badge confidence-badge--${conf.cls}">${t(conf.key)}</span>
+        <button type="button" class="info-tip" data-tip-key="confidence" aria-label="${t('tip.ariaLabel')}">?</button>
     `;
     content.appendChild(assumption);
 
@@ -197,7 +196,7 @@ export function displayFourthSubstat(predictions, goal, confidence) {
     const summary = document.createElement('p');
     summary.className = 'fourth-chance';
     const chanceColor = chanceGood >= 25 ? '#5FCB8A' : chanceGood >= 10 ? '#D5D96B' : '#D96B6B';
-    summary.innerHTML = `Probabilidad de obtener algo útil: 
+    summary.innerHTML = `${t('fourth.chance')} 
         <strong style="color:${chanceColor}">${chanceGood.toFixed(1)}%</strong>`;
     content.appendChild(summary);
 

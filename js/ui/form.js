@@ -18,12 +18,6 @@ export function pieceLabel(key){
     return t(`piece.${key}`);
 }
 
-// Valores de substat legibles para el usuario
-export const SUBSTAT_VALUE_LABELS = {
-
-
-};
-
 // ─── Instancias de los dropdowns con icono ─────────
 let pieceSelect = null;
 const substatSelects = [];
@@ -151,8 +145,8 @@ export function populateGoalCheckboxes() {
         item.innerHTML = `
             <input type="checkbox" value="${key}" checked>
             <span>${statLabel(key)}</span>
-            <button class="move-up"   title="Mayor prioridad">▲</button>
-            <button class="move-down" title="Menor prioridad">▼</button>
+            <button class="move-up"   title="${t('form.priority.high')}">▲</button>
+            <button class="move-down" title="${t('form.priority.low')}">▼</button>
         `;
         container.appendChild(item);
     }

@@ -18,6 +18,7 @@ export const TRANSLATIONS = {
         'tip.crit':    'CRIT Rate y CRIT DMG son los substats más valiosos para hacer daño. Tener dos en el mismo artefacto —o también en el mainstat— se conoce como doble o triple crítico, y es poco común.',
         'tip.fourth':  'Si el artefacto salió con solo 3 substats, el 4to se revela al llegar a +4 con un valor aleatorio (a esa mejora aleatoria se le llama "roll"). Hasta que sube a +4, no hay forma de saberlo con certeza — solo probabilidades.',
         'tip.confidence': 'Qué tan clara es la apuesta sobre el 4to substat. Alta: una opción domina claramente al resto. Baja: varias opciones están casi empatadas y el resultado real podría cambiar bastante.',
+        'tip.ariaLabel': 'Más información',
 
         'error.substatCount':   'Un artefacto debe tener 3 o 4 substats.',
         'error.invalidMain':    'El main stat no es válido para esta pieza.',
@@ -36,6 +37,8 @@ export const TRANSLATIONS = {
         'form.select.placeholder': '-- Selecciona --',
         'form.button.back': '← Volver',
         'form.button.analyze': 'Predecir Artefacto',
+        'form.priority.high': 'Mayor prioridad',
+        'form.priority.low': 'Menor prioridad',
 
         'results.fourth.title': '4to Substat',
         'results.fourth.hint': 'Aún no revelado — aparece al llegar a +4',
@@ -103,8 +106,9 @@ export const TRANSLATIONS = {
         'reason.worstBad': 'En el peor escenario, este artefacto se queda corto.',
         'reason.avgGreat': 'En promedio, apunta a quedar entre los mejores rolls posibles.',
 
-        'fourth.assumption': 'Los escenarios de abajo asumen <strong>{stat}</strong> ({pct}%) como 4to substat — es la opción más probable.',
+        'fourth.assumption': 'Los escenarios de abajo asumen {stat} ({pct}%) como 4to substat — es la opción más probable.',
         'fourth.chance': 'Probabilidad de obtener algo útil:',
+        'fourth.projected': 'supuesto',
     },
 
     en: {
@@ -124,6 +128,8 @@ export const TRANSLATIONS = {
         'form.select.placeholder': '-- Select --',
         'form.button.back': '← Back',
         'form.button.analyze': 'Predict Artifact',
+        'form.priority.high': 'Higher priority',
+        'form.priority.low': 'Lower priority',
 
         'piece.FLOWER':  'Flower of Life',
         'piece.PLUME':   'Plume of Death',
@@ -137,6 +143,7 @@ export const TRANSLATIONS = {
         'tip.crit':    'CRIT Rate and CRIT DMG are the most valuable substats for damage. Having both on one artifact — or also on the mainstat — is called double or triple crit, and is rare.',
         'tip.fourth':  "If the artifact came with only 3 substats, the 4th reveals at +4 with a random value (that random upgrade is called a \"roll\"). Until it reaches +4, there's no way to know for sure — only probabilities.",
         'tip.confidence': "How clear the bet on the 4th substat is. High: one option clearly dominates the rest. Low: several options are nearly tied and the real result could change a lot.",
+        'tip.ariaLabel': 'More information',
 
         'error.substatCount':   'An artifact must have 3 or 4 substats.',
         'error.invalidMain':    'The main stat is not valid for this piece.',
@@ -211,7 +218,8 @@ export const TRANSLATIONS = {
         'reason.worstBad': 'In the worst scenario, this artifact falls short.',
         'reason.avgGreat': 'On average, it aims to land among the best possible rolls.',
 
-        'fourth.assumption': 'The scenarios below assume <strong>{stat}</strong> ({pct}%) as the 4th substat — it\'s the most likely option.',
+        'fourth.assumption': 'The scenarios below assume {stat} ({pct}%) as the 4th substat — it\'s the most likely option.',
         'fourth.chance': 'Chance of getting something useful:',
+        'fourth.projected': 'assumed',
     },
 };

@@ -199,7 +199,7 @@ export function simulate(artifact, goal, projectedFourthStat = null, iterations 
 
     const reason =
         `${successRate}% de probabilidad de INVERTIR, ${considerRate}% CONSIDERAR, ` +
-        `${discardRate}% DESCARTAR (${iterations.toLocaleString('es')} simulaciones).`;
+        `${discardRate}% DESCARTAR (${iterations.toLocaleString()} simulaciones).`;
 
     return new SimulationResult(
         bestRun.substats,  worstRun.substats, avgRun.substats,

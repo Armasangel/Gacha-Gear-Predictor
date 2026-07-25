@@ -6,7 +6,7 @@ function tipText(key){
 }
 
 export function infoTip(key) {
-    return `<button type="button" class="info-tip" data-tip-key="${key}" aria-label="Más información">?</button>`;
+    return `<button type="button" class="info-tip" data-tip-key="${key}" aria-label="${t('tip.ariaLabel')}">?</button>`;
 }
 
 // Un solo listener delegado para todos los (?) del documento, incluyendo

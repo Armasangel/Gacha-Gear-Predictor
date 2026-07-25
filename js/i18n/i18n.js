@@ -1,7 +1,8 @@
 import { TRANSLATIONS } from './translations.js';
 
 const STORAGE_KEY = 'gacha-lang';
-let currentLang = localStorage.getItem(STORAGE_KEY) || 'es';
+const hasStorage = typeof localStorage !== 'undefined';
+let currentLang = hasStorage ? (localStorage.getItem(STORAGE_KEY) || 'es') : 'es';
 
 export function getLanguage() {
     return currentLang;
@@ -10,7 +11,7 @@ export function getLanguage() {
 export function setLanguage(lang) {
     if (!TRANSLATIONS[lang]) return;
     currentLang = lang;
-    localStorage.setItem(STORAGE_KEY, lang);
+    if (hasStorage) localStorage.setItem(STORAGE_KEY, lang);
     document.documentElement.lang = lang;
     // Cualquier módulo puede escuchar esto para re-renderizar sin
     // acoplarse directamente a quién cambió el idioma.

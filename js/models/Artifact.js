@@ -17,7 +17,7 @@ export class Artifact {
         const seen = new Set();
         for (const s of substats) {
             if (seen.has(s.type))
-                throw new Error(t('error.duplicatesub'));
+                throw new Error(t('error.duplicateSub'));
             seen.add(s.type);
         }
 
