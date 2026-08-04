@@ -58,6 +58,7 @@ export const TRANSLATIONS = {
         'results.detail.cvSub': 'CV (substats)',
         'results.detail.cvMain': 'CV (con mainstat)',
         'results.detail.rv': 'Roll Value %',
+        'results.detail.probabilitySummary': '{invest}% de probabilidad de INVERTIR, {consider}% CONSIDERAR, {discard}% DESCARTAR ({n} simulaciones).',
 
         'stat.CRIT_RATE': 'Prob. Crítica',
         'stat.CRIT_DMG': 'Daño Crítico',
@@ -170,6 +171,7 @@ export const TRANSLATIONS = {
         'results.detail.cvSub': 'CV (substats)',
         'results.detail.cvMain': 'CV (with mainstat)',
         'results.detail.rv': 'Roll Value %',
+        'results.detail.probabilitySummary': '{invest}% chance of INVEST, {consider}% CONSIDER, {discard}% DISCARD ({n} simulations).',
 
         'stat.CRIT_RATE': 'CRIT Rate',
         'stat.CRIT_DMG': 'CRIT DMG',

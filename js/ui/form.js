@@ -198,6 +198,37 @@ export function readForm() {
     return { artifact, goal };
 }
 
+// Re-renderiza los labels del form al idioma activo SIN tocar lo que ya
+// eligió el usuario: reconstruye options y triggers, preserva la selección
+// de pieza/substats/mainstat y solo actualiza los nombres de los checkboxes.
+export function refreshForm() {
+    const pieceOptions = Object.keys(PieceType).map(key => ({
+        value: key,
+        label: pieceLabel(key),
+        icon: PIECE_ICONS[key],
+    }));
+    pieceSelect.setOptions(pieceOptions, pieceSelect.value);
+
+    const substatOptions = [
+        { value: '', label: t('form.select.placeholder'), icon: null },
+        ...Object.keys(StatType).map(key => ({
+            value: key,
+            label: statLabel(key),
+            icon: STAT_ICONS[key],
+        })),
+    ];
+    substatSelects.forEach(s => s.setOptions(substatOptions, s.value));
+
+    const mainSelect = document.getElementById('mainStat');
+    const mainValue  = mainSelect.value;
+    populateMainStats();
+    if (mainValue) mainSelect.value = mainValue;
+
+    document.querySelectorAll('#goal-checkboxes .goal-item').forEach(item => {
+        item.querySelector('span').textContent = statLabel(item.dataset.key);
+    });
+}
+
 export function resetSubstatSelects() {
     substatSelects.forEach((s, i) => {
         s.value = '';

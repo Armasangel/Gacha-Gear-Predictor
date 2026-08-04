@@ -124,7 +124,15 @@ export function displayResults(artifact, result, projectedStat = null) {
     }
 
     // ─── Detalles técnicos ────────────────────────
-    document.getElementById('verdict-reason-technical').textContent = result.verdictReason;
+    document.getElementById('verdict-reason-technical').textContent =
+        result.iterations != null
+            ? t('results.detail.probabilitySummary', {
+                  invest:   result.successRate.toFixed(1),
+                  consider: result.considerRate.toFixed(1),
+                  discard:  result.discardRate.toFixed(1),
+                  n:        result.iterations.toLocaleString(),
+              })
+            : '';
     document.getElementById('d-best-cv-sub').textContent  = result.bestCVSub.toFixed(1);
     document.getElementById('d-avg-cv-sub').textContent   = result.avgCVSub.toFixed(1);
     document.getElementById('d-worst-cv-sub').textContent = result.worstCVSub.toFixed(1);

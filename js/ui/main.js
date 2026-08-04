@@ -1,4 +1,4 @@
-import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm, prefillForm } from './form.js';
+import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm, prefillForm, refreshForm } from './form.js';
 import { displayResults, displayFourthSubstat } from './display.js';
 import { simulate } from '../engine/Simulator.js';
 import { predictFourthSubstat, getMostLikelyFourthSubstat, getProjectionConfidence } from '../engine/GameRules.js';
@@ -83,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('languagechange', (e) => {
         renderStaticTexts();
+        refreshForm();
         document.querySelector('#lang-switch span').textContent = e.detail.lang === 'es' ? 'EN' : 'ES';
 
         // Re-renderizar contenido dinámico si estamos en la pantalla de resultados
