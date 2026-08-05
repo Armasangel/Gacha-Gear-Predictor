@@ -1,3 +1,5 @@
+import { t } from '../i18n/i18n.js';
+
 let globalCloseBound = false;
 
 export class IconSelect {
@@ -69,7 +71,7 @@ export class IconSelect {
                 ? `<img src="${opt.icon}" alt="${opt.label}" class="select-icon"><span>${opt.label}</span>`
                 : `<span>${opt.label}</span>`;
         } else {
-            this.trigger.innerHTML = `<span>-- Selecciona --</span>`;
+            this.trigger.innerHTML = `<span>${t('form.select.placeholder')}</span>`;
         }
 
         if (!silent && typeof this.onChange === 'function') {

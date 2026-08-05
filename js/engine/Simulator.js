@@ -129,30 +129,32 @@ function runOneTrial(artifact, remaining, totalRolls, projectedFourthStat) {
     };
 }
 
+// Devuelve solo la categoría del veredicto: el texto visible lo construye
+// la capa de UI con i18n, no el motor.
 function verdict(artifact, cv, cvSub, rv) {
     if (isFixedMainPiece(artifact)) {
-        if (cvSub >= 30) return ["INVERTIR", `CV de substats ${cvSub} es bueno (>=30).`];
-        if (cvSub >= 15) return ["CONSIDERAR", `CV de substats ${cvSub} es moderado.`];
+        if (cvSub >= 30) return "INVERTIR";
+        if (cvSub >= 15) return "CONSIDERAR";
 
         if (cvSub === 0) {
-            if (rv >= 85) return ["INVERTIR", `RV de ${rv}% es excelente.`];
-            if (rv >= 70) return ["CONSIDERAR", `RV de ${rv}% es aceptable.`];
-            return ["DESCARTAR", `RV de ${rv}% es bajo.`];
+            if (rv >= 85) return "INVERTIR";
+            if (rv >= 70) return "CONSIDERAR";
+            return "DESCARTAR";
         }
 
-        return ["DESCARTAR", `CV de substats ${cvSub} es bajo (<15).`];
+        return "DESCARTAR";
     }
 
-    if (cv >= 50) return ["INVERTIR", `CV ${cv} es bueno (>=50).`];
-    if (cv >= 35) return ["CONSIDERAR", `CV ${cv} es moderado.`];
+    if (cv >= 50) return "INVERTIR";
+    if (cv >= 35) return "CONSIDERAR";
 
     if (cv === 0) {
-        if (rv >= 85) return ["INVERTIR", `RV de ${rv}% es excelente.`];
-        if (rv >= 70) return ["CONSIDERAR", `RV de ${rv}% es aceptable.`];
-        return ["DESCARTAR", `RV de ${rv}% es bajo.`];
+        if (rv >= 85) return "INVERTIR";
+        if (rv >= 70) return "CONSIDERAR";
+        return "DESCARTAR";
     }
 
-    return ["DESCARTAR", `CV ${cv} es bajo (<35).`];
+    return "DESCARTAR";
 }
 
 // projectedFourthStat: mismo parámetro que ya usaba main.js (viene de
@@ -173,7 +175,7 @@ export function simulate(artifact, goal, projectedFourthStat = null, iterations 
         const trial = runOneTrial(artifact, remaining, totalRolls, projectedFourthStat);
         trials.push(trial);
 
-        const [category] = verdict(artifact, trial.cvTotal, trial.cvSub, trial.rv);
+        const category = verdict(artifact, trial.cvTotal, trial.cvSub, trial.rv);
         if (category === "INVERTIR") investCount++;
         else if (category === "CONSIDERAR") considerCount++;
         else discardCount++;
@@ -197,16 +199,12 @@ export function simulate(artifact, goal, projectedFourthStat = null, iterations 
     if (investCount >= considerCount && investCount >= discardCount) finalVerdict = "INVERTIR";
     else if (considerCount >= discardCount) finalVerdict = "CONSIDERAR";
 
-    const reason =
-        `${successRate}% de probabilidad de INVERTIR, ${considerRate}% CONSIDERAR, ` +
-        `${discardRate}% DESCARTAR (${iterations.toLocaleString('es')} simulaciones).`;
-
     return new SimulationResult(
         bestRun.substats,  worstRun.substats, avgRun.substats,
         bestRun.cvTotal,   worstRun.cvTotal,  avgRun.cvTotal,
         bestRun.cvSub,     worstRun.cvSub,    avgRun.cvSub,
         bestRun.rv,        worstRun.rv,       avgRun.rv,
-        finalVerdict,      reason,
+        finalVerdict,
         successRate, considerRate, discardRate, iterations
     );
 }

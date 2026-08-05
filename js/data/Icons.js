@@ -8,14 +8,6 @@ export const PIECE_ICONS = {
     CIRCLET: 'js/images/Icon_Circlet_of_Logos.png',
 };
 
-export const PIECE_LABELS = {
-    FLOWER:  'Flor de la Vida',
-    PLUME:   'Pluma de la Muerte',
-    SANDS:   'Arenas del Eón',
-    GOBLET:  'Cáliz del Eonothem',
-    CIRCLET: 'Corona de los Logos',
-};
-
 // Un icono de atributo puede representar varias StatType (ej. ATK_FLAT y ATK_PERCENT
 // comparten el mismo icono de "Ataque" en la wiki).
 export const STAT_ICONS = {

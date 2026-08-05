@@ -1,4 +1,4 @@
-import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm, prefillForm } from './form.js';
+import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm, prefillForm, refreshForm } from './form.js';
 import { displayResults, displayFourthSubstat } from './display.js';
 import { simulate } from '../engine/Simulator.js';
 import { predictFourthSubstat, getMostLikelyFourthSubstat, getProjectionConfidence } from '../engine/GameRules.js';
@@ -6,6 +6,8 @@ import { initTooltips } from './tooltip.js';
 import { PieceType } from '../data/PieceType.js';
 import { MainStatType } from '../data/MainStatType.js';
 import { StatType } from '../data/StatType.js';
+import { initI18n, setLanguage, getLanguage, t } from '../i18n/i18n.js';
+import { renderStaticTexts } from './i18nRender.js';
 
 function keyOf(dict, value) {
     return Object.keys(dict).find(k => dict[k] === value);
@@ -24,6 +26,15 @@ function buildSnapshot(artifact, goal) {
     };
 }
 
+// ─── Last analysis data (for re-render on language change) ──
+let lastArtifact = null;
+let lastResult = null;
+let lastProjectedStat = null;
+let lastPredictions = null;
+let lastGoal = null;
+let lastConfidence = null;
+let lastIsPending = false;
+
 // ─── Navegación entre pantallas ───────────────────
 window.showScreen = function(id) {
     document.querySelectorAll('.screen').forEach(s => {
@@ -39,7 +50,7 @@ window.toggleDetails = function() {
     const btn    = document.getElementById('details-toggle');
     const open   = block.style.display !== 'none';
     block.style.display = open ? 'none' : 'block';
-    btn.textContent = open ? 'Ver detalles técnicos ▼' : 'Ocultar detalles técnicos ▲';
+    btn.textContent = open ? t('results.details.show') : t('results.details.hide');
 };
 
 window.resetAndGoForm = function() {
@@ -48,6 +59,12 @@ window.resetAndGoForm = function() {
     document.getElementById('fourth-substat-block').style.display = 'none';
     document.getElementById('pending-block').style.display = 'none';
     document.getElementById('details-block').style.display = 'none';
+    lastArtifact = null;
+    lastResult = null;
+    lastProjectedStat = null;
+    lastPredictions = null;
+    lastGoal = null;
+    lastConfidence = null;
     showScreen('screen-form');
 };
 
@@ -56,6 +73,28 @@ document.addEventListener('DOMContentLoaded', () => {
     initCustomSelects();
     populateMainStats();
     initTooltips();
+    initI18n();
+    renderStaticTexts();
+
+    document.getElementById('lang-switch').addEventListener('click', () => {
+        const next = getLanguage() === 'es' ? 'en' : 'es';
+        setLanguage(next);
+    });
+
+    window.addEventListener('languagechange', (e) => {
+        renderStaticTexts();
+        refreshForm();
+        document.querySelector('#lang-switch .lang-code').textContent = e.detail.lang === 'es' ? 'EN' : 'ES';
+
+        // Re-renderizar contenido dinámico si estamos en la pantalla de resultados
+        const resultsScreen = document.getElementById('screen-results');
+        if (resultsScreen.classList.contains('active') && lastResult) {
+            displayResults(lastArtifact, lastResult, lastProjectedStat);
+            if (lastIsPending && lastPredictions) {
+                displayFourthSubstat(lastPredictions, lastGoal, lastConfidence);
+            }
+        }
+    })
 
     let lastSnapshot = null;
 
@@ -78,10 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // que nunca queden desincronizados.
             document.getElementById('fourth-substat-block').style.display = 'none';
             let projectedStat = null;
+            let predictions = null;
+            let confidence = null;
             if (isPending) {
                 projectedStat = getMostLikelyFourthSubstat(artifact);
-                const predictions = predictFourthSubstat(artifact, goal);
-                const confidence  = getProjectionConfidence(artifact);
+                predictions = predictFourthSubstat(artifact, goal);
+                confidence  = getProjectionConfidence(artifact);
                 displayFourthSubstat(predictions, goal, confidence);
                 lastSnapshot = buildSnapshot(artifact, goal);
             }
@@ -91,16 +132,26 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('pending-block').style.display = isPending ? 'block' : 'none';
             document.getElementById('verdict-block').style.display = isPending ? 'none'  : 'block';
 
+            let result;
             if (!isPending) {
-                const result = simulate(artifact, goal, null);
+                result = simulate(artifact, goal, null);
                 displayResults(artifact, result, null);
             } else {
                 // Igual corremos la simulación de referencia para las cards
                 // mejor/promedio/peor -- son útiles para decidir si vale la
                 // pena llegar a +4, solo que ya no se llaman "veredicto".
-                const result = simulate(artifact, goal, projectedStat);
+                result = simulate(artifact, goal, projectedStat);
                 displayResults(artifact, result, projectedStat);
             }
+
+            // Store for re-render on language change
+            lastArtifact = artifact;
+            lastResult = result;
+            lastProjectedStat = projectedStat;
+            lastPredictions = predictions;
+            lastGoal = goal;
+            lastConfidence = confidence;
+            lastIsPending = isPending;
 
             showScreen('screen-results');
 

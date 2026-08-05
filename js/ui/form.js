@@ -5,36 +5,18 @@ import { Artifact } from '../models/Artifact.js';
 import { Substat } from '../models/Substat.js';
 import { BuildGoal } from '../models/BuildGoal.js';
 import { IconSelect } from './IconSelect.js';
-import { PIECE_ICONS, PIECE_LABELS, STAT_ICONS } from '../data/Icons.js';
-
-// Nombres legibles para el usuario
-export const STAT_LABELS = {
-    CRIT_RATE:          'Prob. Crítica',
-    CRIT_DMG:           'Daño Crítico',
-    ATK_PERCENT:        'ATK%',
-    HP_PERCENT:         'HP%',
-    DEF_PERCENT:        'DEF%',
-    ENERGY_RECHARGE:    'Recarga de Energía',
-    ELEMENTAL_MASTERY:  'Maestría Elemental',
-    HP_FLAT:            'HP Plano',
-    ATK_FLAT:           'ATK Plano',
-    DEF_FLAT:            'DEF Plano',
-    HEALING_BONUS:      'Bono de Curación',
-    PYRO_DMG_BONUS:     'Bono DMG Pyro',
-    HYDRO_DMG_BONUS:    'Bono DMG Hydro',
-    CRYO_DMG_BONUS:     'Bono DMG Cryo',
-    ELECTRO_DMG_BONUS:  'Bono DMG Electro',
-    ANEMO_DMG_BONUS:    'Bono DMG Anemo',
-    GEO_DMG_BONUS:      'Bono DMG Geo',
-    DENDRO_DMG_BONUS:   'Bono DMG Dendro',
-    PHYSICAL_DMG_BONUS: 'Bono DMG Físico',
-};
-
-// Valores de substat legibles para el usuario
-export const SUBSTAT_VALUE_LABELS = {
+import { PIECE_ICONS, STAT_ICONS } from '../data/Icons.js';
+import {t} from '../i18n/i18n.js';
 
 
-};
+//Ya no es un diccionario estático -- se resuelve en el idioma activo.
+export function statLabel(key){
+    return t(`stat.${key}`);
+}
+
+export function pieceLabel(key){
+    return t(`piece.${key}`);
+}
 
 // ─── Instancias de los dropdowns con icono ─────────
 let pieceSelect = null;
@@ -47,7 +29,7 @@ export function initCustomSelects() {
     const pieceWrapper = document.getElementById('pieceType-select');
     const pieceOptions = Object.keys(PieceType).map(key => ({
         value: key,
-        label: PIECE_LABELS[key] ?? key,
+        label: pieceLabel(key),
         icon: PIECE_ICONS[key],
     }));
     pieceSelect = new IconSelect(pieceWrapper, {
@@ -58,10 +40,10 @@ export function initCustomSelects() {
 
     // Dropdowns de substats (uno por fila)
     const substatOptions = [
-        { value: '', label: '-- Selecciona --', icon: null },
+        {value: '', label: t('form.select.placeholder'), icon : null},
         ...Object.keys(StatType).map(key => ({
             value: key,
-            label: STAT_LABELS[key] ?? key,
+            label: statLabel(key),
             icon: STAT_ICONS[key],
         })),
     ];
@@ -130,7 +112,7 @@ export function populateMainStats() {
         if (piece.validMainStats.includes(value)) {
             const option = document.createElement('option');
             option.value = key;
-            option.textContent = STAT_LABELS[key] ?? key;
+            option.textContent = statLabel(key);
             mainSelect.appendChild(option);
         }
     }
@@ -162,9 +144,9 @@ export function populateGoalCheckboxes() {
         item.dataset.key = key;
         item.innerHTML = `
             <input type="checkbox" value="${key}" checked>
-            <span>${STAT_LABELS[key] ?? key}</span>
-            <button class="move-up"   title="Mayor prioridad">▲</button>
-            <button class="move-down" title="Menor prioridad">▼</button>
+            <span>${statLabel(key)}</span>
+            <button class="move-up"   title="${t('form.priority.high')}">▲</button>
+            <button class="move-down" title="${t('form.priority.low')}">▼</button>
         `;
         container.appendChild(item);
     }
@@ -214,6 +196,37 @@ export function readForm() {
     const goal     = new BuildGoal(desiredStats);
 
     return { artifact, goal };
+}
+
+// Re-renderiza los labels del form al idioma activo SIN tocar lo que ya
+// eligió el usuario: reconstruye options y triggers, preserva la selección
+// de pieza/substats/mainstat y solo actualiza los nombres de los checkboxes.
+export function refreshForm() {
+    const pieceOptions = Object.keys(PieceType).map(key => ({
+        value: key,
+        label: pieceLabel(key),
+        icon: PIECE_ICONS[key],
+    }));
+    pieceSelect.setOptions(pieceOptions, pieceSelect.value);
+
+    const substatOptions = [
+        { value: '', label: t('form.select.placeholder'), icon: null },
+        ...Object.keys(StatType).map(key => ({
+            value: key,
+            label: statLabel(key),
+            icon: STAT_ICONS[key],
+        })),
+    ];
+    substatSelects.forEach(s => s.setOptions(substatOptions, s.value));
+
+    const mainSelect = document.getElementById('mainStat');
+    const mainValue  = mainSelect.value;
+    populateMainStats();
+    if (mainValue) mainSelect.value = mainValue;
+
+    document.querySelectorAll('#goal-checkboxes .goal-item').forEach(item => {
+        item.querySelector('span').textContent = statLabel(item.dataset.key);
+    });
 }
 
 export function resetSubstatSelects() {

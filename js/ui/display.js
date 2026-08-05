@@ -1,17 +1,28 @@
-import { STAT_LABELS } from './form.js';
 import { StatType } from '../data/StatType.js';
 import { MainStatType } from '../data/MainStatType.js';
+import { statLabel } from './form.js';
+import { t } from '../i18n/i18n.js';
 
-const VERDICT_CONFIG = {
-    'INVERTIR':   { icon: '🔥', color: '#5FCB8A', potential: 'Alto',  headline: 'Excelente inversión', action: 'Vale la pena subirlo hasta +20.' },
-    'CONSIDERAR': { icon: '👍', color: '#D5D96B', potential: 'Medio', headline: 'Prometedor',           action: 'Súbelo un poco más y vuelve a evaluar.' },
-    'DESCARTAR':  { icon: '🗑️', color: '#D96B6B', potential: 'Bajo',  headline: 'Descártalo',           action: 'Es poco probable que termine siendo bueno.' },
+const VERDICT_META = {
+    'INVERTIR':   { icon: '🔥', color: '#5FCB8A', key: 'invest'   },
+    'CONSIDERAR': { icon: '👍', color: '#D5D96B', key: 'consider' },
+    'DESCARTAR':  { icon: '🗑️', color: '#D96B6B', key: 'discard'  },
 };
 
+function verdictConfig(verdict) {
+    const m = VERDICT_META[verdict] ?? VERDICT_META['CONSIDERAR'];
+    return {
+        icon: m.icon, color: m.color,
+        potential: t(`verdict.potential.${m.key === 'invest' ? 'high' : m.key === 'consider' ? 'mid' : 'low'}`),
+        headline: t(`verdict.${m.key}.headline`),
+        action: t(`verdict.${m.key}.action`),
+    };
+}
+
 const CONFIDENCE_CONFIG = {
-    alta:  { label: 'Confianza: Alta',  cls: 'high' },
-    media: { label: 'Confianza: Media', cls: 'mid'  },
-    baja:  { label: 'Confianza: Baja',  cls: 'low'  },
+    alta:  { key: 'confidence.high', cls: 'high' },
+    media: { key: 'confidence.mid',  cls: 'mid'  },
+    baja:  { key: 'confidence.low',  cls: 'low'  },
 };
 
 function getStatKey(stat) {
@@ -34,23 +45,23 @@ function buildHumanReasons(artifact, result) {
     const critSubstats = artifact.substats.filter(s => isCritStat(s.type)).length;
 
     if (critSubstats >= 2) {
-        reasons.push('Tiene doble crítico en substats: es poco común y muy valioso.');
+        reasons.push(t('reason.doubleCrit'));
     } else if (critSubstats === 1 && mainStatIsCrit(artifact)) {
-        reasons.push('Combina un substat crítico con un mainstat crítico.');
+        reasons.push(t('reason.critWithMain'));
     } else if (critSubstats === 1) {
-        reasons.push('Tiene un substat crítico, buena base para escalar.');
+        reasons.push(t('reason.oneCrit'));
     } else if (!mainStatIsCrit(artifact)) {
-        reasons.push('Todavía no tiene ningún stat crítico.');
+        reasons.push(t('reason.noCrit'));
     }
 
     if (result.worstRV >= 60) {
-        reasons.push('Incluso en el peor escenario posible, se mantiene decente.');
+        reasons.push(t('reason.worstOk'));
     } else if (result.worstRV < 35) {
-        reasons.push('En el peor escenario, este artefacto se queda corto.');
+        reasons.push(t('reason.worstBad'));
     }
 
     if (result.avgRV >= 85) {
-        reasons.push('En promedio, apunta a quedar entre los mejores rolls posibles.');
+        reasons.push(t('reason.avgGreat'));
     }
 
     return reasons.slice(0, 3);
@@ -67,9 +78,9 @@ function renderProbabilityBar(result) {
     if (result.successRate == null) return; // resultado sin datos de Montecarlo
 
     const rows = [
-        { label: 'Invertir',   value: result.successRate,  cls: 'good' },
-        { label: 'Considerar', value: result.considerRate, cls: 'mid'  },
-        { label: 'Descartar',  value: result.discardRate,  cls: 'danger'  },
+        { label: t('probability.invest'),   value: result.successRate,  cls: 'good' },
+        { label: t('probability.consider'), value: result.considerRate, cls: 'mid'  },
+        { label: t('probability.discard'),  value: result.discardRate,  cls: 'danger'  },
     ];
 
     for (const r of rows) {
@@ -89,19 +100,18 @@ function renderProbabilityBar(result) {
     if (result.iterations) {
         const note = document.createElement('p');
         note.className = 'fourth-assumption-text';
-        note.textContent = `Basado en ${result.iterations.toLocaleString('es')} simulaciones.`;
+        note.textContent = t('probability.basedOn', { n: result.iterations.toLocaleString() });
         container.appendChild(note);
     }
 }
 
 export function displayResults(artifact, result, projectedStat = null) {
     // ─── Veredicto (lenguaje humano primero) ──────
-    const cfg = VERDICT_CONFIG[result.verdict] ?? VERDICT_CONFIG['CONSIDERAR'];
+    const cfg = verdictConfig(result.verdict);
     document.getElementById('verdict-icon').textContent  = cfg.icon;
     document.getElementById('verdict-label').textContent = cfg.headline;
     document.getElementById('verdict-label').style.color = cfg.color;
     document.getElementById('verdict-potential-text').textContent = cfg.potential;
-    document.getElementById('verdict-action-text').textContent = cfg.action;
     document.getElementById('verdict-action-text').textContent = cfg.action;
     renderProbabilityBar(result); // ← nuevo
 
@@ -114,7 +124,15 @@ export function displayResults(artifact, result, projectedStat = null) {
     }
 
     // ─── Detalles técnicos ────────────────────────
-    document.getElementById('verdict-reason-technical').textContent = result.verdictReason;
+    document.getElementById('verdict-reason-technical').textContent =
+        result.iterations != null
+            ? t('results.detail.probabilitySummary', {
+                  invest:   result.successRate.toFixed(1),
+                  consider: result.considerRate.toFixed(1),
+                  discard:  result.discardRate.toFixed(1),
+                  n:        result.iterations.toLocaleString(),
+              })
+            : '';
     document.getElementById('d-best-cv-sub').textContent  = result.bestCVSub.toFixed(1);
     document.getElementById('d-avg-cv-sub').textContent   = result.avgCVSub.toFixed(1);
     document.getElementById('d-worst-cv-sub').textContent = result.worstCVSub.toFixed(1);
@@ -140,14 +158,14 @@ function renderScenario(containerId, caseData, projectedKey) {
     container.innerHTML = '';
 
     for (const key of Object.keys(caseData)) {
-        const label       = STAT_LABELS[key] ?? key;
+        const label       = statLabel(key);
         const value        = caseData[key]?.toFixed(1) ?? '-';
         const isProjected = key === projectedKey;
 
         const row = document.createElement('div');
         row.className = 'scenario-substat' + (isProjected ? ' scenario-substat--projected' : '');
         row.innerHTML = `
-            <span class="scenario-substat-name">${label}${isProjected ? ' <span class="projected-tag">supuesto</span>' : ''}</span>
+            <span class="scenario-substat-name">${label}${isProjected ? ` <span class="projected-tag">${t('fourth.projected')}</span>` : ''}</span>
             <span class="scenario-substat-value">${value}</span>
         `;
         container.appendChild(row);
@@ -168,18 +186,17 @@ export function displayFourthSubstat(predictions, goal, confidence) {
     // Esto es lo que conecta esta pantalla con las cards de resultado:
     // el mismo dato, mostrado, no un cálculo aparte.
     const usedKey   = getStatKey(confidence.top.stat);
-    const usedLabel = STAT_LABELS[usedKey] ?? usedKey;
+    const usedLabel = statLabel(usedKey);
     const conf      = CONFIDENCE_CONFIG[confidence.level] ?? CONFIDENCE_CONFIG.media;
 
     const assumption = document.createElement('div');
     assumption.className = 'fourth-assumption';
     assumption.innerHTML = `
         <p class="fourth-assumption-text">
-            Los escenarios de abajo asumen <strong>${usedLabel}</strong>
-            (${confidence.top.probability.toFixed(1)}%) como 4to substat — es la opción más probable.
+            ${t('fourth.assumption', { stat: `<strong>${usedLabel}</strong>`, pct: confidence.top.probability.toFixed(1) })}
         </p>
-        <span class="confidence-badge confidence-badge--${conf.cls}">${conf.label}</span>
-        <button type="button" class="info-tip" data-tip-key="confidence" aria-label="Más información">?</button>
+        <span class="confidence-badge confidence-badge--${conf.cls}">${t(conf.key)}</span>
+        <button type="button" class="info-tip" data-tip-key="confidence" aria-label="${t('tip.ariaLabel')}">?</button>
     `;
     content.appendChild(assumption);
 
@@ -187,14 +204,14 @@ export function displayFourthSubstat(predictions, goal, confidence) {
     const summary = document.createElement('p');
     summary.className = 'fourth-chance';
     const chanceColor = chanceGood >= 25 ? '#5FCB8A' : chanceGood >= 10 ? '#D5D96B' : '#D96B6B';
-    summary.innerHTML = `Probabilidad de obtener algo útil: 
+    summary.innerHTML = `${t('fourth.chance')} 
         <strong style="color:${chanceColor}">${chanceGood.toFixed(1)}%</strong>`;
     content.appendChild(summary);
 
     // Barras de distribución completa
     for (const p of predictions) {
         const key    = getStatKey(p.stat);
-        const label  = STAT_LABELS[key] ?? key;
+        const label  = statLabel(key);
         const isGood = goal.isDesired(p.stat);
         const isMid  = p.probability >= 15;
 
