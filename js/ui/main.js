@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('languagechange', (e) => {
         renderStaticTexts();
         refreshForm();
-        document.querySelector('#lang-switch span').textContent = e.detail.lang === 'es' ? 'EN' : 'ES';
+        document.querySelector('#lang-switch .lang-code').textContent = e.detail.lang === 'es' ? 'EN' : 'ES';
 
         // Re-renderizar contenido dinámico si estamos en la pantalla de resultados
         const resultsScreen = document.getElementById('screen-results');

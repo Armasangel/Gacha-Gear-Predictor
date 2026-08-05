@@ -192,6 +192,46 @@ body {
 
 .btn-details:hover { opacity: .75; }
 
+/* ─── BOTÓN DE IDIOMA ───────────────────────────── */
+#lang-switch {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .55rem 1.1rem;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    color: var(--gold2);
+    background: rgba(24, 34, 53, .75);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .3);
+    transition: color var(--transition), border-color var(--transition),
+                box-shadow var(--transition), transform var(--transition);
+}
+
+#lang-switch:hover,
+#lang-switch:focus-visible {
+    color: var(--gold3);
+    border-color: var(--gold2);
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+#lang-switch .globe {
+    font-size: 16px;
+    line-height: 1;
+}
+
 /* ─── FORM ───────────────────────────────────────── */
 .form-grid {
     display: grid;
@@ -352,6 +392,8 @@ body {
     border-radius: var(--radius);
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 3;
 }
 
 .verdict-header {
@@ -485,6 +527,8 @@ body {
     padding: 1.25rem;
     margin-bottom: 1.5rem;
     animation: fadeUp 150ms ease forwards;
+    position: relative;
+    z-index: 2;
 }
 
 .details-grid {
@@ -543,7 +587,8 @@ body {
     border-radius: var(--radius);
     padding: 1.25rem;
     animation: fadeUp 200ms ease forwards;
-    overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 
 .scenario-card--best  { border-color: rgba(95,203,138,.35); }
@@ -582,6 +627,11 @@ body {
 }
 
 /* 4to substat */
+#fourth-substat-block {
+    position: relative;
+    z-index: 4;
+}
+
 .fourth-content {
     background: var(--panel);
     border: 1px solid var(--border);
