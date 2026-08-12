@@ -144,7 +144,6 @@ Gacha-Gear-Predictor/
 - [x] Soporte para niveles intermedios (0, 4, 8, 12, 16, 20)
 - [x] Webapp desplegable en GitHub Pages
 - [ ] Diseño visual pulido
-- [ ] Perfiles de personaje (BuildGoal predefinidos)
 - [ ] Soporte multi-juego (Star Rail, ZZZ)
 
 ---
