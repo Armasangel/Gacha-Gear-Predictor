@@ -716,6 +716,21 @@ body {
     margin-top: 1rem;
 }
 
+/* Footer */
+.site-footer {
+    padding: 1.5rem 1rem 2.5rem;
+    text-align: center;
+}
+
+.footer-disclaimer {
+    max-width: 60ch;
+    margin: 0 auto;
+    font-size: .8rem;
+    line-height: 1.5;
+    color: var(--text-dim, inherit);
+    opacity: .7;
+}
+
 /* ─── RESPONSIVE ─────────────────────────────────── */
 @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
@@ -812,6 +827,19 @@ body {
 
 .custom-option.selected {
     color: var(--gold3);
+}
+
+/* Opción activa por teclado (flechas). Se define después de :hover y .selected
+   para que el fondo visible gane aunque la opción también esté seleccionada. */
+.custom-option.focused {
+    background-color: var(--hover);
+    color: var(--text);
+    box-shadow: inset 2px 0 0 var(--gold2);
+}
+
+.custom-select-trigger:focus-visible {
+    outline: 2px solid var(--gold2);
+    outline-offset: 1px;
 }
 
 .select-icon {

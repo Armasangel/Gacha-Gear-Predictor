@@ -8,21 +8,18 @@ import { MainStatType } from '../data/MainStatType.js';
 import { StatType } from '../data/StatType.js';
 import { initI18n, setLanguage, getLanguage, t } from '../i18n/i18n.js';
 import { renderStaticTexts } from './i18nRender.js';
-
-function keyOf(dict, value) {
-    return Object.keys(dict).find(k => dict[k] === value);
-}
+import { STAT_KEY_BY_REF, MAINSTAT_KEY_BY_REF, PIECE_KEY_BY_REF } from '../utils/lookup.js';
 
 // Snapshot de lo que el usuario ya ingresó, para cuando vuelva a completar
 // el 4to substat tras subir el artefacto real a +4. No se recalcula nada
 // que el usuario ya escribió, solo se reusa.
 function buildSnapshot(artifact, goal) {
     return {
-        pieceKey: keyOf(PieceType, artifact.pieceType),
-        mainKey:  keyOf(MainStatType, artifact.mainStat),
+        pieceKey: PIECE_KEY_BY_REF.get(artifact.pieceType),
+        mainKey:  MAINSTAT_KEY_BY_REF.get(artifact.mainStat),
         level:    artifact.level,
-        substats: artifact.substats.map(s => ({ key: keyOf(StatType, s.type), value: s.value })),
-        desiredKeys: goal.desiredStats.map(s => keyOf(StatType, s)),
+        substats: artifact.substats.map(s => ({ key: STAT_KEY_BY_REF.get(s.type), value: s.value })),
+        desiredKeys: goal.desiredStats.map(s => STAT_KEY_BY_REF.get(s)),
     };
 }
 

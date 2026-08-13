@@ -158,3 +158,11 @@ Gacha-Gear-Predictor/
 ## Autor
 
 **Armasangel** — proyecto personal de un fan de los juegos gacha que se cansó de no entender el RNG.
+
+---
+
+## Licencia y aviso legal
+
+Código bajo licencia [MIT](LICENSE).
+
+> **Fan project no oficial.** Este proyecto no está afiliado, respaldado ni patrocinado por HoYoverse / miHoYo. "Genshin Impact" y los assets visuales usados son propiedad de sus respectivos dueños y se usan aquí con fines informativos/educativos.

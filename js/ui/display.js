@@ -1,7 +1,7 @@
 import { StatType } from '../data/StatType.js';
-import { MainStatType } from '../data/MainStatType.js';
 import { statLabel } from './form.js';
 import { t } from '../i18n/i18n.js';
+import { STAT_KEY_BY_REF, MAINSTAT_KEY_BY_REF } from '../utils/lookup.js';
 
 const VERDICT_META = {
     'INVERTIR':   { icon: '🔥', color: '#5FCB8A', key: 'invest'   },
@@ -26,7 +26,7 @@ const CONFIDENCE_CONFIG = {
 };
 
 function getStatKey(stat) {
-    return Object.keys(StatType).find(k => StatType[k] === stat);
+    return STAT_KEY_BY_REF.get(stat);
 }
 
 function isCritStat(stat) {
@@ -34,7 +34,7 @@ function isCritStat(stat) {
 }
 
 function mainStatIsCrit(artifact) {
-    const key = Object.keys(MainStatType).find(k => MainStatType[k] === artifact.mainStat);
+    const key = MAINSTAT_KEY_BY_REF.get(artifact.mainStat);
     return key === 'CRIT_RATE' || key === 'CRIT_DMG';
 }
 
