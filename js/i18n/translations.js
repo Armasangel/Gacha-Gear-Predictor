@@ -110,6 +110,7 @@ export const TRANSLATIONS = {
         'fourth.assumption': 'Los escenarios de abajo asumen {stat} ({pct}%) como 4to substat — es la opción más probable.',
         'fourth.chance': 'Probabilidad de obtener algo útil:',
         'fourth.projected': 'supuesto',
+        'footer.disclaimer': 'Fan project no oficial. No está afiliado, respaldado ni patrocinado por HoYoverse / miHoYo. "Genshin Impact" y sus assets visuales pertenecen a sus respectivos dueños.',
     },
 
     en: {
@@ -223,5 +224,6 @@ export const TRANSLATIONS = {
         'fourth.assumption': 'The scenarios below assume {stat} ({pct}%) as the 4th substat — it\'s the most likely option.',
         'fourth.chance': 'Chance of getting something useful:',
         'fourth.projected': 'assumed',
+        'footer.disclaimer': 'Unofficial fan project. Not affiliated with, endorsed or sponsored by HoYoverse / miHoYo. "Genshin Impact" and its visual assets belong to their respective owners.',
     },
 };

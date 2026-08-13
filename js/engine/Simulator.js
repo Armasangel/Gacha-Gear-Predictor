@@ -39,14 +39,14 @@ function isFixedMainPiece(artifact) {
 }
 
 // Tier al azar, equiprobable entre las 4 posiciones.
-function randomTierValue(key) {
+function randomTierValue(key, rng) {
     const tiers = StatType[key].tiers;
-    return tiers[Math.floor(Math.random() * tiers.length)];
+    return tiers[Math.floor(rng() * tiers.length)];
 }
 
-function pickWeightedRandom(candidates) {
+function pickWeightedRandom(candidates, rng) {
     const totalWeight = candidates.reduce((sum, c) => sum + c.weight, 0);
-    let roll = Math.random() * totalWeight;
+    let roll = rng() * totalWeight;
     for (const c of candidates) {
         roll -= c.weight;
         if (roll <= 0) return c.key;
@@ -57,7 +57,7 @@ function pickWeightedRandom(candidates) {
 // Fallback: solo se usa si simulate() se llama sin proyección de 4to
 // substat. El flujo normal desde main.js siempre pasa projectedFourthStat
 // (calculado por GameRules.js), así que esto casi nunca corre.
-function pickFourthSubstatType(artifact) {
+function pickFourthSubstatType(artifact, rng) {
     const mainKey = Object.keys(MainStatType)
         .find(k => MainStatType[k] === artifact.mainStat);
     const existingKeys = artifact.substats.map(s => getStatKey(s.type));
@@ -66,7 +66,7 @@ function pickFourthSubstatType(artifact) {
         .filter(key => key !== mainKey && !existingKeys.includes(key))
         .map(key => ({ key, weight: StatType[key].weight }));
 
-    return pickWeightedRandom(candidates);
+    return pickWeightedRandom(candidates, rng);
 }
 
 function calcCVSubstats(substats) {
@@ -101,20 +101,20 @@ function calcRV(substats, totalRolls) {
 // que ya se le mostró al usuario -- solo el tier es random) y aplica cada
 // upgrade restante a un substat elegido al azar entre los existentes,
 // igual que sube de nivel un artefacto real en el juego.
-function runOneTrial(artifact, remaining, totalRolls, projectedFourthStat) {
+function runOneTrial(artifact, remaining, totalRolls, projectedFourthStat, rng) {
     const substats = copySubstats(artifact.substats);
 
     if (artifact.getSubstatCount() === 3) {
         const fourthKey = projectedFourthStat
             ? getStatKey(projectedFourthStat)
-            : pickFourthSubstatType(artifact);
-        substats[fourthKey] = randomTierValue(fourthKey);
+            : pickFourthSubstatType(artifact, rng);
+        substats[fourthKey] = randomTierValue(fourthKey, rng);
     }
 
     const keys = Object.keys(substats);
     for (let i = 0; i < remaining; i++) {
-        const targetKey = keys[Math.floor(Math.random() * keys.length)];
-        substats[targetKey] += randomTierValue(targetKey);
+        const targetKey = keys[Math.floor(rng() * keys.length)];
+        substats[targetKey] += randomTierValue(targetKey, rng);
     }
 
     for (const key of keys) {
@@ -159,7 +159,8 @@ function verdict(artifact, cv, cvSub, rv) {
 
 // projectedFourthStat: mismo parámetro que ya usaba main.js (viene de
 // GameRules.getMostLikelyFourthSubstat). iterations es nuevo y opcional.
-export function simulate(artifact, goal, projectedFourthStat = null, iterations = MC_ITERATIONS) {
+// rng es inyectable para hacer los tests determinísticos (seeding).
+export function simulate(artifact, goal, projectedFourthStat = null, iterations = MC_ITERATIONS, rng = Math.random) {
     const substatCount = artifact.getSubstatCount();
     const remaining    = upgradesRemaining(artifact.level, substatCount);
     const maxUpgrades  = substatCount === 4 ? 5 : 4;
@@ -172,7 +173,7 @@ export function simulate(artifact, goal, projectedFourthStat = null, iterations 
     let investCount = 0, considerCount = 0, discardCount = 0;
 
     for (let i = 0; i < iterations; i++) {
-        const trial = runOneTrial(artifact, remaining, totalRolls, projectedFourthStat);
+        const trial = runOneTrial(artifact, remaining, totalRolls, projectedFourthStat, rng);
         trials.push(trial);
 
         const category = verdict(artifact, trial.cvTotal, trial.cvSub, trial.rv);

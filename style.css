@@ -716,6 +716,21 @@ body {
     margin-top: 1rem;
 }
 
+/* Footer */
+.site-footer {
+    padding: 1.5rem 1rem 2.5rem;
+    text-align: center;
+}
+
+.footer-disclaimer {
+    max-width: 60ch;
+    margin: 0 auto;
+    font-size: .8rem;
+    line-height: 1.5;
+    color: var(--text-dim, inherit);
+    opacity: .7;
+}
+
 /* ─── RESPONSIVE ─────────────────────────────────── */
 @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }

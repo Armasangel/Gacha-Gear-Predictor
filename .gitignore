@@ -10,5 +10,3 @@ Thumbs.db
 # Logs / temporales
 *.log
 npm-debug.log*
-
-tests/

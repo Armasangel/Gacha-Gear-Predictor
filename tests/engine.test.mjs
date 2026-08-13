@@ -10,25 +10,35 @@ import { StatType } from '../js/data/StatType.js';
 import { simulate } from '../js/engine/Simulator.js';
 import { predictFourthSubstat, getMostLikelyFourthSubstat } from '../js/engine/GameRules.js';
 
+// PRNG determinístico (mulberry32): hace que la simulación sea reproducible
+// en tests. Misma semilla -> misma secuencia -> mismos resultados exactos.
+function mulberry32(seed) {
+    return function() {
+        let t = (seed += 0x6D2B79F5);
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
 const noGoal = new BuildGoal([]);
 const critGoal = new BuildGoal([StatType.CRIT_RATE, StatType.CRIT_DMG]);
 
 describe('3 substats: el 4to substat proyectado debe participar en la simulación', () => {
     test('totalRolls corregido: 8 rolls (no 7) para un 3-substat', () => {
         // Corona con 3 substats sin crit, sin proyección forzada -> usa el más probable.
+        // RNG con seed: la simulación es determinística. Los valores golden se
+        // generaron con seed 42; si el motor volviera a contar 7 rolls (bug viejo),
+        // el denominador de RV cambiaría y estos valores exactos fallarían.
         const artifact = new Artifact(PieceType.CIRCLET, MainStatType.HP_PERCENT, 0, [
             new Substat(StatType.ATK_FLAT, 14),
             new Substat(StatType.DEF_FLAT, 16),
             new Substat(StatType.ENERGY_RECHARGE, 4.531),
         ]);
-        const result = simulate(artifact, noGoal);
-        // Con 8 rolls totales, el mejor caso posible (si todo fuera al stat de
-        // mayor techo, T4 x8) da un RV proporcionalmente MENOR que si el motor
-        // (con el bug viejo) solo contara 7 rolls. Verificamos indirectamente:
-        // el peor caso nunca debería superar el promedio, y el promedio nunca
-        // al mejor -- y ambos deben ser calculables sin excepción.
-        assert.ok(result.worstRV <= result.avgRV);
-        assert.ok(result.avgRV <= result.bestRV);
+        const result = simulate(artifact, noGoal, null, 10000, mulberry32(42));
+        assert.equal(result.worstRV, 81.2);
+        assert.equal(result.avgRV, 75.8);
+        assert.equal(result.bestRV, 80.6);
     });
 
     test('el substat proyectado SÍ se refleja en CV cuando el goal lo pide y es CRIT', () => {
@@ -39,7 +49,7 @@ describe('3 substats: el 4to substat proyectado debe participar en la simulació
         ]);
         // Forzamos la proyección a CRIT_DMG (antes del fix, esto era imposible:
         // el simulador jamás consideraba un 4to stat que no estuviera ya en el array).
-        const result = simulate(artifact, critGoal, StatType.CRIT_DMG);
+        const result = simulate(artifact, critGoal, StatType.CRIT_DMG, 10000, mulberry32(42));
         assert.ok(result.bestCVSub > 0, 'el mejor caso debe reflejar CRIT_DMG proyectado en el CV');
     });
 
@@ -65,7 +75,7 @@ describe('4 substats: comportamiento pre-existente no debe cambiar', () => {
             new Substat(StatType.ATK_PERCENT, 5.833),
             new Substat(StatType.HP_FLAT, 299),
         ]);
-        const result = simulate(artifact, critGoal);
+        const result = simulate(artifact, critGoal, null, 10000, mulberry32(1));
         // A nivel 20 no quedan upgrades, best === worst === avg.
         assert.equal(result.bestRV, result.worstRV);
         assert.equal(result.bestRV, result.avgRV);
@@ -80,7 +90,7 @@ describe('Flor y Pluma: mainstat fijo, CV se basa solo en substats', () => {
             new Substat(StatType.ATK_PERCENT, 5.833),
             new Substat(StatType.DEF_FLAT, 23),
         ]);
-        const result = simulate(artifact, critGoal);
+        const result = simulate(artifact, critGoal, null, 10000, mulberry32(2));
         assert.equal(result.verdict, 'INVERTIR');
     });
 
@@ -91,7 +101,7 @@ describe('Flor y Pluma: mainstat fijo, CV se basa solo en substats', () => {
             new Substat(StatType.ATK_PERCENT, 5.833),
             new Substat(StatType.ENERGY_RECHARGE, 6.474),
         ]);
-        const result = simulate(artifact, critGoal);
+        const result = simulate(artifact, critGoal, null, 10000, mulberry32(3));
         assert.equal(result.avgCVSub, 0);
         assert.ok(['INVERTIR', 'CONSIDERAR', 'DESCARTAR'].includes(result.verdict));
     });
@@ -105,7 +115,7 @@ describe('Triple crítico (CV extremo)', () => {
             new Substat(StatType.ENERGY_RECHARGE, 6.474),
             new Substat(StatType.HP_FLAT, 299),
         ]);
-        const result = simulate(artifact, critGoal);
+        const result = simulate(artifact, critGoal, null, 10000, mulberry32(4));
         assert.equal(result.verdict, 'INVERTIR');
         assert.ok(result.avgCV > result.avgCVSub, 'el CV total debe ser mayor al de solo-substats por el mainstat crit');
     });
