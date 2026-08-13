@@ -829,6 +829,19 @@ body {
     color: var(--gold3);
 }
 
+/* Opción activa por teclado (flechas). Se define después de :hover y .selected
+   para que el fondo visible gane aunque la opción también esté seleccionada. */
+.custom-option.focused {
+    background-color: var(--hover);
+    color: var(--text);
+    box-shadow: inset 2px 0 0 var(--gold2);
+}
+
+.custom-select-trigger:focus-visible {
+    outline: 2px solid var(--gold2);
+    outline-offset: 1px;
+}
+
 .select-icon {
     width: 24px;
     height: 24px;

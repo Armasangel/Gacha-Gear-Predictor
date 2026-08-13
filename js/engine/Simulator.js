@@ -2,12 +2,14 @@ import { StatType } from '../data/StatType.js';
 import { MainStatType } from '../data/MainStatType.js';
 import { SimulationResult } from '../models/SimulationResult.js';
 import { PieceType } from '../data/PieceType.js';
+import { STAT_KEY_BY_REF, MAINSTAT_KEY_BY_REF } from '../utils/lookup.js';
+import { VERDICT_THRESHOLDS } from './VerdictThresholds.js';
 
 const UPGRADE_LEVELS = [4, 8, 12, 16, 20];
 const MC_ITERATIONS  = 10000;
 
 function getStatKey(stat) {
-    return Object.keys(StatType).find(k => StatType[k] === stat);
+    return STAT_KEY_BY_REF.get(stat);
 }
 
 function upgradesDone(level, substatCount) {
@@ -58,8 +60,7 @@ function pickWeightedRandom(candidates, rng) {
 // substat. El flujo normal desde main.js siempre pasa projectedFourthStat
 // (calculado por GameRules.js), así que esto casi nunca corre.
 function pickFourthSubstatType(artifact, rng) {
-    const mainKey = Object.keys(MainStatType)
-        .find(k => MainStatType[k] === artifact.mainStat);
+    const mainKey = MAINSTAT_KEY_BY_REF.get(artifact.mainStat);
     const existingKeys = artifact.substats.map(s => getStatKey(s.type));
 
     const candidates = Object.keys(StatType)
@@ -79,8 +80,7 @@ function calcCVTotal(substats, artifact) {
     let cr = substats['CRIT_RATE'] ?? 0;
     let cd = substats['CRIT_DMG']  ?? 0;
 
-    const mainKey = Object.keys(MainStatType)
-        .find(k => MainStatType[k] === artifact.mainStat);
+    const mainKey = MAINSTAT_KEY_BY_REF.get(artifact.mainStat);
 
     if (mainKey === 'CRIT_RATE') cr += artifact.mainStat.value;
     if (mainKey === 'CRIT_DMG')  cd += artifact.mainStat.value;
@@ -133,24 +133,28 @@ function runOneTrial(artifact, remaining, totalRolls, projectedFourthStat, rng) 
 // la capa de UI con i18n, no el motor.
 function verdict(artifact, cv, cvSub, rv) {
     if (isFixedMainPiece(artifact)) {
-        if (cvSub >= 30) return "INVERTIR";
-        if (cvSub >= 15) return "CONSIDERAR";
+        const t = VERDICT_THRESHOLDS.FIXED_MAIN;
+
+        if (cvSub >= t.cvSub.INVEST)   return "INVERTIR";
+        if (cvSub >= t.cvSub.CONSIDER) return "CONSIDERAR";
 
         if (cvSub === 0) {
-            if (rv >= 85) return "INVERTIR";
-            if (rv >= 70) return "CONSIDERAR";
+            if (rv >= t.rv.INVEST)   return "INVERTIR";
+            if (rv >= t.rv.CONSIDER) return "CONSIDERAR";
             return "DESCARTAR";
         }
 
         return "DESCARTAR";
     }
 
-    if (cv >= 50) return "INVERTIR";
-    if (cv >= 35) return "CONSIDERAR";
+    const t = VERDICT_THRESHOLDS.VARIABLE_MAIN;
+
+    if (cv >= t.cv.INVEST)   return "INVERTIR";
+    if (cv >= t.cv.CONSIDER) return "CONSIDERAR";
 
     if (cv === 0) {
-        if (rv >= 85) return "INVERTIR";
-        if (rv >= 70) return "CONSIDERAR";
+        if (rv >= t.rv.INVEST)   return "INVERTIR";
+        if (rv >= t.rv.CONSIDER) return "CONSIDERAR";
         return "DESCARTAR";
     }
 
