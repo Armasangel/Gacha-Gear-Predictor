@@ -24,6 +24,11 @@ export class IconSelect {
         this.trigger.setAttribute('aria-controls', this.optionsEl.id);
         this.optionsEl.setAttribute('role', 'listbox');
 
+        // Sin esto, el mousedown sobre una opción mueve el foco fuera del
+        // trigger, dispara su focusout y cierra el dropdown antes de que el
+        // click llegue a la opción (rompía la selección con el ratón).
+        this.optionsEl.addEventListener('mousedown', (e) => e.preventDefault());
+
         this.trigger.addEventListener('click', (e) => {
             e.stopPropagation();
             this._closeOthers();
