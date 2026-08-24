@@ -12,6 +12,9 @@ const { window } = dom;
 globalThis.window   = window;
 globalThis.document = window.document;
 
+// jsdom no implementa scrollIntoView; IconSelect lo usa al desplegarse.
+window.Element.prototype.scrollIntoView = function () {};
+
 await import('../js/ui/main.js');
 
 // En un navegador, window === globalThis, así que `window.showScreen = fn`
@@ -37,6 +40,26 @@ if (window.document.readyState === 'loading') {
 
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+// El form ya no usa <input> numérico: tipo y valor son IconSelect con
+// opciones .custom-option[data-value="..."] dentro de cada .substat-row.
+async function setRow(doc, i, statKey, tierValue) {
+    const row = doc.querySelectorAll('.substat-row')[i];
+
+    const typeWrapper = row.querySelector('.substat-type-select');
+    typeWrapper.querySelector('.custom-select-trigger').click();
+    typeWrapper.querySelector(`.custom-option[data-value="${statKey}"]`).click();
+    await wait(20);
+
+    const valueWrapper = row.querySelector('.substat-value-select');
+    valueWrapper.querySelector('.custom-select-trigger').click();
+    const opt = valueWrapper.querySelector(`.custom-option[data-value="${tierValue}"]`);
+    if (!opt) {
+        throw new Error(`No existe la opción de valor ${tierValue} para ${statKey} en la fila ${i}`);
+    }
+    opt.click();
+    await wait(20);
+}
+
 async function main() {
     // Esperar a que el módulo main.js cargue y corra DOMContentLoaded
     await wait(500);
@@ -50,16 +73,9 @@ async function main() {
 
     doc.getElementById('mainStat').value = 'ENERGY_RECHARGE';
 
-    const rows = doc.querySelectorAll('.substat-row');
-    const setRow = (i, statKey, value) => {
-        const wrapper = rows[i].querySelector('.substat-type-select');
-        wrapper.querySelector('.custom-select-trigger').click();
-        wrapper.querySelector(`.custom-option[data-value="${statKey}"]`).click();
-        rows[i].querySelector('.substat-value').value = value;
-    };
-    setRow(0, 'CRIT_RATE', '2.722');
-    setRow(1, 'CRIT_DMG', '5.444');
-    setRow(2, 'HP_FLAT', '209');
+    await setRow(doc, 0, 'CRIT_RATE', '2.722');
+    await setRow(doc, 1, 'CRIT_DMG', '5.444');
+    await setRow(doc, 2, 'HP_FLAT', '209');
     await wait(50);
 
     doc.getElementById('analyze-btn').click();
@@ -82,19 +98,25 @@ async function main() {
     console.log('PASO 2 -> volvió al form:', formActive);
     if (!formActive) throw new Error('FALLÓ: no volvió al form');
 
-    // Verificar que los 3 substats siguen ahí
-    const rows2 = doc.querySelectorAll('.substat-row');
-    const val0 = rows2[0].querySelector('.substat-value').value;
-    const val1 = rows2[1].querySelector('.substat-value').value;
-    const val2 = rows2[2].querySelector('.substat-value').value;
-    const val3 = rows2[3].querySelector('.substat-value').value;
-    console.log('  fila0:', val0, '| fila1:', val1, '| fila2:', val2, '| fila3 (vacía, a llenar):', JSON.stringify(val3));
-    if (val0 !== '2.722' || val1 !== '5.444' || val2 !== '209' || val3 !== '') {
+    // Verificar que los 3 substats siguen ahí (los selects conservan su selección)
+    const selOf = i => {
+        const row = doc.querySelectorAll('.substat-row')[i];
+        return {
+            type:  row.querySelector('.substat-type-select .custom-option.selected')?.dataset.value ?? '',
+            value: row.querySelector('.substat-value-select .custom-option.selected')?.dataset.value ?? '',
+        };
+    };
+    const s0 = selOf(0), s1 = selOf(1), s2 = selOf(2), s3 = selOf(3);
+    console.log('  fila0:', JSON.stringify(s0), '| fila3 (vacía):', JSON.stringify(s3));
+    if (s0.type !== 'CRIT_RATE' || s0.value !== '2.722' ||
+        s1.type !== 'CRIT_DMG'  || s1.value !== '5.444' ||
+        s2.type !== 'HP_FLAT'   || s2.value !== '209'   ||
+        s3.value !== '') {
         throw new Error('FALLÓ: el prefill no conservó los 3 substats originales o no dejó la 4ta vacía');
     }
 
     // ── Paso 3: completar el 4to substat con lo que "salió" al llegar a +4 ──
-    setRow(3, 'ATK_PERCENT', '4.083');
+    await setRow(doc, 3, 'ATK_PERCENT', '4.083');
     await wait(50);
 
     doc.getElementById('analyze-btn').click();
@@ -109,6 +131,7 @@ async function main() {
     }
 
     console.log('\n✅ TODO EL FLUJO FUNCIONA END TO END');
+    process.exit(0);
 }
 
 main().catch(e => {

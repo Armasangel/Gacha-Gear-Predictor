@@ -22,6 +22,9 @@
             <button class="btn-primary" onclick="showScreen('screen-form')" data-i18n="landing.cta">
                 Analizar Artefacto
             </button>
+            <button class="btn-secondary landing-cta-secondary" onclick="showScreen('screen-import')" data-i18n="landing.ctaImport">
+                Importar Lote
+            </button>
         </div>
     </section>
 
@@ -223,6 +226,52 @@
                 <button class="btn-primary" onclick="resetAndGoForm()" data-i18n="results.button.another">Predecir otro Artefacto</button>
             </div>
 
+        </div>
+    </section>
+
+    <!-- SCREEN 4: IMPORT BATCH -->
+    <section class="screen" id="screen-import">
+        <div class="screen-inner">
+            <h2 class="screen-title" data-i18n="import.title">Analizar un Lote de Artefactos</h2>
+            <p class="section-hint" data-i18n="import.hint"></p>
+
+            <div class="form-group form-group--full">
+                <label class="form-label" data-i18n="import.file.label">Archivos JSON</label>
+                <input type="file" id="import-file" class="form-file" accept=".json,application/json" multiple>
+            </div>
+
+            <div class="form-group form-group--full">
+                <label class="form-label" for="import-paste" data-i18n="import.paste.label">...o pega el JSON aquí</label>
+                <textarea id="import-paste" class="form-textarea" rows="6" data-i18n-placeholder="import.paste.placeholder"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-secondary" onclick="resetImportAndGoLanding()" data-i18n="import.back">← Volver</button>
+                <button class="btn-primary" id="import-analyze-btn" data-i18n="import.analyze">Analizar Lote</button>
+            </div>
+
+            <div id="import-error" class="form-error" style="display:none"></div>
+            <div id="import-progress" class="import-progress" style="display:none"></div>
+
+            <div id="import-results" class="import-results" style="display:none">
+                <p id="import-summary" class="section-hint"></p>
+
+                <details id="import-skipped-details" class="import-skipped" style="display:none">
+                    <summary data-i18n="import.skipped.title">Omitidos</summary>
+                    <ul id="import-skipped-list"></ul>
+                </details>
+
+                <div class="table-wrap">
+                    <table class="import-table" id="import-table">
+                        <thead id="import-table-head"></thead>
+                        <tbody id="import-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn-primary" id="import-export-btn" data-i18n="import.export">Exportar CSV</button>
+                </div>
+            </div>
         </div>
     </section>
 
