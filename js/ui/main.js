@@ -9,6 +9,7 @@ import { StatType } from '../data/StatType.js';
 import { initI18n, setLanguage, getLanguage, t } from '../i18n/i18n.js';
 import { renderStaticTexts } from './i18nRender.js';
 import { STAT_KEY_BY_REF, MAINSTAT_KEY_BY_REF, PIECE_KEY_BY_REF } from '../utils/lookup.js';
+import { initImport, refreshImportTexts } from './importer.js';
 
 // Snapshot de lo que el usuario ya ingresó, para cuando vuelva a completar
 // el 4to substat tras subir el artefacto real a +4. No se recalcula nada
@@ -70,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCustomSelects();
     populateMainStats();
     initTooltips();
+    initImport();
     initI18n();
     renderStaticTexts();
 
@@ -81,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('languagechange', (e) => {
         renderStaticTexts();
         refreshForm();
+        refreshImportTexts();
         document.querySelector('#lang-switch .lang-code').textContent = e.detail.lang === 'es' ? 'EN' : 'ES';
 
         // Re-renderizar contenido dinámico si estamos en la pantalla de resultados
