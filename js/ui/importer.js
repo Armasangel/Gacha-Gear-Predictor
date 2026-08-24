@@ -61,6 +61,14 @@ function verdictClass(verdict) {
     return 'badge--discard';
 }
 
+// El motor emite categorías en español (INVERTIR/CONSIDERAR/DESCARTAR)
+// pero las keys i18n usan el nombre en inglés.
+function verdictKey(verdict) {
+    if (verdict === 'INVERTIR') return 'invest';
+    if (verdict === 'CONSIDERAR') return 'consider';
+    return 'discard';
+}
+
 function renderTable(rows) {
     const head = document.getElementById('import-table-head');
     const body = document.getElementById('import-table-body');
@@ -89,7 +97,7 @@ function renderTable(rows) {
                 ? ` <span class="fourth-known" title="${escapeHtml(t('import.fourth.known'))}">★</span>`
                 : '';
             const pieceText = escapeHtml(t(`piece.${r.pieceKey}`));
-            const verdictText = escapeHtml(t(`probability.${r.verdict.toLowerCase()}`));
+            const verdictText = escapeHtml(t(`probability.${verdictKey(r.verdict)}`));
             return (
                 '<tr>' +
                 `<td class="cell-name">${name}${fourthMark}</td>` +
