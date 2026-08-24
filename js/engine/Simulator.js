@@ -5,26 +5,27 @@ import { PieceType } from '../data/PieceType.js';
 import { STAT_KEY_BY_REF, MAINSTAT_KEY_BY_REF } from '../utils/lookup.js';
 import { VERDICT_THRESHOLDS } from './VerdictThresholds.js';
 
-const UPGRADE_LEVELS = [4, 8, 12, 16, 20];
+const DEFAULT_UPGRADE_LEVELS = [4, 8, 12, 16, 20];
 const MC_ITERATIONS  = 10000;
 
 function getStatKey(stat) {
     return STAT_KEY_BY_REF.get(stat);
 }
 
-function upgradesDone(level, substatCount) {
+function upgradesDone(level, substatCount, upgradeLevels) {
     let upgrades = 0;
-    for (const lvl of UPGRADE_LEVELS) {
-        if (lvl > level) break;
-        if (substatCount === 3 && lvl === 4) continue;
+    for (let i = 0; i < upgradeLevels.length; i++) {
+        if (upgradeLevels[i] > level) break;
+        // La primera mejora revela el 4to substat: no cuenta como roll.
+        if (substatCount === 3 && i === 0) continue;
         upgrades++;
     }
     return upgrades;
 }
 
-function upgradesRemaining(level, substatCount) {
-    const maxUpgrades = substatCount === 4 ? 5 : 4;
-    return maxUpgrades - upgradesDone(level, substatCount);
+function upgradesRemaining(level, substatCount, upgradeLevels) {
+    const maxUpgrades = substatCount === 4 ? upgradeLevels.length : upgradeLevels.length - 1;
+    return maxUpgrades - upgradesDone(level, substatCount, upgradeLevels);
 }
 
 function copySubstats(substats) {
@@ -131,9 +132,9 @@ function runOneTrial(artifact, remaining, totalRolls, projectedFourthStat, rng) 
 
 // Devuelve solo la categoría del veredicto: el texto visible lo construye
 // la capa de UI con i18n, no el motor.
-function verdict(artifact, cv, cvSub, rv) {
+function verdict(artifact, cv, cvSub, rv, thresholds) {
     if (isFixedMainPiece(artifact)) {
-        const t = VERDICT_THRESHOLDS.FIXED_MAIN;
+        const t = thresholds.FIXED_MAIN;
 
         if (cvSub >= t.cvSub.INVEST)   return "INVERTIR";
         if (cvSub >= t.cvSub.CONSIDER) return "CONSIDERAR";
@@ -147,7 +148,7 @@ function verdict(artifact, cv, cvSub, rv) {
         return "DESCARTAR";
     }
 
-    const t = VERDICT_THRESHOLDS.VARIABLE_MAIN;
+    const t = thresholds.VARIABLE_MAIN;
 
     if (cv >= t.cv.INVEST)   return "INVERTIR";
     if (cv >= t.cv.CONSIDER) return "CONSIDERAR";
@@ -164,10 +165,21 @@ function verdict(artifact, cv, cvSub, rv) {
 // projectedFourthStat: mismo parámetro que ya usaba main.js (viene de
 // GameRules.getMostLikelyFourthSubstat). iterations es nuevo y opcional.
 // rng es inyectable para hacer los tests determinísticos (seeding).
-export function simulate(artifact, goal, projectedFourthStat = null, iterations = MC_ITERATIONS, rng = Math.random) {
+// gameConfig permite adaptar el motor a otros sistemas de gear de HoYoverse
+// (p. ej. HSR con [3,6,9,12,15]) sin tocar la lógica; por defecto usa el
+// modelo de Genshin. La grilla se asume ordenada ascendente y el primer
+// escalón es siempre el que revela el 4to substat.
+export function simulate(
+    artifact,
+    goal,
+    projectedFourthStat = null,
+    iterations = MC_ITERATIONS,
+    rng = Math.random,
+    { upgradeLevels = DEFAULT_UPGRADE_LEVELS, thresholds = VERDICT_THRESHOLDS } = {}
+) {
     const substatCount = artifact.getSubstatCount();
-    const remaining    = upgradesRemaining(artifact.level, substatCount);
-    const maxUpgrades  = substatCount === 4 ? 5 : 4;
+    const remaining    = upgradesRemaining(artifact.level, substatCount, upgradeLevels);
+    const maxUpgrades  = substatCount === 4 ? upgradeLevels.length : upgradeLevels.length - 1;
     const totalRolls   = 4 + maxUpgrades;
 
     const fixedMain = isFixedMainPiece(artifact);
@@ -180,7 +192,7 @@ export function simulate(artifact, goal, projectedFourthStat = null, iterations 
         const trial = runOneTrial(artifact, remaining, totalRolls, projectedFourthStat, rng);
         trials.push(trial);
 
-        const category = verdict(artifact, trial.cvTotal, trial.cvSub, trial.rv);
+        const category = verdict(artifact, trial.cvTotal, trial.cvSub, trial.rv, thresholds);
         if (category === "INVERTIR") investCount++;
         else if (category === "CONSIDERAR") considerCount++;
         else discardCount++;
