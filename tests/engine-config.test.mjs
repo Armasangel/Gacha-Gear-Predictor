@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { simulate } from '../js/engine/Simulator.js';
@@ -8,6 +8,7 @@ import { BuildGoal } from '../js/models/BuildGoal.js';
 import { PieceType } from '../js/data/PieceType.js';
 import { MainStatType } from '../js/data/MainStatType.js';
 import { StatType } from '../js/data/StatType.js';
+import { getProfile, getAllProfiles } from '../js/data/profiles/index.js';
 
 function sub(key, value) {
     return new Substat(StatType[key], value);
@@ -116,4 +117,69 @@ test('grilla estilo HSR [3,6,9,12,15]: primera mejora revela, resto suma rolls',
         assert.ok(Math.abs(total - 100) <= 0.4);
         assert.ok(r.avgRV > 0);
     }
+});
+
+describe('perfil HSR: contrato de datos abstracto del motor', () => {
+    const hsr = getProfile('hsr');
+
+    test('grilla de niveles, tiers y RV de referencia', () => {
+        assert.equal(hsr.id, 'hsr');
+        assert.deepEqual(hsr.upgradeLevels, [3, 6, 9, 12, 15]);
+        assert.equal(hsr.maxLevel, 15);
+        // 3 tiers (Low/Med/High), no 4 como Genshin.
+        assert.equal(hsr.maxTierIndex, 2);
+        for (const key of Object.keys(hsr.stat)) {
+            assert.equal(hsr.stat[key].tiers.length, 3, key);
+        }
+    });
+
+    test('lookups inversos resuelven refs de stat, main y pieza', () => {
+        assert.equal(hsr.statKeyByRef.get(hsr.stat.CRIT_RATE), 'CRIT_RATE');
+        assert.equal(hsr.mainStatKeyByRef.get(hsr.mainStat.HP_PERCENT), 'HP_PERCENT');
+        assert.equal(hsr.pieceKeyByRef.get(hsr.piece.BODY), 'BODY');
+        assert.equal(hsr.pieceKeyByRef.get(hsr.piece.HEAD), 'HEAD');
+        assert.equal(hsr.statKeyByRef.get(hsr.mainStat.CRIT_RATE), undefined, 'mainStat no debe colisionar con stat');
+    });
+
+    test('substats específicos de HSR (SPD, EHT, EHR, BE) y sin EM', () => {
+        for (const key of ['SPD', 'EFFECT_HIT_RATE', 'EFFECT_RES', 'BREAK_EFFECT']) {
+            assert.ok(hsr.stat[key], key);
+            assert.ok(hsr.stat[key].weight > 0, key);
+        }
+        assert.equal(hsr.stat.ELEMENTAL_MASTERY, undefined, 'HSR no tiene EM');
+        // Pesos suman 100 (fuente wiki).
+        const total = Object.values(hsr.stat).reduce((s, v) => s + v.weight, 0);
+        assert.equal(total, 100);
+    });
+
+    test('mainstats de cuerpo y botas: variable con mains válidos', () => {
+        const body = hsr.piece.BODY.validMainStats;
+        assert.ok(body.includes(hsr.mainStat.CRIT_RATE));
+        assert.ok(body.includes(hsr.mainStat.HEALING_BONUS));
+        assert.ok(body.includes(hsr.mainStat.EFFECT_HIT_RATE));
+        assert.ok(!body.includes(hsr.mainStat.SPD), 'cuerpo no tiene SPD');
+
+        const feet = hsr.piece.FEET.validMainStats;
+        assert.ok(feet.includes(hsr.mainStat.SPD));
+        assert.ok(!feet.includes(hsr.mainStat.CRIT_RATE), 'botas no tiene CRIT');
+
+        assert.deepEqual(hsr.variableMainPieces, ['BODY', 'FEET']);
+    });
+
+    test('simulación HSR con perfil inyectado produce rangos válidos', () => {
+        // Cabeza (mainstat fijo HP_FLAT) a +0 con 3 substats -> 4 rolls restantes.
+        const artifact = new Artifact(hsr.piece.HEAD, hsr.mainStat.HP_FLAT, 0, [
+            new Substat(hsr.stat.CRIT_RATE, 2.9),
+            new Substat(hsr.stat.HP_PERCENT, 3.8),
+            new Substat(hsr.stat.ATK_PERCENT, 3.8),
+        ]);
+
+        const result = simulate(artifact, new BuildGoal([]), null, 500, Math.random, { profile: hsr });
+
+        assert.ok(result.bestCV >= result.worstCV);
+        assert.ok(['INVERTIR', 'CONSIDERAR', 'DESCARTAR'].includes(result.verdict));
+        assert.ok(result.avgRV > 0);
+        // RV de referencia HSR: máximo real (3 tiers). Jamás debe exceder 100.
+        assert.ok(result.bestRV <= 100.1);
+    });
 });

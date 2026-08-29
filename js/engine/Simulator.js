@@ -29,6 +29,10 @@ function statKeyOf(profile, stat) {
     return profile.statKeyByRef.get(stat);
 }
 
+function mainStatKeyOf(profile, mainStat) {
+    return profile.mainStatKeyByRef.get(mainStat);
+}
+
 function upgradesDone(level, substatCount, upgradeLevels) {
     let upgrades = 0;
     for (let i = 0; i < upgradeLevels.length; i++) {
@@ -80,7 +84,7 @@ function pickWeightedRandom(candidates, rng) {
 // Fallback: solo se usa si simulate() se llama sin proyección de 4to
 // substat. El flujo normal siempre pasa projectedFourthStat.
 function pickFourthSubstatType(profile, artifact, rng) {
-    const mainKey = statKeyOf(profile, artifact.mainStat);
+    const mainKey = mainStatKeyOf(profile, artifact.mainStat);
     const existingKeys = artifact.substats.map(s => statKeyOf(profile, s.type));
 
     const candidates = Object.keys(profile.stat)
@@ -96,11 +100,11 @@ function calcCVSubstats(substats) {
     return Math.round((cd + cr * 2) * 10) / 10;
 }
 
-function calcCVTotal(substats, artifact, keyOf) {
+function calcCVTotal(substats, artifact, profile) {
     let cr = substats['CRIT_RATE'] ?? 0;
     let cd = substats['CRIT_DMG']  ?? 0;
 
-    const mainKey = keyOf(artifact.mainStat);
+    const mainKey = mainStatKeyOf(profile, artifact.mainStat);
 
     if (mainKey === 'CRIT_RATE') cr += artifact.mainStat.value;
     if (mainKey === 'CRIT_DMG')  cd += artifact.mainStat.value;
@@ -146,7 +150,7 @@ function runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthSt
 
     return {
         substats,
-        cvTotal: calcCVTotal(substats, artifact, keyOf),
+        cvTotal: calcCVTotal(substats, artifact, profile),
         cvSub:   calcCVSubstats(substats),
         rv:      calcRV(profile, substats, totalRolls),
     };
