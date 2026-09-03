@@ -1,7 +1,6 @@
-import { StatType } from '../data/StatType.js';
-import { statLabel } from './form.js';
 import { t } from '../i18n/i18n.js';
-import { STAT_KEY_BY_REF, MAINSTAT_KEY_BY_REF } from '../utils/lookup.js';
+import { getProfile } from '../data/profiles/index.js';
+import { statLabel } from './form.js';
 
 const VERDICT_META = {
     'INVERTIR':   { icon: '🔥', color: '#5FCB8A', key: 'invest'   },
@@ -25,32 +24,36 @@ const CONFIDENCE_CONFIG = {
     baja:  { key: 'confidence.low',  cls: 'low'  },
 };
 
-function getStatKey(stat) {
-    return STAT_KEY_BY_REF.get(stat);
+function profileOf(artifact) {
+    return artifact?.profile ?? getProfile('genshin');
 }
 
-function isCritStat(stat) {
-    return stat === StatType.CRIT_RATE || stat === StatType.CRIT_DMG;
+function getStatKey(profile, stat) {
+    return profile.statKeyByRef.get(stat);
 }
 
-function mainStatIsCrit(artifact) {
-    const key = MAINSTAT_KEY_BY_REF.get(artifact.mainStat);
+function isCritStat(profile, stat) {
+    return stat === profile.stat.CRIT_RATE || stat === profile.stat.CRIT_DMG;
+}
+
+function mainStatIsCrit(profile, artifact) {
+    const key = profile.mainStatKeyByRef.get(artifact.mainStat);
     return key === 'CRIT_RATE' || key === 'CRIT_DMG';
 }
 
 // Traduce los números del resultado a 2-3 frases en lenguaje llano.
 // Nunca menciona CV/RV -- esos quedan solo en la sección técnica.
-function buildHumanReasons(artifact, result) {
+function buildHumanReasons(profile, artifact, result) {
     const reasons = [];
-    const critSubstats = artifact.substats.filter(s => isCritStat(s.type)).length;
+    const critSubstats = artifact.substats.filter(s => isCritStat(profile, s.type)).length;
 
     if (critSubstats >= 2) {
         reasons.push(t('reason.doubleCrit'));
-    } else if (critSubstats === 1 && mainStatIsCrit(artifact)) {
+    } else if (critSubstats === 1 && mainStatIsCrit(profile, artifact)) {
         reasons.push(t('reason.critWithMain'));
     } else if (critSubstats === 1) {
         reasons.push(t('reason.oneCrit'));
-    } else if (!mainStatIsCrit(artifact)) {
+    } else if (!mainStatIsCrit(profile, artifact)) {
         reasons.push(t('reason.noCrit'));
     }
 
@@ -106,6 +109,8 @@ function renderProbabilityBar(result) {
 }
 
 export function displayResults(artifact, result, projectedStat = null) {
+    const profile = profileOf(artifact);
+
     // ─── Veredicto (lenguaje humano primero) ──────
     const cfg = verdictConfig(result.verdict);
     document.getElementById('verdict-icon').textContent  = cfg.icon;
@@ -117,7 +122,7 @@ export function displayResults(artifact, result, projectedStat = null) {
 
     const reasonsList = document.getElementById('verdict-reasons');
     reasonsList.innerHTML = '';
-    for (const reason of buildHumanReasons(artifact, result)) {
+    for (const reason of buildHumanReasons(profile, artifact, result)) {
         const li = document.createElement('li');
         li.textContent = reason;
         reasonsList.appendChild(li);
@@ -147,7 +152,7 @@ export function displayResults(artifact, result, projectedStat = null) {
     // Iteramos las keys que YA DEVUELVE el motor (result.*Case), no artifact.substats.
     // Así el 4to substat proyectado (cuando aplica) sale en pantalla como cualquier
     // otro, en vez de quedar calculado pero invisible.
-    const projectedKey = projectedStat ? getStatKey(projectedStat) : null;
+    const projectedKey = projectedStat ? getStatKey(profile, projectedStat) : null;
     renderScenario('best-substats',  result.bestCase,  projectedKey);
     renderScenario('avg-substats',   result.avgCase,   projectedKey);
     renderScenario('worst-substats', result.worstCase, projectedKey);
@@ -172,7 +177,7 @@ function renderScenario(containerId, caseData, projectedKey) {
     }
 }
 
-export function displayFourthSubstat(predictions, goal, confidence) {
+export function displayFourthSubstat(predictions, goal, confidence, profile = null) {
     const block   = document.getElementById('fourth-substat-block');
     const content = document.getElementById('fourth-substat-content');
     block.style.display = 'block';
@@ -182,10 +187,9 @@ export function displayFourthSubstat(predictions, goal, confidence) {
         .filter(p => goal.isDesired(p.stat))
         .reduce((sum, p) => sum + p.probability, 0);
 
-    // Qué asumió el simulador para calcular los escenarios de abajo.
-    // Esto es lo que conecta esta pantalla con las cards de resultado:
-    // el mismo dato, mostrado, no un cálculo aparte.
-    const usedKey   = getStatKey(confidence.top.stat);
+    // El perfil del artifact de origen (stats compartidos por referencia).
+    const p = profile ?? profileFromStats(predictions);
+    const usedKey   = getStatKey(p, confidence.top.stat);
     const usedLabel = statLabel(usedKey);
     const conf      = CONFIDENCE_CONFIG[confidence.level] ?? CONFIDENCE_CONFIG.media;
 
@@ -209,11 +213,11 @@ export function displayFourthSubstat(predictions, goal, confidence) {
     content.appendChild(summary);
 
     // Barras de distribución completa
-    for (const p of predictions) {
-        const key    = getStatKey(p.stat);
+    for (const pred of predictions) {
+        const key    = getStatKey(p, pred.stat);
         const label  = statLabel(key);
-        const isGood = goal.isDesired(p.stat);
-        const isMid  = p.probability >= 15;
+        const isGood = goal.isDesired(pred.stat);
+        const isMid  = pred.probability >= 15;
 
         const barClass = isGood ? 'good' : isMid ? 'mid' : 'bad';
 
@@ -223,10 +227,22 @@ export function displayFourthSubstat(predictions, goal, confidence) {
             <span class="fourth-bar-label">${label}</span>
             <div class="fourth-bar-track">
                 <div class="fourth-bar-fill fourth-bar-fill--${barClass}"
-                     style="width: ${p.probability.toFixed(1)}%"></div>
+                     style="width: ${pred.probability.toFixed(1)}%"></div>
             </div>
-            <span class="fourth-bar-pct fourth-bar-pct--${barClass}">${p.probability.toFixed(1)}%</span>
+            <span class="fourth-bar-pct fourth-bar-pct--${barClass}">${pred.probability.toFixed(1)}%</span>
         `;
         content.appendChild(item);
     }
+}
+
+function profileFromStats(predictions) {
+    if (!predictions?.length) return getProfile('genshin');
+    const first = predictions[0].stat;
+    // Buscamos el perfil cuyo statKeyByRef contiene `first` como ref (stats
+    // compartidos por referencia entre perfil y predicciones).
+    for (const id of ['genshin', 'hsr', 'zzz']) {
+        const p = getProfile(id);
+        if (p.statKeyByRef.has(first)) return p;
+    }
+    return getProfile('genshin');
 }

@@ -3,6 +3,9 @@ export const TRANSLATIONS = {
         'app.title': 'Gacha Gear Predictor',
 
         'landing.eyebrow': 'Genshin Impact · Análisis de Artefactos',
+        'landing.eyebrow.genshin': 'Genshin Impact · Análisis de Artefactos',
+        'landing.eyebrow.hsr': 'Honkai: Star Rail · Análisis de Reliquias',
+        'landing.eyebrow.zzz': 'Zenless Zone Zero · Análisis de Discos',
         'landing.sub': 'Adivina cuál será tu artefacto<br>antes de que el RNG acabe con tus esperanzas.',
         'landing.cta': 'Analizar Artefacto',
         'landing.ctaImport': 'Importar Lote',
@@ -44,6 +47,22 @@ export const TRANSLATIONS = {
         'piece.GOBLET':  'Cáliz del Eonothem',
         'piece.CIRCLET': 'Corona de los Logos',
 
+        // HSR
+        'piece.HEAD':    'Cabeza',
+        'piece.HANDS':   'Manos',
+        'piece.BODY':    'Cuerpo',
+        'piece.FEET':    'Pies',
+        'piece.SPHERE':  'Esfera Plana',
+        'piece.ROPE':    'Cuerda de Enlace',
+
+        // ZZZ
+        'piece.SLOT_1':  'Ranura 1',
+        'piece.SLOT_2':  'Ranura 2',
+        'piece.SLOT_3':  'Ranura 3',
+        'piece.SLOT_4':  'Ranura 4',
+        'piece.SLOT_5':  'Ranura 5',
+        'piece.SLOT_6':  'Ranura 6',
+
         'tip.cv-sub':  'El CV mide qué tan cargado de crítico está el artefacto usando solo sus substats. Referencia: 30+ es bueno, entre 15 y 30 es moderado, menos de 15 es bajo.',
         'tip.cv-main': 'Igual que el CV de substats, pero sumando también el mainstat cuando puede ser crítico (Reloj, Copa, Corona). Referencia: 50+ es bueno, entre 35 y 50 es moderado, menos de 35 es bajo.',
         'tip.rv':      'Qué tan bien salieron los rolls comparado con el máximo posible para este artefacto. Referencia: 85%+ es excelente, entre 70% y 85% es aceptable, menos de 70% es flojo.',
@@ -60,6 +79,7 @@ export const TRANSLATIONS = {
         'error.maxSubstats':    'Un artefacto no puede tener más de 4 substats.',
 
         'form.title': 'Ingresa tu Artefacto',
+        'form.label.game': 'Juego',
         'form.label.piece': 'Pieza',
         'form.label.mainstat': 'Main Stat',
         'form.label.level': 'Nivel',
@@ -112,6 +132,23 @@ export const TRANSLATIONS = {
         'stat.DENDRO_DMG_BONUS': 'Bono DMG Dendro',
         'stat.PHYSICAL_DMG_BONUS': 'Bono DMG Físico',
 
+        // HSR
+        'stat.SPD': 'Velocidad',
+        'stat.EFFECT_HIT_RATE': 'Prob. de Efecto',
+        'stat.EFFECT_RES': 'Resistencia a Efecto',
+        'stat.BREAK_EFFECT': 'Efecto de Ruptura',
+        'stat.ENERGY_REGEN': 'Reg. de Energía',
+        'stat.FIRE_DMG_BONUS': 'Bono DMG Fuego',
+        'stat.ICE_DMG_BONUS': 'Bono DMG Hielo',
+        'stat.WIND_DMG_BONUS': 'Bono DMG Viento',
+        'stat.LIGHTNING_DMG_BONUS': 'Bono DMG Rayo',
+        'stat.QUANTUM_DMG_BONUS': 'Bono DMG Cuántico',
+        'stat.IMAGINARY_DMG_BONUS': 'Bono DMG Imaginario',
+
+        // ZZZ
+        'stat.PEN': 'Penetración',
+        'stat.ANOMALY_MASTERY': 'Dominio de Anomalía',
+
         'verdict.invest.headline': 'Excelente inversión',
         'verdict.invest.action': 'Vale la pena subirlo hasta +20.',
         'verdict.consider.headline': 'Prometedor',
@@ -149,6 +186,9 @@ export const TRANSLATIONS = {
         'app.title': 'Gacha Gear Predictor',
 
         'landing.eyebrow': 'Genshin Impact · Artifact Analysis',
+        'landing.eyebrow.genshin': 'Genshin Impact · Artifact Analysis',
+        'landing.eyebrow.hsr': 'Honkai: Star Rail · Relic Analysis',
+        'landing.eyebrow.zzz': 'Zenless Zone Zero · Drive Disc Analysis',
         'landing.sub': 'Guess what your artifact will become<br>before the RNG crushes your hopes.',
         'landing.cta': 'Analyze Artifact',
         'landing.ctaImport': 'Batch Import',
@@ -185,6 +225,7 @@ export const TRANSLATIONS = {
         'import.skip.INVALID_ARTIFACT': 'invalid combination (duplicates, substat = main, etc.)',
 
         'form.title': 'Enter Your Artifact',
+        'form.label.game': 'Game',
         'form.label.piece': 'Piece',
         'form.label.mainstat': 'Main Stat',
         'form.label.level': 'Level',
@@ -202,6 +243,30 @@ export const TRANSLATIONS = {
         'piece.SANDS':   'Sands of Eon',
         'piece.GOBLET':  'Goblet of Eonothem',
         'piece.CIRCLET': 'Circlet of Logos',
+
+        // HSR
+        'piece.HEAD':    'Head',
+        'piece.HANDS':   'Hands',
+        'piece.BODY':    'Body',
+        'piece.FEET':    'Feet',
+        'piece.SPHERE':  'Planar Sphere',
+        'piece.ROPE':    'Link Rope',
+
+        // ZZZ
+        'piece.SLOT_1':  'Slot 1',
+        'piece.SLOT_2':  'Slot 2',
+        'piece.SLOT_3':  'Slot 3',
+        'piece.SLOT_4':  'Slot 4',
+        'piece.SLOT_5':  'Slot 5',
+        'piece.SLOT_6':  'Slot 6',
+
+        // HSR
+        'piece.HEAD':    'Head',
+        'piece.HANDS':   'Hands',
+        'piece.BODY':    'Body',
+        'piece.FEET':    'Feet',
+        'piece.SPHERE':  'Planar Sphere',
+        'piece.ROPE':    'Link Rope',
 
         'tip.cv-sub':  'CV measures how crit-heavy an artifact is using only its substats. Reference: 30+ is good, 15-30 is moderate, under 15 is low.',
         'tip.cv-main': 'Same as substat CV, but also adding the mainstat when it can be crit (Sands, Goblet, Circlet). Reference: 50+ is good, 35-50 is moderate, under 35 is low.',
@@ -257,6 +322,23 @@ export const TRANSLATIONS = {
         'stat.GEO_DMG_BONUS': 'Geo DMG Bonus',
         'stat.DENDRO_DMG_BONUS': 'Dendro DMG Bonus',
         'stat.PHYSICAL_DMG_BONUS': 'Physical DMG Bonus',
+
+        // HSR
+        'stat.SPD': 'SPD',
+        'stat.EFFECT_HIT_RATE': 'Effect Hit Rate',
+        'stat.EFFECT_RES': 'Effect RES',
+        'stat.BREAK_EFFECT': 'Break Effect',
+        'stat.ENERGY_REGEN': 'Energy Regen',
+        'stat.FIRE_DMG_BONUS': 'Fire DMG Bonus',
+        'stat.ICE_DMG_BONUS': 'Ice DMG Bonus',
+        'stat.WIND_DMG_BONUS': 'Wind DMG Bonus',
+        'stat.LIGHTNING_DMG_BONUS': 'Lightning DMG Bonus',
+        'stat.QUANTUM_DMG_BONUS': 'Quantum DMG Bonus',
+        'stat.IMAGINARY_DMG_BONUS': 'Imaginary DMG Bonus',
+
+        // ZZZ
+        'stat.PEN': 'Pen',
+        'stat.ANOMALY_MASTERY': 'Anomaly Mastery',
 
         'verdict.invest.headline': 'Excellent investment',
         'verdict.invest.action': "It's worth leveling to +20.",

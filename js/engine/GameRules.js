@@ -1,9 +1,12 @@
-import { StatType } from '../data/StatType.js';
-import { MainStatType } from '../data/MainStatType.js';
 import { StatPrediction } from '../models/StatPrediction.js';
-import { MAINSTAT_TO_SUBSTAT } from '../data/StatMapping.js';
+import { getProfile } from '../data/profiles/index.js';
+
+function resolveProfile(artifact) {
+    return artifact.profile ?? getProfile('genshin');
+}
 
 export function getAvailablePool(artifact) {
+    const profile = resolveProfile(artifact);
     const excluded = new Set();
 
     // Excluir substats existentes
@@ -12,13 +15,13 @@ export function getAvailablePool(artifact) {
     }
 
     // Excluir el mainstat si tiene equivalente en substat
-    const mainAsSubstat = MAINSTAT_TO_SUBSTAT.get(artifact.mainStat);
+    const mainAsSubstat = profile.mainstatToSubstat.get(artifact.mainStat);
     if (mainAsSubstat !== undefined) {
         excluded.add(mainAsSubstat);
     }
 
-    // Pool = todos los StatType menos los excluidos
-    return Object.values(StatType).filter(stat => !excluded.has(stat));
+    // Pool = todos los substats del perfil menos los excluidos
+    return Object.values(profile.stat).filter(stat => stat && !excluded.has(stat));
 }
 
 export function predictFourthSubstat(artifact, goal) {

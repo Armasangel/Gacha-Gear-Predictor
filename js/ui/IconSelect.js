@@ -158,9 +158,17 @@ export class IconSelect {
             el.setAttribute('role', 'option');
             el.id = `${this.optionsEl.id}-opt-${this.optionsEl.children.length}`;
             el.setAttribute('aria-selected', 'false');
-            el.innerHTML = opt.icon
-                ? `<img src="${opt.icon}" alt="${opt.label}" class="select-icon">${opt.label}`
-                : opt.label;
+            if (opt.icon) {
+                const img = document.createElement('img');
+                img.src = opt.icon;
+                img.alt = opt.label;
+                img.className = 'select-icon';
+                // Si el asset no existe (p. ej. un stat nuevo sin icono dedicado),
+                // se oculta en vez de mostrar una imagen rota.
+                img.addEventListener('error', () => img.remove());
+                el.appendChild(img);
+            }
+            el.appendChild(document.createTextNode(opt.label));
             el.addEventListener('click', () => {
                 this._select(opt.value);
                 this._setOpen(false);
@@ -191,9 +199,18 @@ export class IconSelect {
         });
 
         if (opt) {
-            this.trigger.innerHTML = opt.icon
-                ? `<img src="${opt.icon}" alt="${opt.label}" class="select-icon"><span>${opt.label}</span>`
-                : `<span>${opt.label}</span>`;
+            this.trigger.innerHTML = '';
+            if (opt.icon) {
+                const img = document.createElement('img');
+                img.src = opt.icon;
+                img.alt = opt.label;
+                img.className = 'select-icon';
+                img.addEventListener('error', () => img.remove());
+                this.trigger.appendChild(img);
+            }
+            const span = document.createElement('span');
+            span.textContent = opt.label;
+            this.trigger.appendChild(span);
         } else {
             this.trigger.innerHTML = `<span>${t('form.select.placeholder')}</span>`;
         }

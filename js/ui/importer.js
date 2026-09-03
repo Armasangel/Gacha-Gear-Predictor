@@ -1,6 +1,7 @@
 import { t } from '../i18n/i18n.js';
 import { BuildGoal } from '../models/BuildGoal.js';
 import { mapRecords, analyzeBatch } from '../io/batchImport.js';
+import { getCurrentProfileId } from './form.js';
 
 let rawRecords = [];
 let lastRows = [];
@@ -198,7 +199,7 @@ async function analyze() {
     setBusy(true);
 
     try {
-        const { mapped, skipped } = mapRecords(records);
+        const { mapped, skipped } = mapRecords(records, getCurrentProfileId());
 
         renderSkipped(skipped);
         document.getElementById('import-results').style.display = 'none';

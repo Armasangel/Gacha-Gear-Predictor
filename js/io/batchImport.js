@@ -1,11 +1,7 @@
 import { Artifact } from '../models/Artifact.js';
 import { Substat } from '../models/Substat.js';
 import { BuildGoal } from '../models/BuildGoal.js';
-import { PieceType } from '../data/PieceType.js';
-import { MainStatType } from '../data/MainStatType.js';
-import { StatType } from '../data/StatType.js';
-import { MAINSTAT_TO_SUBSTAT } from '../data/StatMapping.js';
-import { PIECE_KEY_BY_REF } from '../utils/lookup.js';
+import { getProfile } from '../data/profiles/index.js';
 import { simulate } from '../engine/Simulator.js';
 
 export const SKIP_REASONS = Object.freeze({
@@ -16,56 +12,72 @@ export const SKIP_REASONS = Object.freeze({
     INVALID_ARTIFACT: 'INVALID_ARTIFACT'
 });
 
-const VALID_LEVELS = [0, 4, 8, 12, 16, 20];
+// maps un registro normalizado a una pieza del perfil activo (org por https).
+function resolveProfile(profileId) {
+    try {
+        return getProfile(profileId);
+    } catch {
+        return getProfile('genshin');
+    }
+}
 
-export function mapRecordToArtifact(record) {
+export function mapRecordToArtifact(record, profileId = 'genshin') {
+    const profile = resolveProfile(profileId);
+
     const pieceKey = record?.piece;
-    if (!pieceKey || !PieceType[pieceKey]) {
+    if (!pieceKey || !profile.piece[pieceKey]) {
         return { ok: false, reason: SKIP_REASONS.NO_PIECE };
     }
 
     const mainKey = record.main?.key;
-    if (!mainKey || !MainStatType[mainKey]) {
+    if (!mainKey || !profile.mainStat[mainKey]) {
         return { ok: false, reason: SKIP_REASONS.NO_MAIN };
     }
 
     const level = record.main.level;
-    if (!VALID_LEVELS.includes(level)) {
+    const validLevels = [0, ...profile.upgradeLevels];
+    if (!validLevels.includes(level)) {
         return { ok: false, reason: SKIP_REASONS.UNKNOWN_LEVEL };
     }
 
     const substats = [];
     for (const s of record.substats ?? []) {
-        if (!s?.key || !StatType[s.key] || !Number.isFinite(s.value)) {
+        if (!s?.key || !profile.stat[s.key] || !Number.isFinite(s.value)) {
             return { ok: false, reason: SKIP_REASONS.BAD_SUBSTAT, detail: s?.key ?? '' };
         }
-        substats.push(new Substat(StatType[s.key], s.value));
+        substats.push(new Substat(profile.stat[s.key], s.value));
     }
 
     let knownFourth = null;
     const pendingKey = record.pending?.key;
-    if (pendingKey && StatType[pendingKey] && substats.length === 3) {
-        const mainAsSub = MAINSTAT_TO_SUBSTAT.get(MainStatType[mainKey]);
+    if (pendingKey && profile.stat[pendingKey] && substats.length === 3) {
+        const mainAsSub = profile.mainstatToSubstat.get(profile.mainStat[mainKey]);
         const collides =
-            substats.some(s => s.type === StatType[pendingKey]) ||
-            (mainAsSub !== undefined && mainAsSub === StatType[pendingKey]);
-        if (!collides) knownFourth = StatType[pendingKey];
+            substats.some(s => s.type === profile.stat[pendingKey]) ||
+            (mainAsSub !== undefined && mainAsSub === profile.stat[pendingKey]);
+        if (!collides) knownFourth = profile.stat[pendingKey];
     }
 
     try {
-        const artifact = new Artifact(PieceType[pieceKey], MainStatType[mainKey], level, substats);
+        const artifact = new Artifact(
+            profile.piece[pieceKey],
+            profile.mainStat[mainKey],
+            level,
+            substats,
+            profile
+        );
         return { ok: true, artifact, knownFourth };
     } catch {
         return { ok: false, reason: SKIP_REASONS.INVALID_ARTIFACT };
     }
 }
 
-export function mapRecords(records) {
+export function mapRecords(records, profileId = 'genshin') {
     const mapped = [];
     const skipped = [];
 
     for (const r of records ?? []) {
-        const res = mapRecordToArtifact(r);
+        const res = mapRecordToArtifact(r, profileId);
         if (res.ok) {
             mapped.push({
                 archivo: r.archivo ?? '',
@@ -115,14 +127,14 @@ export async function analyzeBatch(mappedItems, goal = new BuildGoal([]), option
 }
 
 function toRow(item, result) {
-    const fixedMain =
-        item.artifact.pieceType === PieceType.FLOWER ||
-        item.artifact.pieceType === PieceType.PLUME;
+    const profile = item.artifact.profile ?? getProfile('genshin');
+    const pieceKey = profile.pieceKeyByRef.get(item.artifact.pieceType) ?? '';
+    const fixedMain = !profile.variableMainPieces.includes(pieceKey);
 
     return {
         archivo: item.archivo,
         setName: item.setName,
-        pieceKey: PIECE_KEY_BY_REF.get(item.artifact.pieceType) ?? '',
+        pieceKey,
         level: item.artifact.level,
         fourthKnown: Boolean(item.knownFourth),
         substatCount: item.artifact.getSubstatCount(),

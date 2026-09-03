@@ -1,48 +1,73 @@
-import { StatType } from '../data/StatType.js';
-import { MainStatType } from '../data/MainStatType.js';
+// Motor de simulación Monte Carlo de gear, independiente del juego.
+//
+// Antes dependía de los módulos de datos de Genshin (StatType, PieceType,
+// StatMapping, lookup). Ahora todo el dato llega vía un `profile` (ver
+// js/data/profiles): stats, mains, piezas, mapeo main->substat, grilla de
+// niveles, número de tiers y umbrales de veredicto. Esto permite correr el
+// mismo motor para Genshin, HSR (u otro juego de HoYoverse) sin tocar la
+// lógica.
+//
+// Cada función recibe `profile` como primer argumento. El perfil expone:
+//   profile.stat                 -> { KEY: { tiers, weight } }
+//   profile.mainStat             -> { KEY: { value } }
+//   profile.piece                -> { KEY: { validMainStats: [...] } }
+//   profile.mainstatToSubstat    -> Map(mainStatRef -> substatStatRef|null)
+//   profile.upgradeLevels        -> [n, n, ...]  (grilla de mejoras)
+//   profile.maxTierIndex         -> índice del tier más alto (RV de referencia)
+//   profile.thresholds           -> umbrales de veredicto
+//   profile.statKeyByRef         -> Map(statRef -> key)
+//   profile.mainStatKeyByRef     -> Map(mainStatRef -> key)
+//   profile.pieceKeyByRef        -> Map(pieceRef -> key)
+//   profile.variableMainPieces   -> [keys de piezas de mainstat variable]
+
 import { SimulationResult } from '../models/SimulationResult.js';
-import { PieceType } from '../data/PieceType.js';
-import { STAT_KEY_BY_REF, MAINSTAT_KEY_BY_REF } from '../utils/lookup.js';
-import { VERDICT_THRESHOLDS } from './VerdictThresholds.js';
+import { getProfile } from '../data/profiles/index.js';
 
-const UPGRADE_LEVELS = [4, 8, 12, 16, 20];
-const MC_ITERATIONS  = 10000;
+const MC_ITERATIONS = 10000;
 
-function getStatKey(stat) {
-    return STAT_KEY_BY_REF.get(stat);
+function statKeyOf(profile, stat) {
+    return profile.statKeyByRef.get(stat);
 }
 
-function upgradesDone(level, substatCount) {
+function mainStatKeyOf(profile, mainStat) {
+    return profile.mainStatKeyByRef.get(mainStat);
+}
+
+function upgradesDone(level, substatCount, upgradeLevels) {
     let upgrades = 0;
-    for (const lvl of UPGRADE_LEVELS) {
-        if (lvl > level) break;
-        if (substatCount === 3 && lvl === 4) continue;
+    for (let i = 0; i < upgradeLevels.length; i++) {
+        if (upgradeLevels[i] > level) break;
+        // La primera mejora revela el 4to substat: no cuenta como roll.
+        if (substatCount === 3 && i === 0) continue;
         upgrades++;
     }
     return upgrades;
 }
 
-function upgradesRemaining(level, substatCount) {
-    const maxUpgrades = substatCount === 4 ? 5 : 4;
-    return maxUpgrades - upgradesDone(level, substatCount);
+function upgradesRemaining(level, substatCount, upgradeLevels) {
+    const maxUpgrades = substatCount === 4 ? upgradeLevels.length : upgradeLevels.length - 1;
+    return maxUpgrades - upgradesDone(level, substatCount, upgradeLevels);
 }
 
-function copySubstats(substats) {
+function copySubstats(substats, keyOf) {
     const map = {};
     for (const s of substats) {
-        map[getStatKey(s.type)] = s.value;
+        map[keyOf(s.type)] = s.value;
     }
     return map;
 }
 
-function isFixedMainPiece(artifact) {
-    return artifact.pieceType === PieceType.FLOWER ||
-           artifact.pieceType === PieceType.PLUME;
+function isVariableMainPiece(profile, artifact) {
+    const key = profile.pieceKeyByRef.get(artifact.pieceType);
+    if (profile.variableMainPieces) {
+        return profile.variableMainPieces.includes(key);
+    }
+    return !['FLOWER', 'PLUME'].includes(key);
 }
 
-// Tier al azar, equiprobable entre las 4 posiciones.
-function randomTierValue(key, rng) {
-    const tiers = StatType[key].tiers;
+// Tier al azar, equiprobable entre las posiciones reales del perfil.
+function randomTierValue(profile, key, rng) {
+    const tiers = profile.stat[key].tiers;
     return tiers[Math.floor(rng() * tiers.length)];
 }
 
@@ -57,15 +82,14 @@ function pickWeightedRandom(candidates, rng) {
 }
 
 // Fallback: solo se usa si simulate() se llama sin proyección de 4to
-// substat. El flujo normal desde main.js siempre pasa projectedFourthStat
-// (calculado por GameRules.js), así que esto casi nunca corre.
-function pickFourthSubstatType(artifact, rng) {
-    const mainKey = MAINSTAT_KEY_BY_REF.get(artifact.mainStat);
-    const existingKeys = artifact.substats.map(s => getStatKey(s.type));
+// substat. El flujo normal siempre pasa projectedFourthStat.
+function pickFourthSubstatType(profile, artifact, rng) {
+    const mainKey = mainStatKeyOf(profile, artifact.mainStat);
+    const existingKeys = artifact.substats.map(s => statKeyOf(profile, s.type));
 
-    const candidates = Object.keys(StatType)
+    const candidates = Object.keys(profile.stat)
         .filter(key => key !== mainKey && !existingKeys.includes(key))
-        .map(key => ({ key, weight: StatType[key].weight }));
+        .map(key => ({ key, weight: profile.stat[key].weight }));
 
     return pickWeightedRandom(candidates, rng);
 }
@@ -76,11 +100,11 @@ function calcCVSubstats(substats) {
     return Math.round((cd + cr * 2) * 10) / 10;
 }
 
-function calcCVTotal(substats, artifact) {
+function calcCVTotal(substats, artifact, profile) {
     let cr = substats['CRIT_RATE'] ?? 0;
     let cd = substats['CRIT_DMG']  ?? 0;
 
-    const mainKey = MAINSTAT_KEY_BY_REF.get(artifact.mainStat);
+    const mainKey = mainStatKeyOf(profile, artifact.mainStat);
 
     if (mainKey === 'CRIT_RATE') cr += artifact.mainStat.value;
     if (mainKey === 'CRIT_DMG')  cd += artifact.mainStat.value;
@@ -88,33 +112,36 @@ function calcCVTotal(substats, artifact) {
     return Math.round((cd + cr * 2) * 10) / 10;
 }
 
-function calcRV(substats, totalRolls) {
+// El RV de referencia usa el tier más alto real del perfil (no un índice
+// fijo a 4 tiers). Para Genshin es tiers[3]; para HSR tiers[2].
+function calcRV(profile, substats, totalRolls) {
     let earned = 0;
+    const maxIdx = profile.maxTierIndex;
     for (const [key, value] of Object.entries(substats)) {
-        const t4 = StatType[key].tiers[3];
-        earned += (value / t4) * 100;
+        const topTier = profile.stat[key].tiers[maxIdx];
+        earned += (value / topTier) * 100;
     }
     return Math.round((earned / (totalRolls * 100)) * 1000) / 10;
 }
 
 // Una tirada completa: revela el 4to substat (si aplica, con el stat FIJO
 // que ya se le mostró al usuario -- solo el tier es random) y aplica cada
-// upgrade restante a un substat elegido al azar entre los existentes,
-// igual que sube de nivel un artefacto real en el juego.
-function runOneTrial(artifact, remaining, totalRolls, projectedFourthStat, rng) {
-    const substats = copySubstats(artifact.substats);
+// upgrade restante a un substat elegido al azar entre los existentes.
+function runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthStat, rng) {
+    const keyOf = statKeyOf.bind(null, profile);
+    const substats = copySubstats(artifact.substats, keyOf);
 
     if (artifact.getSubstatCount() === 3) {
         const fourthKey = projectedFourthStat
-            ? getStatKey(projectedFourthStat)
-            : pickFourthSubstatType(artifact, rng);
-        substats[fourthKey] = randomTierValue(fourthKey, rng);
+            ? keyOf(projectedFourthStat)
+            : pickFourthSubstatType(profile, artifact, rng);
+        substats[fourthKey] = randomTierValue(profile, fourthKey, rng);
     }
 
     const keys = Object.keys(substats);
     for (let i = 0; i < remaining; i++) {
         const targetKey = keys[Math.floor(rng() * keys.length)];
-        substats[targetKey] += randomTierValue(targetKey, rng);
+        substats[targetKey] += randomTierValue(profile, targetKey, rng);
     }
 
     for (const key of keys) {
@@ -123,22 +150,22 @@ function runOneTrial(artifact, remaining, totalRolls, projectedFourthStat, rng) 
 
     return {
         substats,
-        cvTotal: calcCVTotal(substats, artifact),
+        cvTotal: calcCVTotal(substats, artifact, profile),
         cvSub:   calcCVSubstats(substats),
-        rv:      calcRV(substats, totalRolls),
+        rv:      calcRV(profile, substats, totalRolls),
     };
 }
 
 // Devuelve solo la categoría del veredicto: el texto visible lo construye
 // la capa de UI con i18n, no el motor.
-function verdict(artifact, cv, cvSub, rv) {
-    if (isFixedMainPiece(artifact)) {
-        const t = VERDICT_THRESHOLDS.FIXED_MAIN;
+function verdict(profile, artifact, cv, cvSub, rv, thresholds) {
+    if (isVariableMainPiece(profile, artifact)) {
+        const t = thresholds.VARIABLE_MAIN;
 
-        if (cvSub >= t.cvSub.INVEST)   return "INVERTIR";
-        if (cvSub >= t.cvSub.CONSIDER) return "CONSIDERAR";
+        if (cv >= t.cv.INVEST)   return "INVERTIR";
+        if (cv >= t.cv.CONSIDER) return "CONSIDERAR";
 
-        if (cvSub === 0) {
+        if (cv === 0) {
             if (rv >= t.rv.INVEST)   return "INVERTIR";
             if (rv >= t.rv.CONSIDER) return "CONSIDERAR";
             return "DESCARTAR";
@@ -147,12 +174,12 @@ function verdict(artifact, cv, cvSub, rv) {
         return "DESCARTAR";
     }
 
-    const t = VERDICT_THRESHOLDS.VARIABLE_MAIN;
+    const t = thresholds.FIXED_MAIN;
 
-    if (cv >= t.cv.INVEST)   return "INVERTIR";
-    if (cv >= t.cv.CONSIDER) return "CONSIDERAR";
+    if (cvSub >= t.cvSub.INVEST)   return "INVERTIR";
+    if (cvSub >= t.cvSub.CONSIDER) return "CONSIDERAR";
 
-    if (cv === 0) {
+    if (cvSub === 0) {
         if (rv >= t.rv.INVEST)   return "INVERTIR";
         if (rv >= t.rv.CONSIDER) return "CONSIDERAR";
         return "DESCARTAR";
@@ -163,24 +190,42 @@ function verdict(artifact, cv, cvSub, rv) {
 
 // projectedFourthStat: mismo parámetro que ya usaba main.js (viene de
 // GameRules.getMostLikelyFourthSubstat). iterations es nuevo y opcional.
-// rng es inyectable para hacer los tests determinísticos (seeding).
-export function simulate(artifact, goal, projectedFourthStat = null, iterations = MC_ITERATIONS, rng = Math.random) {
+// rng es inyectable para los tests determinísticos (seeding).
+//
+// profile: el perfil de juego (ver js/data/profiles). Por defecto usa
+// Genshin, de modo que los call sites existentes siguen funcionando igual.
+// El 6º argumento `config` permite pasar el perfil explícito:
+//   { profile }                  <-- perfil (lo habitual)
+// Y mantiene los atajos del refactor previo para compatibilidad:
+//   { upgradeLevels, thresholds } <-- si se pasan, pisan al perfil.
+export function simulate(
+    artifact,
+    goal,
+    projectedFourthStat = null,
+    iterations = MC_ITERATIONS,
+    rng = Math.random,
+    config = {}
+) {
+    const profile = config.profile ?? artifact.profile ?? getProfile('genshin');
+    const upgradeLevels = config.upgradeLevels ?? profile.upgradeLevels;
+    const thresholds    = config.thresholds    ?? profile.thresholds;
+
     const substatCount = artifact.getSubstatCount();
-    const remaining    = upgradesRemaining(artifact.level, substatCount);
-    const maxUpgrades  = substatCount === 4 ? 5 : 4;
+    const remaining    = upgradesRemaining(artifact.level, substatCount, upgradeLevels);
+    const maxUpgrades  = substatCount === 4 ? upgradeLevels.length : upgradeLevels.length - 1;
     const totalRolls   = 4 + maxUpgrades;
 
-    const fixedMain = isFixedMainPiece(artifact);
+    const fixedMain = !isVariableMainPiece(profile, artifact);
     const metricOf  = trial => fixedMain ? trial.cvSub : trial.cvTotal;
 
     const trials = [];
     let investCount = 0, considerCount = 0, discardCount = 0;
 
     for (let i = 0; i < iterations; i++) {
-        const trial = runOneTrial(artifact, remaining, totalRolls, projectedFourthStat, rng);
+        const trial = runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthStat, rng);
         trials.push(trial);
 
-        const category = verdict(artifact, trial.cvTotal, trial.cvSub, trial.rv);
+        const category = verdict(profile, artifact, trial.cvTotal, trial.cvSub, trial.rv, thresholds);
         if (category === "INVERTIR") investCount++;
         else if (category === "CONSIDERAR") considerCount++;
         else discardCount++;

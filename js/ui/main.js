@@ -1,26 +1,32 @@
-import { initCustomSelects, populateMainStats, resetSubstatSelects, readForm, prefillForm, refreshForm } from './form.js';
+import {
+    initCustomSelects, populateMainStats, populateLevelOptions,
+    resetSubstatSelects, readForm, prefillForm, refreshForm,
+    setProfile, getCurrentProfileId
+} from './form.js';
 import { displayResults, displayFourthSubstat } from './display.js';
 import { simulate } from '../engine/Simulator.js';
 import { predictFourthSubstat, getMostLikelyFourthSubstat, getProjectionConfidence } from '../engine/GameRules.js';
 import { initTooltips } from './tooltip.js';
-import { PieceType } from '../data/PieceType.js';
-import { MainStatType } from '../data/MainStatType.js';
-import { StatType } from '../data/StatType.js';
+import { getProfile, getAvailableProfileIds } from '../data/profiles/index.js';
 import { initI18n, setLanguage, getLanguage, t } from '../i18n/i18n.js';
 import { renderStaticTexts } from './i18nRender.js';
-import { STAT_KEY_BY_REF, MAINSTAT_KEY_BY_REF, PIECE_KEY_BY_REF } from '../utils/lookup.js';
 import { initImport, refreshImportTexts } from './importer.js';
+import { IconSelect } from './IconSelect.js';
+
+const GAME_STORAGE_KEY = 'gacha-game';
 
 // Snapshot de lo que el usuario ya ingresó, para cuando vuelva a completar
 // el 4to substat tras subir el artefacto real a +4. No se recalcula nada
 // que el usuario ya escribió, solo se reusa.
 function buildSnapshot(artifact, goal) {
+    const p = artifact.profile;
     return {
-        pieceKey: PIECE_KEY_BY_REF.get(artifact.pieceType),
-        mainKey:  MAINSTAT_KEY_BY_REF.get(artifact.mainStat),
+        profileId: p.id,
+        pieceKey: p.pieceKeyByRef.get(artifact.pieceType),
+        mainKey:  p.mainStatKeyByRef.get(artifact.mainStat),
         level:    artifact.level,
-        substats: artifact.substats.map(s => ({ key: STAT_KEY_BY_REF.get(s.type), value: s.value })),
-        desiredKeys: goal.desiredStats.map(s => STAT_KEY_BY_REF.get(s)),
+        substats: artifact.substats.map(s => ({ key: p.statKeyByRef.get(s.type), value: s.value })),
+        desiredKeys: goal.desiredStats.map(s => p.statKeyByRef.get(s)),
     };
 }
 
@@ -66,14 +72,75 @@ window.resetAndGoForm = function() {
     showScreen('screen-form');
 };
 
+// ─── Selector de juego ────────────────────────────
+function initGameSelector() {
+    const wrapper = document.getElementById('game-select');
+    if (!wrapper) return;
+
+    const options = getAvailableProfileIds().map(id => {
+        const p = getProfile(id);
+        return { value: p.id, label: p.name, icon: null };
+    });
+
+    const selector = new IconSelect(wrapper, {
+        options,
+        value: getStoredGameId(),
+        onChange: (id) => {
+            applyGame(id);
+        },
+    });
+    window.__gameSelector = selector;
+}
+
+function getStoredGameId() {
+    try {
+        return localStorage.getItem(GAME_STORAGE_KEY) || 'genshin';
+    } catch {
+        return 'genshin';
+    }
+}
+
+function applyGame(id) {
+    if (!getAvailableProfileIds().includes(id)) id = 'genshin';
+    try { localStorage.setItem(GAME_STORAGE_KEY, id); } catch {}
+    setProfile(getProfile(id));
+    // Limpiar pantalla de resultados si estamos viendo el análisis de otro juego
+    document.getElementById('fourth-substat-block').style.display = 'none';
+    document.getElementById('pending-block').style.display = 'none';
+    refreshGameLabels();
+}
+
+// Muestra el nombre del juego activo en el landing (eyebrow + badge).
+function refreshGameLabels() {
+    const profile = getProfile(getCurrentProfileId());
+
+    const eyebrow = document.getElementById('landing-eyebrow');
+    if (eyebrow) {
+        eyebrow.textContent = t(`landing.eyebrow.${profile.id}`) || t('landing.eyebrow');
+    }
+
+    const badge = document.getElementById('landing-badge');
+    if (badge) {
+        badge.textContent = '🎮 ' + profile.name;
+    }
+}
+
 // ─── Init ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // Aplicar el juego guardado ANTES de construir los selects del formulario.
+    setProfile(getProfile(getStoredGameId()));
+
     initCustomSelects();
     populateMainStats();
+    populateLevelOptions();
     initTooltips();
     initImport();
     initI18n();
     renderStaticTexts();
+    refreshGameLabels();
+
+    // Selector de juego (refleja el juego activo)
+    initGameSelector();
 
     document.getElementById('lang-switch').addEventListener('click', () => {
         const next = getLanguage() === 'es' ? 'en' : 'es';
@@ -84,14 +151,23 @@ document.addEventListener('DOMContentLoaded', () => {
         renderStaticTexts();
         refreshForm();
         refreshImportTexts();
+        refreshGameLabels();
         document.querySelector('#lang-switch .lang-code').textContent = e.detail.lang === 'es' ? 'EN' : 'ES';
+        // Re-sincronizar las etiquetas del selector de juego
+        if (window.__gameSelector) {
+            const profileId = getCurrentProfileId();
+            const options = getAvailableProfileIds().map(id => ({
+                value: id, label: getProfile(id).name, icon: null
+            }));
+            window.__gameSelector.setOptions(options, profileId);
+        }
 
         // Re-renderizar contenido dinámico si estamos en la pantalla de resultados
         const resultsScreen = document.getElementById('screen-results');
         if (resultsScreen.classList.contains('active') && lastResult) {
             displayResults(lastArtifact, lastResult, lastProjectedStat);
             if (lastIsPending && lastPredictions) {
-                displayFourthSubstat(lastPredictions, lastGoal, lastConfidence);
+                displayFourthSubstat(lastPredictions, lastGoal, lastConfidence, lastArtifact.profile);
             }
         }
     })
@@ -123,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 projectedStat = getMostLikelyFourthSubstat(artifact);
                 predictions = predictFourthSubstat(artifact, goal);
                 confidence  = getProjectionConfidence(artifact);
-                displayFourthSubstat(predictions, goal, confidence);
+                displayFourthSubstat(predictions, goal, confidence, artifact.profile);
                 lastSnapshot = buildSnapshot(artifact, goal);
             }
 

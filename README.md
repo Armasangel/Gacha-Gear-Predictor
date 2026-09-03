@@ -1,7 +1,9 @@
 # Gacha Gear Predictor
-> Herramienta de análisis y proyección de artefactos para Genshin Impact (5★)
+> Herramienta de análisis y proyección de gear para los juegos de HoYoverse: **Genshin Impact**, **Honkai: Star Rail** y **Zenless Zone Zero**.
 
-Un jugador promedio de Genshin Impact pasa horas farmeando artefactos sin saber si vale la pena invertir en uno. Esta herramienta responde esa pregunta con matemáticas reales del juego — sin instalaciones, directo en el navegador.
+Un jugador promedio de HoYoverse pasa horas farmeando artefactos sin saber si vale la pena invertir en uno. Esta herramienta responde esa pregunta con matemáticas reales del juego — sin instalaciones, directo en el navegador.
+
+Selecciona tu juego y la app adapta automáticamente piezas, mainstats, substats, grilla de niveles y umbrales de veredicto a ese específico.
 
 ---
 
@@ -102,25 +104,35 @@ Gacha-Gear-Predictor/
 │
 └── js/
     ├── data/
-    │   ├── StatType.js         # Substats con tiers y pesos
-    │   ├── MainStatType.js     # Mainstats con valor al +20
-    │   └── PieceType.js        # Piezas con mainstats válidos
+    │   ├── profiles/
+    │   │   ├── index.js          # Registro de juegos (getProfile)
+    │   │   ├── genshin.js        # Perfil Genshin Impact
+    │   │   ├── hsr.js            # Perfil Honkai: Star Rail
+    │   │   └── zzz.js            # Perfil Zenless Zone Zero
+    │   ├── StatType.js           # Substats Genshin (tiers + pesos)
+    │   ├── MainStatType.js       # Mainstats Genshin
+    │   ├── PieceType.js          # Piezas Genshin
+    │   ├── StatMapping.js        # main <-> substat (Genshin)
+    │   └── Icons.js              # Iconos SVG por stat/pieza
     │
     ├── models/
     │   ├── Substat.js
-    │   ├── Artifact.js
-    │   ├── BuildGoal.js        # Stats prioritarios del jugador
+    │   ├── Artifact.js           # Consume un perfil para validar
+    │   ├── BuildGoal.js
     │   ├── StatPrediction.js
     │   └── SimulationResult.js
     │
     ├── engine/
-    │   ├── GameRules.js        # Pool disponible + predicción 4to substat
-    │   └── Simulator.js        # Proyección mejor/peor/promedio
+    │   ├── GameRules.js          # Pool + predicción 4to substat (perfil-aware)
+    │   └── Simulator.js          # Monte Carlo (perfil-aware)
+    │
+    ├── i18n/                     # ES / EN
     │
     └── ui/
-        ├── form.js             # Lee inputs y construye modelos
-        ├── display.js          # Renderiza resultados en el DOM
-        └── main.js             # Orquesta todo
+        ├── form.js               # Form dinámico según el perfil activo
+        ├── display.js            # Renderiza resultados perfil-aware
+        ├── IconSelect.js         # Dropdown accesible con iconos
+        └── main.js               # Orquesta todo + selector de juego
 ```
 
 ---
@@ -128,10 +140,13 @@ Gacha-Gear-Predictor/
 ## Cómo usarlo
 
 1. Abre la herramienta en el navegador
-2. Selecciona el tipo de pieza y el main stat
-3. Ingresa tus substats y sus valores
-4. Marca qué substats te importan y ordénalos por prioridad (▲▼)
-5. Haz clic en **Analizar**
+2. Selecciona el juego (Genshin Impact / Honkai: Star Rail / Zenless Zone Zero)
+3. Selecciona el tipo de pieza y el main stat
+4. Ingresa tus substats y sus valores
+5. Marca qué substats te importan y ordénalos por prioridad (▲▼)
+6. Haz clic en **Analizar**
+
+La selección de juego se guarda y se recuerda entre visitas.
 
 ---
 
@@ -143,8 +158,10 @@ Gacha-Gear-Predictor/
 - [x] CV doble (substats + mainstat) y RV%
 - [x] Soporte para niveles intermedios (0, 4, 8, 12, 16, 20)
 - [x] Webapp desplegable en GitHub Pages
-- [ ] Diseño visual pulido
-- [ ] Soporte multi-juego (Star Rail, ZZZ)
+- [x] Diseño visual pulido
+- [x] Soporte multi-juego (Star Rail, ZZZ)
+- [x] Selector de juego con perfiles configurables (Genshin / Star Rail / ZZZ)
+- [x] Iconos SVG por juego
 
 ---
 
