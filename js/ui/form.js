@@ -1,6 +1,4 @@
-import { StatType } from '../data/StatType.js';
-import { MainStatType } from '../data/MainStatType.js';
-import { PieceType } from '../data/PieceType.js';
+import { getProfile } from '../data/profiles/index.js';
 import { Artifact } from '../models/Artifact.js';
 import { Substat } from '../models/Substat.js';
 import { BuildGoal } from '../models/BuildGoal.js';
@@ -8,6 +6,8 @@ import { IconSelect } from './IconSelect.js';
 import { PIECE_ICONS, STAT_ICONS } from '../data/Icons.js';
 import {t} from '../i18n/i18n.js';
 
+// Perfil de juego activo (por defecto Genshin). Se actualiza al cambiar de juego.
+let activeProfile = getProfile('genshin');
 
 //Ya no es un diccionario estático -- se resuelve en el idioma activo.
 export function statLabel(key){
@@ -23,30 +23,56 @@ let pieceSelect = null;
 const substatSelects = [];
 const substatValueSelects = [];
 
-// Se llama una sola vez al cargar la página.
-export function initCustomSelects() {
-    // Dropdown de pieza
-    const pieceWrapper = document.getElementById('pieceType-select');
-    const pieceOptions = Object.keys(PieceType).map(key => ({
-        value: key,
-        label: pieceLabel(key),
-        icon: PIECE_ICONS[key],
-    }));
-    pieceSelect = new IconSelect(pieceWrapper, {
-        options: pieceOptions,
-        value: pieceOptions[0].value,
-        onChange: () => populateMainStats(),
-    });
+function getActiveProfile() {
+    return activeProfile;
+}
 
-    // Dropdowns de substats (uno por fila)
-    const substatOptions = [
-        {value: '', label: t('form.select.placeholder'), icon : null},
-        ...Object.keys(StatType).map(key => ({
+// Cambia el perfil (juego) activo y reconstruye todos los selects.
+export function setProfile(profile) {
+    activeProfile = profile;
+    if (pieceSelect) rebuildSelects();
+}
+
+export function getCurrentProfileId() {
+    return activeProfile.id;
+}
+
+function buildPieceOptions() {
+    const p = getActiveProfile();
+    return Object.keys(p.piece)
+        .filter(key => p.pieceOrder.includes(key))
+        .map(key => ({
+            value: key,
+            label: pieceLabel(key),
+            icon: PIECE_ICONS[key],
+        }));
+}
+
+function buildSubstatOptions() {
+    const p = getActiveProfile();
+    return [
+        { value: '', label: t('form.select.placeholder'), icon: null },
+        ...Object.keys(p.stat).map(key => ({
             value: key,
             label: statLabel(key),
             icon: STAT_ICONS[key],
         })),
     ];
+}
+
+// Se llama una sola vez al cargar la página.
+export function initCustomSelects() {
+    // Dropdown de pieza
+    const pieceWrapper = document.getElementById('pieceType-select');
+    const pieceOptions = buildPieceOptions();
+    pieceSelect = new IconSelect(pieceWrapper, {
+        options: pieceOptions,
+        value: pieceOptions[0]?.value ?? '',
+        onChange: () => populateMainStats(),
+    });
+
+    // Dropdowns de substats (uno por fila)
+    const substatOptions = buildSubstatOptions();
 
     document.querySelectorAll('.substat-row').forEach((row, i) => {
         const typeWrapper  = row.querySelector('.substat-type-select');
@@ -73,8 +99,53 @@ export function initCustomSelects() {
     });
 }
 
+// Reconstruye opciones de pieza/substats preservando selecciones válidas.
+// Se usa al cambiar de idioma o de juego.
+function rebuildSelects() {
+    const pieceOptions = buildPieceOptions();
+    const previousPiece = pieceSelect?.value;
+    const keepPiece = pieceOptions.some(o => o.value === previousPiece) ? previousPiece : (pieceOptions[0]?.value ?? '');
+    pieceSelect.setOptions(pieceOptions, keepPiece);
+
+    const substatOptions = buildSubstatOptions();
+    substatSelects.forEach((s) => {
+        const prev = s.value;
+        const keep = substatOptions.some(o => o.value === prev) ? prev : '';
+        s.setOptions(substatOptions, keep);
+    });
+
+    // Repoblar las opciones de valor de cada fila según el tipo conservado
+    substatSelects.forEach((s, i) => {
+        if (s.value) populateValueOptions(i);
+        else substatValueSelects[i].setOptions([{ value: '', label: '--', icon: null }]);
+    });
+
+    populateMainStats();
+    populateLevelOptions();
+    populateGoalCheckboxes();
+}
+
+// Llena el select de nivel con la grilla del perfil activo (+0, +3, ...).
+// Se llama al iniciar y cada vez que cambia de juego.
+export function populateLevelOptions() {
+    const p = getActiveProfile();
+    const levelSelect = document.getElementById('level');
+    const prev = levelSelect.value;
+    const levels = [0, ...p.upgradeLevels];
+
+    // Preserva el nivel previo si sigue siendo válido para este juego; en el
+    // primer render (o si el previo ya no existe) cae a +0.
+    const hasPrev = levels.some(lv => String(lv) === prev);
+
+    levelSelect.innerHTML = levels.map(lv => {
+        const sel = (hasPrev && String(lv) === prev) || (!hasPrev && lv === 0);
+        return `<option value="${lv}" ${sel ? 'selected' : ''}>+${lv}</option>`;
+    }).join('');
+}
+
 //Llena el select de valor de la fila i con los tiers reales del stat
 function populateValueOptions(rowIndex) {
+    const p = getActiveProfile();
     const typeKey     = substatSelects[rowIndex].value;
     const valueSelect = substatValueSelects[rowIndex];
 
@@ -83,7 +154,7 @@ function populateValueOptions(rowIndex) {
         return;
     }
 
-    const { tiers } = StatType[typeKey];
+    const { tiers } = p.stat[typeKey];
     const options = tiers.map(tier => ({
         value: String(tier),
         label: formatStatValue(typeKey, tier),
@@ -98,17 +169,24 @@ function formatStatValue(typeKey, tier){
         typeKey.endsWith('CRIT_RATE') ||
         typeKey.endsWith('CRIT_DMG') || 
         typeKey === 'ENERGY_RECHARGE' || 
-        typeKey === 'HEALING_BONUS';
+        typeKey === 'HEALING_BONUS' ||
+        typeKey === 'ENERGY_REGEN' ||
+        typeKey === 'EFFECT_HIT_RATE' || 
+        typeKey === 'EFFECT_RES' ||
+        typeKey === 'BREAK_EFFECT' ||
+        typeKey === 'PEN';
     return esPorcentaje ? `${tier.toFixed(1)}%` : `${tier}`;
 }
 
 export function populateMainStats() {
+    const p = getActiveProfile();
     const pieceKey   = pieceSelect.value;
     const mainSelect = document.getElementById('mainStat');
-    const piece      = PieceType[pieceKey];
+    const piece      = p.piece[pieceKey];
 
     mainSelect.innerHTML = '';
-    for (const [key, value] of Object.entries(MainStatType)) {
+    if (!piece) return;
+    for (const [key, value] of Object.entries(p.mainStat)) {
         if (piece.validMainStats.includes(value)) {
             const option = document.createElement('option');
             option.value = key;
@@ -164,12 +242,13 @@ export function populateGoalCheckboxes() {
 }
 
 export function readForm() {
+    const p = getActiveProfile();
     const pieceKey = pieceSelect.value;
     const mainKey  = document.getElementById('mainStat').value;
     const level    = parseInt(document.getElementById('level').value);
 
-    const piece   = PieceType[pieceKey];
-    const mainVal = MainStatType[mainKey];
+    const piece   = p.piece[pieceKey];
+    const mainVal = p.mainStat[mainKey];
 
     // Leer substats
     const substatRows = document.querySelectorAll('.substat-row');
@@ -178,7 +257,7 @@ export function readForm() {
         const typeKey = substatSelects[i].value;
         const value = parseFloat(substatValueSelects[i].value);
         if (typeKey && !isNaN(value)){
-            substats.push(new Substat(StatType[typeKey], value));
+            substats.push(new Substat(p.stat[typeKey], value));
         }
     });
 
@@ -188,11 +267,11 @@ export function readForm() {
     for (const item of items) {
         const cb = item.querySelector('input[type="checkbox"]');
         if (cb.checked) {
-            desiredStats.push(StatType[item.dataset.key]);
+            desiredStats.push(p.stat[item.dataset.key]);
         }
     }
 
-    const artifact = new Artifact(piece, mainVal, level, substats);
+    const artifact = new Artifact(piece, mainVal, level, substats, p);
     const goal     = new BuildGoal(desiredStats);
 
     return { artifact, goal };
@@ -202,27 +281,13 @@ export function readForm() {
 // eligió el usuario: reconstruye options y triggers, preserva la selección
 // de pieza/substats/mainstat y solo actualiza los nombres de los checkboxes.
 export function refreshForm() {
-    const pieceOptions = Object.keys(PieceType).map(key => ({
-        value: key,
-        label: pieceLabel(key),
-        icon: PIECE_ICONS[key],
-    }));
-    pieceSelect.setOptions(pieceOptions, pieceSelect.value);
-
-    const substatOptions = [
-        { value: '', label: t('form.select.placeholder'), icon: null },
-        ...Object.keys(StatType).map(key => ({
-            value: key,
-            label: statLabel(key),
-            icon: STAT_ICONS[key],
-        })),
-    ];
-    substatSelects.forEach(s => s.setOptions(substatOptions, s.value));
+    rebuildSelects();
 
     const mainSelect = document.getElementById('mainStat');
     const mainValue  = mainSelect.value;
-    populateMainStats();
-    if (mainValue) mainSelect.value = mainValue;
+    // rebuildSelects ya llama populateMainStats; re-seleccionamos si sigue válido
+    const validMain = [...mainSelect.options].some(o => o.value === mainValue);
+    if (validMain) mainSelect.value = mainValue;
 
     document.querySelectorAll('#goal-checkboxes .goal-item').forEach(item => {
         item.querySelector('span').textContent = statLabel(item.dataset.key);

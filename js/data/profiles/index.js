@@ -8,10 +8,12 @@
 
 import { buildGenshinProfile } from './genshin.js';
 import { buildHsrProfile } from './hsr.js';
+import { buildZzzProfile } from './zzz.js';
 
 const BUILDERS = Object.freeze({
     genshin: buildGenshinProfile,
     hsr: buildHsrProfile,
+    zzz: buildZzzProfile,
 });
 
 const CACHE = new Map();

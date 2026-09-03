@@ -18,9 +18,10 @@
     <section class="screen active" id="screen-landing">
         <div class="stars"></div>
         <div class="landing-content">
-            <p class="landing-eyebrow" data-i18n="landing.eyebrow"></p>
+            <p class="landing-eyebrow" id="landing-eyebrow"></p>
             <h1 class="landing-title">Gacha<br>Gear<br>Predictor</h1>
             <p class="landing-sub" data-i18n-html="landing.sub"></p>
+            <span class="landing-badge" id="landing-badge"></span>
             <button class="btn-primary" onclick="showScreen('screen-form')" data-i18n="landing.cta">
                 Analizar Artefacto
             </button>
@@ -34,6 +35,14 @@
     <section class="screen" id="screen-form">
         <div class="screen-inner">
             <h2 class="screen-title" data-i18n="form.title">Ingresa tu Artefacto</h2>
+
+            <div class="form-group form-group--full game-select-group">
+                <label class="form-label" data-i18n="form.label.game">Juego</label>
+                <div class="custom-select-wrapper" id="game-select">
+                    <div class="custom-select-trigger"></div>
+                    <div class="custom-options"></div>
+                </div>
+            </div>
 
             <div class="form-grid">
 

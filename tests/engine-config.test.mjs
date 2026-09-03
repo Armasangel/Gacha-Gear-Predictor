@@ -183,3 +183,52 @@ describe('perfil HSR: contrato de datos abstracto del motor', () => {
         assert.ok(result.bestRV <= 100.1);
     });
 });
+
+describe('perfil ZZZ: contrato de datos abstracto del motor', () => {
+    const zzz = getProfile('zzz');
+
+    test('identidad, grilla y tiers', () => {
+        assert.equal(zzz.id, 'zzz');
+        assert.deepEqual(zzz.upgradeLevels, [3, 6, 9, 12, 15]);
+        assert.equal(zzz.maxLevel, 15);
+        assert.equal(zzz.maxTierIndex, 2);
+        for (const key of Object.keys(zzz.stat)) {
+            assert.equal(zzz.stat[key].tiers.length, 3, key);
+            assert.ok(zzz.stat[key].weight > 0, key);
+        }
+    });
+
+    test('piezas: slots 1-3 fijos, 4-6 variables con sus mains', () => {
+        assert.deepEqual(zzz.pieceOrder, ['SLOT_1','SLOT_2','SLOT_3','SLOT_4','SLOT_5','SLOT_6']);
+        assert.deepEqual(zzz.variableMainPieces, ['SLOT_4','SLOT_5','SLOT_6']);
+
+        assert.equal(zzz.piece.SLOT_1.validMainStats.length, 1);
+        assert.equal(zzz.piece.SLOT_2.validMainStats.length, 1);
+        assert.equal(zzz.piece.SLOT_3.validMainStats.length, 1);
+
+        // Slot 4: incluye crit y PEN
+        assert.ok(zzz.piece.SLOT_4.validMainStats.includes(zzz.mainStat.CRIT_RATE));
+        assert.ok(zzz.piece.SLOT_4.validMainStats.includes(zzz.mainStat.PEN));
+        // Slot 6: no tiene crit, sí ANOMALY_MASTERY
+        assert.ok(!zzz.piece.SLOT_6.validMainStats.includes(zzz.mainStat.CRIT_RATE));
+        assert.ok(zzz.piece.SLOT_6.validMainStats.includes(zzz.mainStat.ANOMALY_MASTERY));
+    });
+
+    test('simulación ZZZ con perfil inyectado produce rangos válidos', () => {
+        const artifact = new Artifact(zzz.piece.SLOT_1, zzz.mainStat.ATK_FLAT, 0, [
+            new Substat(zzz.stat.CRIT_RATE, 2.8),
+            new Substat(zzz.stat.CRIT_DMG, 5.6),
+            new Substat(zzz.stat.ATK_PERCENT, 2.8),
+        ], zzz);
+
+        const result = simulate(artifact, new BuildGoal([]), null, 500, Math.random, { profile: zzz });
+
+        assert.ok(result.bestCV >= result.worstCV);
+        assert.ok(['INVERTIR', 'CONSIDERAR', 'DESCARTAR'].includes(result.verdict));
+        assert.ok(result.avgRV > 0);
+        assert.ok(result.bestRV <= 100.1);
+
+        const total = result.successRate + result.considerRate + result.discardRate;
+        assert.ok(Math.abs(total - 100) <= 0.4);
+    });
+});

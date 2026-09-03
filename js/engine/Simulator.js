@@ -206,7 +206,7 @@ export function simulate(
     rng = Math.random,
     config = {}
 ) {
-    const profile = config.profile ?? getProfile('genshin');
+    const profile = config.profile ?? artifact.profile ?? getProfile('genshin');
     const upgradeLevels = config.upgradeLevels ?? profile.upgradeLevels;
     const thresholds    = config.thresholds    ?? profile.thresholds;
 
