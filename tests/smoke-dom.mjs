@@ -60,7 +60,7 @@ async function setRow(doc, i, statKey, tierValue) {
     await wait(20);
 }
 
-async function main() {
+async function main() { 
     // Esperar a que el módulo main.js cargue y corra DOMContentLoaded
     await wait(500);
 

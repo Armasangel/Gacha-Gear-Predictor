@@ -49,7 +49,7 @@ window.showScreen = function(id) {
     window.scrollTo(0, 0);
 };
 
-window.toggleDetails = function() {
+window.toggleDetails = function() { // Muestra u oculta el bloque de detalles de la simulación, cambiando el texto del botón según el estado. Se obtiene el bloque y el botón por su id, se verifica si está abierto (display distinto de 'none'), se cambia el display del bloque y se actualiza el texto del botón usando la función t para traducir.
     const block  = document.getElementById('details-block');
     const btn    = document.getElementById('details-toggle');
     const open   = block.style.display !== 'none';
@@ -57,8 +57,8 @@ window.toggleDetails = function() {
     btn.textContent = open ? t('results.details.show') : t('results.details.hide');
 };
 
-window.resetAndGoForm = function() {
-    resetSubstatSelects(); // ya limpia type-selects y value-selects
+window.resetAndGoForm = function() { // Resetea el estado del formulario y vuelve a la pantalla de formulario. Se limpian los selects de substats, se ocultan los bloques de goal, 4to substat, pending y detalles, y se resetean las variables de último artefacto, resultado, proyección, predicciones, goal y confianza.
+    resetSubstatSelects(); 
     document.getElementById('goal-checkboxes').innerHTML = '';
     document.getElementById('fourth-substat-block').style.display = 'none';
     document.getElementById('pending-block').style.display = 'none';
@@ -72,8 +72,7 @@ window.resetAndGoForm = function() {
     showScreen('screen-form');
 };
 
-// ─── Selector de juego ────────────────────────────
-function initGameSelector() {
+function initGameSelector() { // Inicializa el selector de juego en la UI, creando un IconSelect con las opciones de juegos disponibles según los perfiles. Se obtiene el contenedor por su id, se crean las opciones con el id y nombre del perfil, y se establece el valor inicial según el juego guardado. Al cambiar de juego, se aplica el nuevo perfil y se actualizan las etiquetas de la UI.
     const wrapper = document.getElementById('game-select');
     if (!wrapper) return;
 
@@ -92,7 +91,7 @@ function initGameSelector() {
     window.__gameSelector = selector;
 }
 
-function getStoredGameId() {
+function getStoredGameId() { // Devuelve el id del juego guardado en localStorage, o 'genshin' si no hay ninguno o hay un error al acceder a localStorage. Se intenta obtener el valor de localStorage con la clave GAME_STORAGE_KEY, y si falla se devuelve 'genshin'.
     try {
         return localStorage.getItem(GAME_STORAGE_KEY) || 'genshin';
     } catch {
@@ -100,7 +99,7 @@ function getStoredGameId() {
     }
 }
 
-function applyGame(id) {
+function applyGame(id) { // Aplica un juego por id, actualizando el perfil activo y guardando el id en localStorage. Si el id no corresponde a un perfil conocido, se usa 'genshin' como fallback. Se obtiene el constructor del perfil, se construye y cachea si es necesario, y se llama a setProfile con el perfil obtenido. Se limpian los bloques de resultados y se actualizan las etiquetas de la UI.
     if (!getAvailableProfileIds().includes(id)) id = 'genshin';
     try { localStorage.setItem(GAME_STORAGE_KEY, id); } catch {}
     setProfile(getProfile(id));
@@ -115,17 +114,17 @@ function refreshGameLabels() {
     const profile = getProfile(getCurrentProfileId());
 
     const eyebrow = document.getElementById('landing-eyebrow');
-    if (eyebrow) {
+    if (eyebrow) { // Si el elemento eyebrow existe, se actualiza su texto con la traducción correspondiente al id del perfil activo, usando la función t para traducir. Si no hay traducción específica, se usa un valor por defecto.
         eyebrow.textContent = t(`landing.eyebrow.${profile.id}`) || t('landing.eyebrow');
     }
 
     const badge = document.getElementById('landing-badge');
-    if (badge) {
+    if (badge) { // Si el elemento badge existe, se actualiza su texto con un emoji de control y el nombre del perfil activo. Se obtiene el nombre del perfil desde profile.name.
         badge.textContent = '🎮 ' + profile.name;
     }
 }
 
-// ─── Init ─────────────────────────────────────────
+// Init 
 document.addEventListener('DOMContentLoaded', () => {
     // Aplicar el juego guardado ANTES de construir los selects del formulario.
     setProfile(getProfile(getStoredGameId()));
@@ -147,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLanguage(next);
     });
 
-    window.addEventListener('languagechange', (e) => {
+    window.addEventListener('languagechange', (e) => { // Cuando cambia el idioma, se re-renderizan los textos estáticos, se refresca el formulario y la importación, se actualiza el texto del switch de idioma, se re-sincroniza el selector de juego y se re-renderiza el contenido dinámico si estamos en la pantalla de resultados. Se usan las funciones renderStaticTexts, refreshForm, refreshImportTexts, refreshGameLabels y displayResults/displayFourthSubstat según corresponda.
         renderStaticTexts();
         refreshForm();
         refreshImportTexts();
@@ -209,13 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('verdict-block').style.display = isPending ? 'none'  : 'block';
 
             let result;
-            if (!isPending) {
+            if (!isPending) { // Si el artefacto tiene 4 substats, se simula normalmente y se muestra el resultado real
                 result = simulate(artifact, goal, null);
                 displayResults(artifact, result, null);
-            } else {
-                // Igual corremos la simulación de referencia para las cards
-                // mejor/promedio/peor -- son útiles para decidir si vale la
-                // pena llegar a +4, solo que ya no se llaman "veredicto".
+            } else { // Si el artefacto tiene 3 substats, se simula usando el 4to substat proyectado y se muestra el resultado con ese stat
                 result = simulate(artifact, goal, projectedStat);
                 displayResults(artifact, result, projectedStat);
             }

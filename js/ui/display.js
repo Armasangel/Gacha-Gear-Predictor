@@ -86,7 +86,7 @@ function renderProbabilityBar(result) {
         { label: t('probability.discard'),  value: result.discardRate,  cls: 'danger'  },
     ];
 
-    for (const r of rows) {
+    for (const r of rows) { // Para cada fila de probabilidad, se crea un div con la barra de progreso y el porcentaje, usando las clases visuales correspondientes (good/mid/bad)
         const item = document.createElement('div');
         item.className = 'fourth-bar-item';
         item.innerHTML = `
@@ -100,7 +100,7 @@ function renderProbabilityBar(result) {
         container.appendChild(item);
     }
 
-    if (result.iterations) {
+    if (result.iterations) { // Si hay datos de Montecarlo, se agrega un texto que indica cuántas iteraciones se usaron para calcular las probabilidades
         const note = document.createElement('p');
         note.className = 'fourth-assumption-text';
         note.textContent = t('probability.basedOn', { n: result.iterations.toLocaleString() });
@@ -122,7 +122,7 @@ export function displayResults(artifact, result, projectedStat = null) {
 
     const reasonsList = document.getElementById('verdict-reasons');
     reasonsList.innerHTML = '';
-    for (const reason of buildHumanReasons(profile, artifact, result)) {
+    for (const reason of buildHumanReasons(profile, artifact, result)) { // Para cada razón humana, se crea un elemento de lista y se agrega a la lista de razones del veredicto
         const li = document.createElement('li');
         li.textContent = reason;
         reasonsList.appendChild(li);
@@ -158,11 +158,11 @@ export function displayResults(artifact, result, projectedStat = null) {
     renderScenario('worst-substats', result.worstCase, projectedKey);
 }
 
-function renderScenario(containerId, caseData, projectedKey) {
+function renderScenario(containerId, caseData, projectedKey) { // Renderiza un escenario de substats (best, avg, worst) en el contenedor dado, mostrando cada substat con su label y valor, y resaltando el substat proyectado si aplica
     const container = document.getElementById(containerId);
     container.innerHTML = '';
 
-    for (const key of Object.keys(caseData)) {
+    for (const key of Object.keys(caseData)) { // Para cada substat del escenario, se obtiene su label y valor, y se crea un div con la información. Si el substat es el proyectado, se le agrega una clase especial y un tag de "proyectado".
         const label       = statLabel(key);
         const value        = caseData[key]?.toFixed(1) ?? '-';
         const isProjected = key === projectedKey;
@@ -177,7 +177,7 @@ function renderScenario(containerId, caseData, projectedKey) {
     }
 }
 
-export function displayFourthSubstat(predictions, goal, confidence, profile = null) {
+export function displayFourthSubstat(predictions, goal, confidence, profile = null) { //
     const block   = document.getElementById('fourth-substat-block');
     const content = document.getElementById('fourth-substat-content');
     block.style.display = 'block';
@@ -213,7 +213,7 @@ export function displayFourthSubstat(predictions, goal, confidence, profile = nu
     content.appendChild(summary);
 
     // Barras de distribución completa
-    for (const pred of predictions) {
+    for (const pred of predictions) {// Para cada predicción de substat, se obtiene su label, probabilidad y si es deseado según el goal. Se crea un div con la barra de progreso y el porcentaje, usando las clases visuales correspondientes (good/mid/bad).
         const key    = getStatKey(p, pred.stat);
         const label  = statLabel(key);
         const isGood = goal.isDesired(pred.stat);
@@ -235,7 +235,7 @@ export function displayFourthSubstat(predictions, goal, confidence, profile = nu
     }
 }
 
-function profileFromStats(predictions) {
+function profileFromStats(predictions) { // Dado un array de StatPrediction, devuelve el perfil de juego que contiene los stats referenciados por las predicciones. Si no se encuentra ninguno, devuelve el perfil "genshin" por defecto.
     if (!predictions?.length) return getProfile('genshin');
     const first = predictions[0].stat;
     // Buscamos el perfil cuyo statKeyByRef contiene `first` como ref (stats

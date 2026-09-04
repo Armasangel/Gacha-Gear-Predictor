@@ -3,7 +3,7 @@ export class BuildGoal{
         this.desiredStats = desiredStats;
     }
 
-    isDesired(stat){
+    isDesired(stat){ // Devuelve true si el stat es uno de los deseados, false en caso contrarios
         return this.desiredStats.includes(stat);
     }
 }

@@ -36,8 +36,8 @@ export function initTooltips() {
         e.stopPropagation();
     });
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+    document.addEventListener('keydown', (e) => { // Cierra cualquier tooltip abierto al presionar Escape
+        if (e.key === 'Escape') { 
             const existing = document.querySelector('.tooltip-bubble');
             if (existing) existing.remove();
         }

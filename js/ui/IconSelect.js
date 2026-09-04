@@ -3,7 +3,7 @@ import { t } from '../i18n/i18n.js';
 let globalCloseBound = false;
 let uidCounter = 0;
 
-export class IconSelect {
+export class IconSelect { // Un select con iconos, que reemplaza a un <select> nativo. Se puede navegar con el teclado y es accesible (patrón ARIA combobox/listbox). Se inicializa con un wrapper que contiene un trigger y un contenedor de opciones.
     constructor(wrapperEl, { options = [], value = null, onChange = null } = {}) {
         this.wrapper = wrapperEl;
         this.trigger = wrapperEl.querySelector('.custom-select-trigger');
@@ -29,7 +29,7 @@ export class IconSelect {
         // click llegue a la opción (rompía la selección con el ratón).
         this.optionsEl.addEventListener('mousedown', (e) => e.preventDefault());
 
-        this.trigger.addEventListener('click', (e) => {
+        this.trigger.addEventListener('click', (e) => { // Abrir/cerrar el dropdown al hacer click en el trigger. Cierra otros selects abiertos.
             e.stopPropagation();
             this._closeOthers();
             this._setOpen(!this._isOpen());
@@ -146,12 +146,12 @@ export class IconSelect {
         }
     }
 
-    setOptions(options, value = null) {
+    setOptions(options, value = null) { // Establece las opciones del select y selecciona el valor dado (o el primero si no se da). Cada opción es un objeto {value, label, icon}. Se puede llamar varias veces para actualizar las opciones.
         this.options = options;
         this.optionsEl.innerHTML = '';
         this._activeIndex = -1;
 
-        for (const opt of options) {
+        for (const opt of options) { // Para cada opción, se crea un div con la clase custom-option, el valor en data-value, el label y el icono (si lo hay). Se agrega un listener de click para seleccionar la opción.
             const el = document.createElement('div');
             el.className = 'custom-option';
             el.dataset.value = opt.value;
@@ -188,7 +188,7 @@ export class IconSelect {
         this._select(v, true);
     }
 
-    _select(value, silent = false) {
+    _select(value, silent = false) { // Selecciona un valor del select, actualizando la UI y llamando al callback onChange si no es silencioso. Si el valor no existe en las opciones, se deselecciona.
         this._value = value;
         const opt = this.options.find(o => o.value === value);
 
@@ -198,9 +198,9 @@ export class IconSelect {
             el.setAttribute('aria-selected', String(isSelected));
         });
 
-        if (opt) {
+        if (opt) { // Si la opción existe, se actualiza el trigger con el icono y label de la opción seleccionada
             this.trigger.innerHTML = '';
-            if (opt.icon) {
+            if (opt.icon) { // Si la opción tiene icono, se crea un img con el src del icono y el alt del label. Si el asset no existe, se oculta en vez de mostrar una imagen rota.
                 const img = document.createElement('img');
                 img.src = opt.icon;
                 img.alt = opt.label;
@@ -211,11 +211,11 @@ export class IconSelect {
             const span = document.createElement('span');
             span.textContent = opt.label;
             this.trigger.appendChild(span);
-        } else {
+        } else { // Si la opción no existe, se muestra un placeholder en el trigger
             this.trigger.innerHTML = `<span>${t('form.select.placeholder')}</span>`;
         }
 
-        if (!silent && typeof this.onChange === 'function') {
+        if (!silent && typeof this.onChange === 'function') { // Si no es silencioso y hay un callback onChange, se llama con el valor seleccionado
             this.onChange(value);
         }
     }

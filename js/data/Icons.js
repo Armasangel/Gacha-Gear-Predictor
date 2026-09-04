@@ -44,7 +44,7 @@ export const STAT_ICONS = {
     ELEMENTAL_MASTERY:  'js/images/Icon_Attribute_Elemental_Mastery.svg',
     HEALING_BONUS:      'js/images/Icon_Attribute_Healing.svg',
 
-    // DMG bonus elementales -> icono del elemento correspondiente
+    // DMG bonus elementales GENSHIN -> icono del elemento correspondiente
     PYRO_DMG_BONUS:     'js/images/Element_Pyro.svg',
     HYDRO_DMG_BONUS:    'js/images/Element_Hydro.svg',
     CRYO_DMG_BONUS:     'js/images/Element_Cryo.svg',
@@ -52,13 +52,12 @@ export const STAT_ICONS = {
     ANEMO_DMG_BONUS:    'js/images/Element_Anemo.svg',
     GEO_DMG_BONUS:      'js/images/Element_Geo.svg',
     DENDRO_DMG_BONUS:   'js/images/Element_Dendro.svg',
-    // HSR DMG bonus elementales (mismo catálogo)
     FIRE_DMG_BONUS:     'js/images/Element_Pyro.svg',
     ICE_DMG_BONUS:      'js/images/Element_Cryo.svg',
     WIND_DMG_BONUS:     'js/images/Element_Anemo.svg',
-    LIGHTNING_DMG_BONUS:'js/images/Element_Electro.svg',
-    QUANTUM_DMG_BONUS:  'js/images/Element_Dendro.svg',
-    IMAGINARY_DMG_BONUS:'js/images/Element_Hydro.svg',
+    LIGHTNING_DMG_BONUS: 'js/images/Element_Electro.svg',
+    QUANTUM_DMG_BONUS:  'js/images/Element_Quantum.svg',
+    IMAGINARY_DMG_BONUS: 'js/images/Element_Imaginary.svg',
 
     // Físico / HSR / ZZZ sin asset dedicado -> texto sin icono
     PHYSICAL_DMG_BONUS:  null,

@@ -26,59 +26,63 @@ import { getProfile } from '../data/profiles/index.js';
 const MC_ITERATIONS = 10000;
 
 function statKeyOf(profile, stat) {
-    return profile.statKeyByRef.get(stat);
+    return profile.statKeyByRef.get(stat); // Convierte un statRef en su key correspondiente según el perfil
 }
 
 function mainStatKeyOf(profile, mainStat) {
-    return profile.mainStatKeyByRef.get(mainStat);
+    return profile.mainStatKeyByRef.get(mainStat); // Convierte un mainStatRef en su key correspondiente según el perfil
 }
 
-function upgradesDone(level, substatCount, upgradeLevels) {
+function upgradesDone(level, substatCount, upgradeLevels) { // Devuelve la cantidad de mejoras aplicadas al artefacto según su nivel y la grilla de mejoras del perfil
     let upgrades = 0;
-    for (let i = 0; i < upgradeLevels.length; i++) {
-        if (upgradeLevels[i] > level) break;
+    for (let i = 0; i < upgradeLevels.length; i++) { // Itera sobre la grilla de niveles de mejora del perfil
+        if (upgradeLevels[i] > level) break; // Si el nivel de mejora del perfil es mayor que el nivel del artefacto, se detiene
         // La primera mejora revela el 4to substat: no cuenta como roll.
-        if (substatCount === 3 && i === 0) continue;
-        upgrades++;
+        if (substatCount === 3 && i === 0) continue; // Si el artefacto tiene 3 substats y es la primera mejora, se salta (no cuenta como roll)
+        upgrades++; // Incrementa el contador de mejoras aplicadas al artefacto
     }
     return upgrades;
 }
 
+// Devuelve la cantidad de mejoras restantes que se pueden aplicar al artefacto según su nivel, la cantidad de substats y la grilla de mejoras del perfil
 function upgradesRemaining(level, substatCount, upgradeLevels) {
     const maxUpgrades = substatCount === 4 ? upgradeLevels.length : upgradeLevels.length - 1;
     return maxUpgrades - upgradesDone(level, substatCount, upgradeLevels);
 }
 
+// Copia los substats del artefacto en un objeto {key: value} según el perfil, usando la función keyOf para convertir los statRef en keys
 function copySubstats(substats, keyOf) {
     const map = {};
-    for (const s of substats) {
+    for (const s of substats) { // Itera sobre los substats del artefacto
         map[keyOf(s.type)] = s.value;
     }
     return map;
 }
 
+// Devuelve true si el artefacto es de mainstat variable según el perfil (por ejemplo, Sands, Goblet o Circlet en Genshin). Para piezas de mainstat fijo (Flower, Plume) devuelve false.
 function isVariableMainPiece(profile, artifact) {
     const key = profile.pieceKeyByRef.get(artifact.pieceType);
     if (profile.variableMainPieces) {
-        return profile.variableMainPieces.includes(key);
+        return profile.variableMainPieces.includes(key); // Devuelve true si la pieza es de mainstat variable según el perfil
     }
-    return !['FLOWER', 'PLUME'].includes(key);
+    return !['FLOWER', 'PLUME'].includes(key); // Devuelve true si la pieza no es Flower ni Plume (mainstat fijo) según el perfils
 }
-
+ 
 // Tier al azar, equiprobable entre las posiciones reales del perfil.
 function randomTierValue(profile, key, rng) {
     const tiers = profile.stat[key].tiers;
     return tiers[Math.floor(rng() * tiers.length)];
 }
 
+// Devuelve un substat al azar del pool de substats disponibles, ponderado por su peso según el perfil. El pool se calcula según los substats existentes y el mainstat del artefacto.
 function pickWeightedRandom(candidates, rng) {
     const totalWeight = candidates.reduce((sum, c) => sum + c.weight, 0);
     let roll = rng() * totalWeight;
     for (const c of candidates) {
-        roll -= c.weight;
-        if (roll <= 0) return c.key;
+        roll -= c.weight; // Resta el peso del substat al azar del total acumulado
+        if (roll <= 0) return c.key; // Devuelve la key del substat seleccionado al azar según su peso
     }
-    return candidates[candidates.length - 1].key;
+    return candidates[candidates.length - 1].key; // Fallback: devuelve el último substat si no se seleccionó ninguno (por seguridad)
 }
 
 // Fallback: solo se usa si simulate() se llama sin proyección de 4to
@@ -94,12 +98,14 @@ function pickFourthSubstatType(profile, artifact, rng) {
     return pickWeightedRandom(candidates, rng);
 }
 
+// Devuelve el substat más probable como 4to substat según el perfil y los substats existentes. Se usa para proyectar el 4to substat en simulate() si no se pasa explícitamente.
 function calcCVSubstats(substats) {
     const cr = substats['CRIT_RATE'] ?? 0;
     const cd = substats['CRIT_DMG']  ?? 0;
     return Math.round((cd + cr * 2) * 10) / 10;
 }
 
+// Devuelve el CV total del artefacto según el perfil y los substats existentes. Se usa para calcular el veredicto final en simulate().
 function calcCVTotal(substats, artifact, profile) {
     let cr = substats['CRIT_RATE'] ?? 0;
     let cd = substats['CRIT_DMG']  ?? 0;
@@ -131,20 +137,20 @@ function runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthSt
     const keyOf = statKeyOf.bind(null, profile);
     const substats = copySubstats(artifact.substats, keyOf);
 
-    if (artifact.getSubstatCount() === 3) {
+    if (artifact.getSubstatCount() === 3) { // Si el artefacto tiene 3 substats, se revela el 4to substat con un tier al azar según el perfil
         const fourthKey = projectedFourthStat
-            ? keyOf(projectedFourthStat)
-            : pickFourthSubstatType(profile, artifact, rng);
-        substats[fourthKey] = randomTierValue(profile, fourthKey, rng);
+            ? keyOf(projectedFourthStat) // Si se pasa un 4to substat proyectado, se usa su key según el perfil
+            : pickFourthSubstatType(profile, artifact, rng); // Si no se pasa un 4to substat proyectado, se elige uno al azar según el perfil y los substats existentes
+        substats[fourthKey] = randomTierValue(profile, fourthKey, rng); // Revela el 4to substat con un tier al azar según el perfil
     }
 
     const keys = Object.keys(substats);
-    for (let i = 0; i < remaining; i++) {
-        const targetKey = keys[Math.floor(rng() * keys.length)];
-        substats[targetKey] += randomTierValue(profile, targetKey, rng);
+    for (let i = 0; i < remaining; i++) { // Para cada mejora restante, se elige un substat al azar entre los existentes y se le aplica un tier al azar según el perfil
+        const targetKey = keys[Math.floor(rng() * keys.length)];  
+        substats[targetKey] += randomTierValue(profile, targetKey, rng);  
     }
 
-    for (const key of keys) {
+    for (const key of keys) { // Redondea los valores de los substats a 1 decimal para evitar errores de precisión
         substats[key] = Math.round(substats[key] * 10) / 10;
     }
 
@@ -221,7 +227,7 @@ export function simulate(
     const trials = [];
     let investCount = 0, considerCount = 0, discardCount = 0;
 
-    for (let i = 0; i < iterations; i++) {
+    for (let i = 0; i < iterations; i++) { // Corre una tirada completa del artefacto según el perfil y los substats existentes, proyectando el 4to substat si se pasa explícitamente
         const trial = runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthStat, rng);
         trials.push(trial);
 
