@@ -23,18 +23,22 @@ Stats porcentuales tienen hasta 3 decimales internos.
 ## 2. Restricciones de Rolls
 
 ### Substats iniciales
+
 - Un artefacto puede empezar con 3 o 4 substats.
 - Cada substat recibe exactamente 1 roll al aparecer.
 
 ### Upgrades
+
 - Un artefacto +20 recibe exactamente 5 upgrades.
 - Cada upgrade añade 1 roll a cualquier substat existente.
 
 ### Total de rolls por artefacto
+
 - 4 substats iniciales: 4 + 5 = 9 rolls totales
 - 3 substats iniciales: 3 + 5 = 8 rolls totales
 
 ### Rolls por substat
+
 - Mínimo: 1 (solo el roll inicial, ningún upgrade cayó aquí)
 - Máximo: no definido por substat, pero limitado por el total del artefacto
 - El límite real es: suma de rolls de todos los substats == total de rolls del artefacto
@@ -42,9 +46,11 @@ Stats porcentuales tienen hasta 3 decimales internos.
 ## 3. Fórmulas
 
 ### Crit Value (CV)
+
 CV = CRIT_DMG + (CRIT_RATE * 2)
 
 Referencia de calidad (comunidad):
+
 - CV > 50  → Bueno
 - CV > 60  → Muy bueno
 - CV > 70  → Excelente
@@ -53,20 +59,24 @@ Referencia de calidad (comunidad):
 Nota: CV solo se calcula si el artefacto tiene al menos uno de CRIT_RATE o CRIT_DMG.
 
 ### Roll Value (RV) por roll
+
 RV_roll = (valor_del_roll / T4_del_stat) * 100
 
 Los tiers producen exactamente:
+
 - T1 = 70%
 - T2 = 80%
 - T3 = 90%
 - T4 = 100%
 
 ### Roll Value total del artefacto
+
 earnedRV  = suma de RV_roll de todos los rolls de todos los substats
-maxRV     = total_rolls * 100
-percentRV = earnedRV / maxRV * 100
+maxRV     = total_rolls *100
+percentRV = earnedRV / maxRV*100
 
 Ejemplo:
+
 - Artefacto de 4 substats iniciales, todos los rolls en T4:
   earnedRV = 900, maxRV = 900, percentRV = 100%
 - Artefacto de 3 substats iniciales, todos los rolls en T1:
@@ -78,6 +88,7 @@ Un valor observado puede tener múltiples reconstrucciones válidas.
 
 Ejemplo: CRIT_RATE = 10.5
 Combinaciones posibles (round a 1 decimal == 10.5):
+
 - [3.889, 3.889, 2.722] → suma interna = 10.500
 - [3.889, 3.500, 3.111] → suma interna = 10.500
 - [3.500, 3.500, 3.500] → suma interna = 10.500

@@ -14,6 +14,7 @@ SubstatInput {
 }
 
 Restricciones del input:
+
 - Entre 3 y 4 substats (no más, no menos).
 - No puede haber dos substats del mismo tipo.
 - Los valores son los visibles en pantalla (redondeados a 1 decimal
@@ -69,12 +70,13 @@ ArtifactSummary {
 
   bestConfigurations:  ArtifactConfiguration[] // Soporta empates de RV máximo
   worstConfigurations: ArtifactConfiguration[] // Soporta empates de RV mínimo
-  cvDisplay:           number | null          
+  cvDisplay:           number | null
 }
 
 ## 3. Definiciones
 
 ### ¿Qué es un roll?
+
 Un roll es una única asignación de valor a un substat.
 Cada roll tiene un tier (1–4) que determina su valor exacto según
 la tabla de valores del juego.
@@ -82,6 +84,7 @@ El primer roll de un substat ocurre cuando ese substat aparece en el artefacto.
 Los rolls siguientes ocurren en cada upgrade donde ese substat es seleccionado.
 
 ### ¿Qué es RV (Roll Value)?
+
 RV mide la calidad de un roll como porcentaje de su valor máximo posible.
 RV = (valor_del_roll / valor_T4_del_stat) * 100
 Un roll perfecto (T4) tiene RV = 100.
@@ -89,12 +92,14 @@ Un roll mínimo (T1) tiene RV = 70.
 El RV total de un artefacto suma todos los RV individuales.
 
 ### ¿Qué es CV (Crit Value)?
+
 CV = CRIT_DMG + (CRIT_RATE * 2)
 Métrica popular de la comunidad para evaluar artefactos con stats de crítico.
 Se calcula sobre los valores observados (display), no internos.
 Solo aplica si el artefacto tiene CRIT_RATE o CRIT_DMG.
 
 ### ¿Qué hace que un artefacto sea imposible?
+
 Un artefacto es imposible si no existe ninguna ArtifactConfiguration válida.
 Esto ocurre cuando:
   a) Algún substat tiene un valor observado que no puede ser
@@ -103,7 +108,9 @@ Esto ocurre cuando:
      requieren más rolls de los que el artefacto puede tener (9 o 8).
 
 ### ¿Qué hace que una configuración sea válida?
+
 Una ArtifactConfiguration es válida si:
+
   1. Cada substat tiene exactamente 1 RollCombination seleccionada.
   2. Esa combinación produce, al redondearse a 1 decimal,
      el valor observado de ese substat.
