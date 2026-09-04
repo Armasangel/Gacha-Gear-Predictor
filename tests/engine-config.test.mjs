@@ -25,7 +25,7 @@ function plumeAt16() {
     ]);
 }
 
-test('config por defecto: sin gameConfig el motor sigue siendo Genshin', () => {
+test('config por defecto: sin gameConfig el motor sigue siendo Genshin', () => { // Simula una pluma a +16 con 4 substats usando la configuración por defecto del motor (Genshin) y verifica que el resultado tenga un bestCV mayor o igual al worstCV, que se hayan realizado 200 iteraciones y que el veredicto sea uno de los esperados.
     const result = simulate(plumeAt16(), new BuildGoal([]), null, 200);
 
     assert.ok(result.bestCV >= result.worstCV);
@@ -33,7 +33,7 @@ test('config por defecto: sin gameConfig el motor sigue siendo Genshin', () => {
     assert.ok(['INVERTIR', 'CONSIDERAR', 'DESCARTAR'].includes(result.verdict));
 });
 
-test('upgradeLevels inyectado: grilla terminada en +16 deja cero aleatoriedad', () => {
+test('upgradeLevels inyectado: grilla terminada en +16 deja cero aleatoriedad', () => { // Simula una pluma a +16 con 4 substats usando una grilla de niveles inyectada [4,8,12,16] y verifica que el resultado tenga un successRate del 100%, considerRate y discardRate del 0%, que el bestCV sea igual al worstCV y que el veredicto sea 'INVERTIR'. Se utiliza un RNG que lanza un error si se intenta consumir azar, ya que no deberían quedar upgrades pendientes.
     const rngQueExplota = () => {
         throw new Error('no debería consumir azar si no quedan upgrades');
     };
@@ -55,7 +55,7 @@ test('upgradeLevels inyectado: grilla terminada en +16 deja cero aleatoriedad', 
     assert.equal(result.verdict, 'INVERTIR');
 });
 
-test('upgradeLevels inyectado: la misma pieza con grilla default aún tiene azar', () => {
+test('upgradeLevels inyectado: la misma pieza con grilla default aún tiene azar', () => { // Simula una pluma a +16 con 4 substats usando la grilla de niveles por defecto del motor (Genshin) y verifica que el resultado tenga un successRate menor al 100%, considerRate y discardRate mayores a 0%, que el bestCV sea mayor al worstCV y que el veredicto sea uno de los esperados. Se utiliza un RNG que lanza un error si se intenta consumir azar, ya que debería haber upgrades pendientes.
     const rngQueExplota = () => {
         throw new Error('el +20 con grilla default debe consumir rng');
     };
@@ -66,7 +66,7 @@ test('upgradeLevels inyectado: la misma pieza con grilla default aún tiene azar
     );
 });
 
-test('thresholds inyectados: umbrales laxos convierten un veredicto', () => {
+test('thresholds inyectados: umbrales laxos convierten un veredicto', () => { // Simula una arena a +0 con 3 substats usando umbrales laxos para convertir un veredicto de "CONSIDERAR" a "INVERTIR". Se verifica que el successRate sea del 100%, considerRate y discardRate del 0% y que el veredicto sea 'INVERTIR'.
     const sands = new Artifact(PieceType.SANDS, MainStatType.ATK_PERCENT, 0, [
         sub('CRIT_RATE', 3.9),
         sub('CRIT_DMG', 7.8),
@@ -119,7 +119,7 @@ test('grilla estilo HSR [3,6,9,12,15]: primera mejora revela, resto suma rolls',
     }
 });
 
-describe('perfil HSR: contrato de datos abstracto del motor', () => {
+describe('perfil HSR: contrato de datos abstracto del motor', () => { // Se definen pruebas para el perfil de juego HSR, verificando la grilla de niveles, tiers y RV de referencia, los lookups inversos para resolver referencias de stat, main y pieza, la presencia de substats específicos de HSR y la ausencia de EM, los mainstats válidos para cuerpo y botas, y la simulación de un artefacto con perfil inyectado produciendo rangos válidos.
     const hsr = getProfile('hsr');
 
     test('grilla de niveles, tiers y RV de referencia', () => {
@@ -141,7 +141,7 @@ describe('perfil HSR: contrato de datos abstracto del motor', () => {
         assert.equal(hsr.statKeyByRef.get(hsr.mainStat.CRIT_RATE), undefined, 'mainStat no debe colisionar con stat');
     });
 
-    test('substats específicos de HSR (SPD, EHT, EHR, BE) y sin EM', () => {
+    test('substats específicos de HSR (SPD, EHT, EHR, BE) y sin EM', () => { // Verifica que los substats específicos de HSR (SPD, EHT, EHR, BE) estén presentes en el perfil y tengan pesos mayores a 0, y que el substat ELEMENTAL_MASTERY no esté presente en el perfil.
         for (const key of ['SPD', 'EFFECT_HIT_RATE', 'EFFECT_RES', 'BREAK_EFFECT']) {
             assert.ok(hsr.stat[key], key);
             assert.ok(hsr.stat[key].weight > 0, key);
@@ -152,7 +152,7 @@ describe('perfil HSR: contrato de datos abstracto del motor', () => {
         assert.equal(total, 100);
     });
 
-    test('mainstats de cuerpo y botas: variable con mains válidos', () => {
+    test('mainstats de cuerpo y botas: variable con mains válidos', () => { // Verifica que los mainstats válidos para la pieza BODY incluyan CRIT_RATE, HEALING_BONUS y EFFECT_HIT_RATE, y que no incluyan SPD. Verifica que los mainstats válidos para la pieza FEET incluyan SPD y no incluyan CRIT_RATE. Verifica que las piezas variables del perfil HSR sean BODY y FEET.
         const body = hsr.piece.BODY.validMainStats;
         assert.ok(body.includes(hsr.mainStat.CRIT_RATE));
         assert.ok(body.includes(hsr.mainStat.HEALING_BONUS));
@@ -184,7 +184,7 @@ describe('perfil HSR: contrato de datos abstracto del motor', () => {
     });
 });
 
-describe('perfil ZZZ: contrato de datos abstracto del motor', () => {
+describe('perfil ZZZ: contrato de datos abstracto del motor', () => { // Se definen pruebas para el perfil de juego ZZZ, verificando la identidad, grilla de niveles y tiers, las piezas y sus mainstats válidos, y la simulación de un artefacto con perfil inyectado produciendo rangos válidos.
     const zzz = getProfile('zzz');
 
     test('identidad, grilla y tiers', () => {
@@ -198,7 +198,7 @@ describe('perfil ZZZ: contrato de datos abstracto del motor', () => {
         }
     });
 
-    test('piezas: slots 1-3 fijos, 4-6 variables con sus mains', () => {
+    test('piezas: slots 1-3 fijos, 4-6 variables con sus mains', () => { // Verifica que las piezas del perfil ZZZ tengan un orden específico, que los slots 1-3 tengan mainstats válidos fijos y que los slots 4-6 tengan mainstats válidos variables.
         assert.deepEqual(zzz.pieceOrder, ['SLOT_1','SLOT_2','SLOT_3','SLOT_4','SLOT_5','SLOT_6']);
         assert.deepEqual(zzz.variableMainPieces, ['SLOT_4','SLOT_5','SLOT_6']);
 
@@ -214,7 +214,7 @@ describe('perfil ZZZ: contrato de datos abstracto del motor', () => {
         assert.ok(zzz.piece.SLOT_6.validMainStats.includes(zzz.mainStat.ANOMALY_MASTERY));
     });
 
-    test('simulación ZZZ con perfil inyectado produce rangos válidos', () => {
+    test('simulación ZZZ con perfil inyectado produce rangos válidos', () => { // Simula un artefacto en SLOT_1 a +0 con 3 substats usando el perfil ZZZ y verifica que el resultado tenga un bestCV mayor o igual al worstCV, que el veredicto sea uno de los esperados, que el avgRV sea mayor a 0 y que el bestRV no exceda 100.1.
         const artifact = new Artifact(zzz.piece.SLOT_1, zzz.mainStat.ATK_FLAT, 0, [
             new Substat(zzz.stat.CRIT_RATE, 2.8),
             new Substat(zzz.stat.CRIT_DMG, 5.6),

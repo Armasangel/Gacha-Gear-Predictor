@@ -14,7 +14,7 @@ import { PieceType } from '../js/data/PieceType.js';
 import { MainStatType } from '../js/data/MainStatType.js';
 import { StatType } from '../js/data/StatType.js';
 
-function sinRecord(overrides = {}) {
+function sinRecord(overrides = {}) { // Devuelve un registro normalizado de ejemplo con 3 substats y un 4to pendiente, que puede ser sobrescrito con 'overrides'.
     return {
         archivo: 'IMG_001.png',
         source: 'sin',
@@ -34,7 +34,7 @@ function sinRecord(overrides = {}) {
     };
 }
 
-test('mapRecordToArtifact: registro válido con pending mapea y fija el 4to conocido', () => {
+test('mapRecordToArtifact: registro válido con pending mapea y fija el 4to conocido', () => { // Mapea un registro válido con 3 substats y un 4to pendiente, y verifica que se cree un artefacto válido con el 4to substat conocido.
     const res = mapRecordToArtifact(sinRecord());
 
     assert.equal(res.ok, true);
@@ -44,7 +44,7 @@ test('mapRecordToArtifact: registro válido con pending mapea y fija el 4to cono
     assert.equal(res.knownFourth, StatType.ELEMENTAL_MASTERY);
 });
 
-test('mapRecordToArtifact: pending que colisiona con un substat existente se ignora (no rompe)', () => {
+test('mapRecordToArtifact: pending que colisiona con un substat existente se ignora (no rompe)', () => { // Mapea un registro con 3 substats y un 4to pendiente que colisiona con un substat existente, y verifica que se cree un artefacto válido sin el 4to substat conocido.
     const rec = sinRecord({
         pending: { key: 'CRIT_RATE', value: 3.9 }
     });
@@ -55,7 +55,7 @@ test('mapRecordToArtifact: pending que colisiona con un substat existente se ign
     assert.equal(res.knownFourth, null);
 });
 
-test('mapRecordToArtifact: pending que duplica el tipo del main se ignora', () => {
+test('mapRecordToArtifact: pending que duplica el tipo del main se ignora', () => { // Mapea un registro con 3 substats y un 4to pendiente que duplica el tipo del main, y verifica que se cree un artefacto válido sin el 4to substat conocido.
     const rec = sinRecord({
         pending: { key: 'ATK_PERCENT', value: 4.1 }
     });
@@ -66,7 +66,7 @@ test('mapRecordToArtifact: pending que duplica el tipo del main se ignora', () =
     assert.equal(res.knownFourth, null);
 });
 
-test('mapRecordToArtifact: pending ATQ plano junto a main ATQ% es válido (no colisiona)', () => {
+test('mapRecordToArtifact: pending ATQ plano junto a main ATQ% es válido (no colisiona)', () => { // Mapea un registro con 3 substats y un 4to pendiente de ATK_FLAT junto a un main de ATK_PERCENT, y verifica que se cree un artefacto válido con el 4to substat conocido.
     const rec = sinRecord({
         pending: { key: 'ATK_FLAT', value: 14 }
     });
@@ -77,7 +77,7 @@ test('mapRecordToArtifact: pending ATQ plano junto a main ATQ% es válido (no co
     assert.equal(res.knownFourth, StatType.ATK_FLAT);
 });
 
-test('mapRecordToArtifact: pieza con 4 substats no usa pending', () => {
+test('mapRecordToArtifact: pieza con 4 substats no usa pending', () => { // Mapea un registro con 4 substats y un pending, y verifica que se cree un artefacto válido con los 4 substats y sin el 4to substat conocido.
     const rec = sinRecord();
     rec.substats.push({ key: 'DEF_FLAT', value: 19 });
     rec.pending = null;
@@ -89,7 +89,7 @@ test('mapRecordToArtifact: pieza con 4 substats no usa pending', () => {
     assert.equal(res.knownFourth, null);
 });
 
-test('mapRecordToArtifact: nivel null (LEVEL_NO_ANCLA) se rechaza', () => {
+test('mapRecordToArtifact: nivel null (LEVEL_NO_ANCLA) se rechaza', () => { // Mapea un registro con nivel null y verifica que se rechace con la razón UNKNOWN_LEVEL.
     const rec = sinRecord({ main: { key: 'ATK_PERCENT', value: 3967, level: null, levelSource: 'unknown' } });
 
     const res = mapRecordToArtifact(rec);
@@ -98,7 +98,7 @@ test('mapRecordToArtifact: nivel null (LEVEL_NO_ANCLA) se rechaza', () => {
     assert.equal(res.reason, SKIP_REASONS.UNKNOWN_LEVEL);
 });
 
-test('mapRecordToArtifact: nivel fuera de grilla se rechaza; +16 válido se acepta', () => {
+test('mapRecordToArtifact: nivel fuera de grilla se rechaza; +16 válido se acepta', () => { // Mapea un registro con nivel fuera de grilla y verifica que se rechace con la razón UNKNOWN_LEVEL. Luego mapea un registro con nivel +16 y verifica que se acepte.
     const bad = sinRecord({ main: { key: 'ATK_PERCENT', value: 30, level: 13 } });
     const resBad = mapRecordToArtifact(bad);
     assert.equal(resBad.ok, false);
@@ -110,7 +110,7 @@ test('mapRecordToArtifact: nivel fuera de grilla se rechaza; +16 válido se acep
     assert.equal(res.artifact.level, 16);
 });
 
-test('mapRecordToArtifact: substats duplicados se rechazan como artefacto inválido', () => {
+test('mapRecordToArtifact: substats duplicados se rechazan como artefacto inválido', () => { // Mapea un registro con substats duplicados y verifica que se rechace con la razón INVALID_ARTIFACT.
     const rec = sinRecord({
         substats: [
             { key: 'CRIT_RATE', value: 3.9 },
@@ -125,7 +125,7 @@ test('mapRecordToArtifact: substats duplicados se rechazan como artefacto invál
     assert.equal(res.reason, SKIP_REASONS.INVALID_ARTIFACT);
 });
 
-test('mapRecordToArtifact: razones de rechazo básicas', () => {
+test('mapRecordToArtifact: razones de rechazo básicas', () => { // Mapea registros con piezas desconocidas, sin main y con substats inválidos, y verifica que se rechacen con las razones correspondientes.
     assert.equal(mapRecordToArtifact({ ...sinRecord(), piece: 'XXX' }).reason, SKIP_REASONS.NO_PIECE);
     assert.equal(mapRecordToArtifact(sinRecord({ main: {} })).reason, SKIP_REASONS.NO_MAIN);
 
@@ -133,7 +133,7 @@ test('mapRecordToArtifact: razones de rechazo básicas', () => {
     assert.equal(mapRecordToArtifact(badSub).reason, SKIP_REASONS.BAD_SUBSTAT);
 });
 
-test('mapRecords: separa mapeados y omitidos con metadatos', () => {
+test('mapRecords: separa mapeados y omitidos con metadatos', () => { // Mapea un array de registros mixtos y verifica que se separen en mapeados y omitidos con las razones correspondientes.
     const good1 = sinRecord();
     const good2 = sinRecord({ archivo: 'IMG_002.png', piece: 'FLOWER', main: { key: 'HP_FLAT', value: 4780, level: 20, levelSource: 'anchor' }, pending: null });
     const bad = sinRecord({ archivo: 'IMG_003.png', piece: 'ZZZ' });
@@ -147,7 +147,7 @@ test('mapRecords: separa mapeados y omitidos con metadatos', () => {
     assert.equal(mapped[1].artifact.pieceType, PieceType.FLOWER);
 });
 
-test('analyzeBatch: artefacto a +20 con 4 substats es determinístico (sin rolls restantes)', async () => {
+test('analyzeBatch: artefacto a +20 con 4 substats es determinístico (sin rolls restantes)', async () => { // Analiza un artefacto a +20 con 4 substats y verifica que las tasas de inversión, consideración y descarte sean determinísticas (100%, 0%, 0%) y que el RV promedio sea mayor a 0.
     const rec = {
         archivo: 'MAX.png',
         setName: 'Set',
@@ -178,7 +178,7 @@ test('analyzeBatch: artefacto a +20 con 4 substats es determinístico (sin rolls
     assert.equal(row.verdict, 'INVERTIR');
 });
 
-test('analyzeBatch: fila a +0 con 4to conocido reporta probabilidades coherentes', async () => {
+test('analyzeBatch: fila a +0 con 4to conocido reporta probabilidades coherentes', async () => { // Analiza un artefacto a +0 con 3 substats y un 4to conocido, y verifica que las tasas de inversión, consideración y descarte sumen aproximadamente 100 y que el veredicto sea uno de los esperados.
     const { mapped } = mapRecords([sinRecord()]);
     const rows = await analyzeBatch(mapped, new BuildGoal([]), { iterations: 500 });
 
@@ -194,7 +194,7 @@ test('analyzeBatch: fila a +0 con 4to conocido reporta probabilidades coherentes
     assert.ok(row.cvAvg >= 0);
 });
 
-test('analyzeBatch: onProgress reporta hasta el total y ordena por % invertir desc', async () => {
+test('analyzeBatch: onProgress reporta hasta el total y ordena por % invertir desc', async () => { // Analiza un batch de 5 artefactos y verifica que onProgress se llame varias veces hasta el total, y que las filas resultantes estén ordenadas por investRate descendente.
     const records = [];
     for (let i = 0; i < 5; i++) {
         records.push(sinRecord({ archivo: `IMG_${i}.png` }));
@@ -214,7 +214,7 @@ test('analyzeBatch: onProgress reporta hasta el total y ordena por % invertir de
     assert.ok(calls >= 3);
     assert.deepEqual(lastCall, [5, 5]);
 
-    for (let i = 1; i < rows.length; i++) {
+    for (let i = 1; i < rows.length; i++) { // Verifica que las filas estén ordenadas por investRate descendente
         assert.ok(
             rows[i - 1].investRate >= rows[i].investRate,
             'debe estar ordenado por investRate descendente'
@@ -222,7 +222,7 @@ test('analyzeBatch: onProgress reporta hasta el total y ordena por % invertir de
     }
 });
 
-test('integración: un lote mixto produce filas y omisiones esperadas', async () => {
+test('integración: un lote mixto produce filas y omisiones esperadas', async () => { // Analiza un lote mixto de registros válidos e inválidos y verifica que se produzcan filas para los artefactos válidos y omisiones para los inválidos, con las razones correspondientes.
     const records = [
         sinRecord(),
         sinRecord({

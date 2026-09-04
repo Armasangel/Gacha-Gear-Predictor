@@ -22,7 +22,7 @@ await new Promise(r => setTimeout(r, 800));
 await page.evaluate(() => window.showScreen('screen-form'));
 await new Promise(r => setTimeout(r, 300));
 
-async function coordClick(sel) {
+async function coordClick(sel) { // Hace click en el centro del elemento dado por el selector, desplazando la página si es necesario. Espera 150ms después de hacer scroll para que la animación termine.
     const el = await page.$(sel);
     if (!el) throw new Error(`no existe: ${sel}`);
     await el.evaluate(e => e.scrollIntoView({ block: 'center' }));
@@ -67,7 +67,7 @@ await coordClick(`${row3} .substat-value-select .custom-select-trigger`);
 await new Promise(r => setTimeout(r, 250));
 await coordClick(`${row3} .substat-value-select .custom-option[data-value="209"]`);
 
-const formState = await page.evaluate(() => ({
+const formState = await page.evaluate(() => ({ // Se obtiene el estado actual del form, incluyendo la pieza seleccionada y los substats y valores seleccionados.
     pieza: document.querySelector('#pieceType-select .custom-select-trigger').textContent.trim(),
     sub0: document.querySelector('.substat-row:nth-child(1) .substat-type-select .custom-option.selected')?.dataset.value,
     val0: document.querySelector('.substat-row:nth-child(1) .substat-value-select .custom-option.selected')?.dataset.value,

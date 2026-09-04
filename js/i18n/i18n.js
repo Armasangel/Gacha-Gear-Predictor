@@ -4,11 +4,11 @@ const STORAGE_KEY = 'gacha-lang';
 const hasStorage = typeof localStorage !== 'undefined';
 let currentLang = hasStorage ? (localStorage.getItem(STORAGE_KEY) || 'es') : 'es';
 
-export function getLanguage() {
+export function getLanguage() { // Devuelve el idioma activo, que se obtiene de localStorage si está disponible, o 'es' por defecto.
     return currentLang;
 }
 
-export function setLanguage(lang) {
+export function setLanguage(lang) { // Cambia el idioma activo a 'lang', actualiza localStorage si está disponible, y dispara un evento 'languagechange' para que otros módulos puedan re-renderizarse según el nuevo idioma. Si 'lang' no es válido, no hace nada.
     if (!TRANSLATIONS[lang]) return;
     currentLang = lang;
     if (hasStorage) localStorage.setItem(STORAGE_KEY, lang);

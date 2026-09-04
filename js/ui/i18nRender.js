@@ -1,6 +1,6 @@
 import { t } from '../i18n/i18n.js';
 
-export function renderStaticTexts() {
+export function renderStaticTexts() { // Renderiza los textos estáticos de la UI según el idioma activo, usando los atributos data-i18n y data-i18n-html de los elementos HTML
     document.querySelectorAll('[data-i18n]').forEach(el => {
         el.textContent = t(el.dataset.i18n);
     });

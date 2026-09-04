@@ -9,12 +9,11 @@ import {t} from '../i18n/i18n.js';
 // Perfil de juego activo (por defecto Genshin). Se actualiza al cambiar de juego.
 let activeProfile = getProfile('genshin');
 
-//Ya no es un diccionario estático -- se resuelve en el idioma activo.
-export function statLabel(key){
+export function statLabel(key){ // Devuelve el label traducido de un stat según su key
     return t(`stat.${key}`);
 }
 
-export function pieceLabel(key){
+export function pieceLabel(key){ // Devuelve el label traducido de una pieza según su key
     return t(`piece.${key}`);
 }
 
@@ -23,7 +22,7 @@ let pieceSelect = null;
 const substatSelects = [];
 const substatValueSelects = [];
 
-function getActiveProfile() {
+function getActiveProfile() { // Devuelve el perfil de juego activo (por defecto Genshin)
     return activeProfile;
 }
 
@@ -33,11 +32,11 @@ export function setProfile(profile) {
     if (pieceSelect) rebuildSelects();
 }
 
-export function getCurrentProfileId() {
+export function getCurrentProfileId() { //| Devuelve el id del perfil de juego activo (por defecto "genshin")|
     return activeProfile.id;
 }
 
-function buildPieceOptions() {
+function buildPieceOptions() { // Devuelve un array de opciones para el select de pieza según el perfil activo, con value, label e icono
     const p = getActiveProfile();
     return Object.keys(p.piece)
         .filter(key => p.pieceOrder.includes(key))
@@ -48,7 +47,7 @@ function buildPieceOptions() {
         }));
 }
 
-function buildSubstatOptions() {
+function buildSubstatOptions() { // Devuelve un array de opciones para el select de substat según el perfil activo, con value, label e icono
     const p = getActiveProfile();
     return [
         { value: '', label: t('form.select.placeholder'), icon: null },
@@ -60,8 +59,7 @@ function buildSubstatOptions() {
     ];
 }
 
-// Se llama una sola vez al cargar la página.
-export function initCustomSelects() {
+export function initCustomSelects() { // Inicializa los selects de pieza y substats con icono, y los eventos de cambio para repoblar los selects dependientes (mainstat, valor, checkboxes)
     // Dropdown de pieza
     const pieceWrapper = document.getElementById('pieceType-select');
     const pieceOptions = buildPieceOptions();
@@ -149,7 +147,7 @@ function populateValueOptions(rowIndex) {
     const typeKey     = substatSelects[rowIndex].value;
     const valueSelect = substatValueSelects[rowIndex];
 
-    if (!typeKey) {
+    if (!typeKey) { // Si no hay tipo seleccionado, vacía el select de valor
         valueSelect.setOptions([{ value: '', label: '--', icon: null }]);
         return;
     }
@@ -163,7 +161,7 @@ function populateValueOptions(rowIndex) {
     valueSelect.setOptions(options); // ya selecciona options[0] solo
 }
 
-function formatStatValue(typeKey, tier){
+function formatStatValue(typeKey, tier){ // Devuelve el label del valor de un substat según su tipo y tier, con % si corresponde
     const esPorcentaje = 
         typeKey.endsWith('_PERCENT') || 
         typeKey.endsWith('CRIT_RATE') ||
@@ -178,15 +176,15 @@ function formatStatValue(typeKey, tier){
     return esPorcentaje ? `${tier.toFixed(1)}%` : `${tier}`;
 }
 
-export function populateMainStats() {
+export function populateMainStats() { // Llena el select de mainstat según la pieza elegida y el perfil activo. Se llama al iniciar y cada vez que cambia de pieza o de juego.
     const p = getActiveProfile();
     const pieceKey   = pieceSelect.value;
     const mainSelect = document.getElementById('mainStat');
     const piece      = p.piece[pieceKey];
 
     mainSelect.innerHTML = '';
-    if (!piece) return;
-    for (const [key, value] of Object.entries(p.mainStat)) {
+    if (!piece) return; // Si no hay pieza seleccionada, vacía el select de mainstat
+    for (const [key, value] of Object.entries(p.mainStat)) { // Para cada mainstat del perfil, si es válido para la pieza elegida, se agrega como opción al select de mainstat
         if (piece.validMainStats.includes(value)) {
             const option = document.createElement('option');
             option.value = key;
@@ -196,7 +194,7 @@ export function populateMainStats() {
     }
 }
 
-export function populateGoalCheckboxes() {
+export function populateGoalCheckboxes() { // Llena los checkboxes de substats deseados según los substats elegidos en el form y el perfil activo. Se llama al iniciar y cada vez que cambia un substat o de juego.
     const container = document.getElementById('goal-checkboxes');
 
     // Guardar orden actual antes de limpiar
@@ -216,7 +214,7 @@ export function populateGoalCheckboxes() {
         ...selectedKeys.filter(k => !currentOrder.includes(k))
     ];
 
-    for (const key of ordered) {
+    for (const key of ordered) { // Para cada substat seleccionado, se crea un div con un checkbox, el label del stat y botones para moverlo arriba/abajo. Se agrega al contenedor de checkboxes.
         const item = document.createElement('div');
         item.className   = 'goal-item';
         item.dataset.key = key;
@@ -241,7 +239,7 @@ export function populateGoalCheckboxes() {
     };
 }
 
-export function readForm() {
+export function readForm() { // Lee el form y devuelve un objeto {artifact, goal} según lo que eligió el usuario, usando el perfil activo. Lanza errores si hay datos inválidos.
     const p = getActiveProfile();
     const pieceKey = pieceSelect.value;
     const mainKey  = document.getElementById('mainStat').value;
@@ -294,7 +292,7 @@ export function refreshForm() {
     });
 }
 
-export function resetSubstatSelects() {
+export function resetSubstatSelects() { // Vacia los selects de substat y valor, dejando la 4ta fila vacía. Se llama al cambiar de juego o al resetear el form.
     substatSelects.forEach((s, i) => {
         s.value = '';
         substatValueSelects[i].setOptions([{ value: '', label: '--', icon: null }]);
