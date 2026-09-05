@@ -33,6 +33,15 @@ test('config por defecto: sin gameConfig el motor sigue siendo Genshin', () => {
     assert.ok(['INVERTIR', 'CONSIDERAR', 'DESCARTAR'].includes(result.verdict));
 });
 
+test('perfil genshin: modelo tiered explícito, sin rama de utility', () => { // Verifica que el perfil Genshin declare substatRollModel 'tiered' (no el fixed de ZZZ) y que sus umbrales no tengan utilityFallback, de modo que el veredicto siga usando el fallback de RV clásico.
+    const genshin = getProfile('genshin');
+    assert.equal(genshin.substatRollModel, 'tiered');
+    assert.equal(genshin.thresholds.FIXED_MAIN.utilityFallback, undefined);
+    assert.equal(genshin.thresholds.VARIABLE_MAIN.utilityFallback, undefined);
+    assert.ok(genshin.thresholds.FIXED_MAIN.rv);
+    assert.ok(genshin.thresholds.VARIABLE_MAIN.rv);
+});
+
 test('upgradeLevels inyectado: grilla terminada en +16 deja cero aleatoriedad', () => { // Simula una pluma a +16 con 4 substats usando una grilla de niveles inyectada [4,8,12,16] y verifica que el resultado tenga un successRate del 100%, considerRate y discardRate del 0%, que el bestCV sea igual al worstCV y que el veredicto sea 'INVERTIR'. Se utiliza un RNG que lanza un error si se intenta consumir azar, ya que no deberían quedar upgrades pendientes.
     const rngQueExplota = () => {
         throw new Error('no debería consumir azar si no quedan upgrades');
@@ -124,6 +133,7 @@ describe('perfil HSR: contrato de datos abstracto del motor', () => { // Se defi
 
     test('grilla de niveles, tiers y RV de referencia', () => {
         assert.equal(hsr.id, 'hsr');
+        assert.equal(hsr.substatRollModel, 'tiered');
         assert.deepEqual(hsr.upgradeLevels, [3, 6, 9, 12, 15]);
         assert.equal(hsr.maxLevel, 15);
         // 3 tiers (Low/Med/High), no 4 como Genshin.
@@ -131,6 +141,9 @@ describe('perfil HSR: contrato de datos abstracto del motor', () => { // Se defi
         for (const key of Object.keys(hsr.stat)) {
             assert.equal(hsr.stat[key].tiers.length, 3, key);
         }
+        // Perfil tiered: conserva el fallback de RV, sin utilityFallback.
+        assert.equal(hsr.thresholds.FIXED_MAIN.utilityFallback, undefined);
+        assert.ok(hsr.thresholds.FIXED_MAIN.rv);
     });
 
     test('lookups inversos resuelven refs de stat, main y pieza', () => {
@@ -184,18 +197,49 @@ describe('perfil HSR: contrato de datos abstracto del motor', () => { // Se defi
     });
 });
 
-describe('perfil ZZZ: contrato de datos abstracto del motor', () => { // Se definen pruebas para el perfil de juego ZZZ, verificando la identidad, grilla de niveles y tiers, las piezas y sus mainstats válidos, y la simulación de un artefacto con perfil inyectado produciendo rangos válidos.
+describe('perfil ZZZ: contrato de datos abstracto del motor', () => { // Se definen pruebas para el perfil de juego ZZZ, verificando el modelo fixed de substats (un solo tier por stat), los valores reales, los stats unverified, los umbrales con utilityFallback y la simulación con perfil inyectado.
     const zzz = getProfile('zzz');
 
-    test('identidad, grilla y tiers', () => {
+    test('modelo fixed: un solo tier por stat y maxTierIndex 0', () => { // Verifica que el perfil ZZZ use substatRollModel 'fixed', que cada stat tenga un único tier (el valor fijo por roll) y maxTierIndex 0.
         assert.equal(zzz.id, 'zzz');
+        assert.equal(zzz.substatRollModel, 'fixed');
         assert.deepEqual(zzz.upgradeLevels, [3, 6, 9, 12, 15]);
         assert.equal(zzz.maxLevel, 15);
-        assert.equal(zzz.maxTierIndex, 2);
+        assert.equal(zzz.maxTierIndex, 0);
         for (const key of Object.keys(zzz.stat)) {
-            assert.equal(zzz.stat[key].tiers.length, 3, key);
+            assert.equal(zzz.stat[key].tiers.length, 1, key);
+            assert.ok(zzz.stat[key].tiers[0] > 0, key);
             assert.ok(zzz.stat[key].weight > 0, key);
         }
+    });
+
+    test('valores fijos reales de la wiki (sección 1 del doc)', () => { // Verifica que los valores por roll coincidan con zenless-rules.md: CRIT_RATE 2.4, CRIT_DMG 4.8, DEF_PERCENT 4.8, HP_FLAT 112, ATK_FLAT 19, DEF_FLAT 15, y los interpolados 3.0 / 6.0 para los marcados con unverified.
+        assert.equal(zzz.stat.CRIT_RATE.tiers[0], 2.4);
+        assert.equal(zzz.stat.CRIT_DMG.tiers[0], 4.8);
+        assert.equal(zzz.stat.DEF_PERCENT.tiers[0], 4.8);
+        assert.equal(zzz.stat.HP_FLAT.tiers[0], 112);
+        assert.equal(zzz.stat.ATK_FLAT.tiers[0], 19);
+        assert.equal(zzz.stat.DEF_FLAT.tiers[0], 15);
+        assert.equal(zzz.stat.HP_PERCENT.tiers[0], 3.0);
+        assert.equal(zzz.stat.ATK_PERCENT.tiers[0], 3.0);
+        assert.equal(zzz.stat.PEN.tiers[0], 3.0);
+        assert.equal(zzz.stat.ANOMALY_MASTERY.tiers[0], 6.0);
+    });
+
+    test('stats unverified quedan marcados y accesibles', () => { // Verifica que HP_PERCENT, ATK_PERCENT, PEN y ANOMALY_MASTERY estén marcados como unverified (valores interpolados) y que el resto no lo estén.
+        for (const key of ['HP_PERCENT', 'ATK_PERCENT', 'PEN', 'ANOMALY_MASTERY']) {
+            assert.equal(zzz.stat[key].unverified, true, key);
+        }
+        for (const key of ['CRIT_RATE', 'CRIT_DMG', 'DEF_PERCENT', 'HP_FLAT', 'ATK_FLAT', 'DEF_FLAT']) {
+            assert.equal(zzz.stat[key].unverified, undefined, key);
+        }
+    });
+
+    test('umbrales: sin bloque rv, con utilityFallback para el modelo fixed', () => { // Verifica que el perfil ZZZ ya no tenga umbrales de RV (siempre 100% en ZZZ) y que en su lugar use utilityFallback.
+        assert.equal(zzz.thresholds.FIXED_MAIN.rv, undefined);
+        assert.equal(zzz.thresholds.VARIABLE_MAIN.rv, undefined);
+        assert.deepEqual(zzz.thresholds.FIXED_MAIN.utilityFallback, { INVEST: 60, CONSIDER: 35 });
+        assert.deepEqual(zzz.thresholds.VARIABLE_MAIN.utilityFallback, { INVEST: 60, CONSIDER: 35 });
     });
 
     test('piezas: slots 1-3 fijos, 4-6 variables con sus mains', () => { // Verifica que las piezas del perfil ZZZ tengan un orden específico, que los slots 1-3 tengan mainstats válidos fijos y que los slots 4-6 tengan mainstats válidos variables.
@@ -214,21 +258,55 @@ describe('perfil ZZZ: contrato de datos abstracto del motor', () => { // Se defi
         assert.ok(zzz.piece.SLOT_6.validMainStats.includes(zzz.mainStat.ANOMALY_MASTERY));
     });
 
-    test('simulación ZZZ con perfil inyectado produce rangos válidos', () => { // Simula un artefacto en SLOT_1 a +0 con 3 substats usando el perfil ZZZ y verifica que el resultado tenga un bestCV mayor o igual al worstCV, que el veredicto sea uno de los esperados, que el avgRV sea mayor a 0 y que el bestRV no exceda 100.1.
+    test('simulación ZZZ: el RV de todo disco válido da siempre 100', () => { // Simula un disco en SLOT_1 a +0 con 3 substats usando el perfil ZZZ y verifica que el RV (best/avg/worst) sea siempre 100, ya que el modelo fixed no tiene variancia de magnitud por roll.
         const artifact = new Artifact(zzz.piece.SLOT_1, zzz.mainStat.ATK_FLAT, 0, [
-            new Substat(zzz.stat.CRIT_RATE, 2.8),
-            new Substat(zzz.stat.CRIT_DMG, 5.6),
-            new Substat(zzz.stat.ATK_PERCENT, 2.8),
+            new Substat(zzz.stat.CRIT_RATE, 2.4),
+            new Substat(zzz.stat.CRIT_DMG, 4.8),
+            new Substat(zzz.stat.ATK_PERCENT, 3.0),
         ], zzz);
 
         const result = simulate(artifact, new BuildGoal([]), null, 500, Math.random, { profile: zzz });
 
+        assert.equal(result.bestRV, 100);
+        assert.equal(result.avgRV, 100);
+        assert.equal(result.worstRV, 100);
         assert.ok(result.bestCV >= result.worstCV);
         assert.ok(['INVERTIR', 'CONSIDERAR', 'DESCARTAR'].includes(result.verdict));
-        assert.ok(result.avgRV > 0);
-        assert.ok(result.bestRV <= 100.1);
 
         const total = result.successRate + result.considerRate + result.discardRate;
         assert.ok(Math.abs(total - 100) <= 0.4);
+    });
+
+    test('cvSub 0 con goal vacío: DESCARTAR, ya no cae en INVERTIR por RV', () => { // Simula un disco sin crit y con goal vacío: como la utilityRV da 0 (ningún stat deseado), el veredicto debe ser DESCARTAR y el successRate 0, sin crashear. Antes del modelo fixed, el RV de 100% lo llevaba a INVERTIR automáticamente.
+        const artifact = new Artifact(zzz.piece.SLOT_1, zzz.mainStat.ATK_FLAT, 0, [
+            new Substat(zzz.stat.HP_PERCENT, 3.0),
+            new Substat(zzz.stat.ATK_PERCENT, 3.0),
+            new Substat(zzz.stat.DEF_PERCENT, 4.8),
+            new Substat(zzz.stat.HP_FLAT, 112),
+        ], zzz);
+
+        const result = simulate(artifact, new BuildGoal([]), null, 300, Math.random, { profile: zzz });
+
+        assert.equal(result.successRate, 0);
+        assert.equal(result.considerRate, 0);
+        assert.equal(result.discardRate, 100);
+        assert.equal(result.verdict, 'DESCARTAR');
+    });
+
+    test('cvSub 0 con utility alta: INVERTIR vía utilityFallback', () => { // Simula el mismo disco sin crit pero con un goal que marca HP_PERCENT como deseado y un RNG determinístico que fuerza los 5 upgrades a caer en ese stat: 6 de 9 rolls deseados (66.7% >= 60) deben dar INVERTIR.
+        const artifact = new Artifact(zzz.piece.SLOT_1, zzz.mainStat.ATK_FLAT, 0, [
+            new Substat(zzz.stat.HP_PERCENT, 3.0),
+            new Substat(zzz.stat.ATK_PERCENT, 3.0),
+            new Substat(zzz.stat.DEF_PERCENT, 4.8),
+            new Substat(zzz.stat.HP_FLAT, 112),
+        ], zzz);
+
+        const goal = new BuildGoal([zzz.stat.HP_PERCENT]);
+        const result = simulate(artifact, goal, null, 10, () => 0, { profile: zzz });
+
+        assert.equal(result.successRate, 100);
+        assert.equal(result.considerRate, 0);
+        assert.equal(result.discardRate, 0);
+        assert.equal(result.verdict, 'INVERTIR');
     });
 });

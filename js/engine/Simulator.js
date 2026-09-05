@@ -119,7 +119,8 @@ function calcCVTotal(substats, artifact, profile) {
 }
 
 // El RV de referencia usa el tier más alto real del perfil (no un índice
-// fijo a 4 tiers). Para Genshin es tiers[3]; para HSR tiers[2].
+// fijo a 4 tiers). Para Genshin es tiers[3]; para HSR tiers[2]; para ZZZ
+// (modelo fixed) tiers[0], lo que hace que el RV de todo disco válido sea 100.
 function calcRV(profile, substats, totalRolls) {
     let earned = 0;
     const maxIdx = profile.maxTierIndex;
@@ -130,10 +131,25 @@ function calcRV(profile, substats, totalRolls) {
     return Math.round((earned / (totalRolls * 100)) * 1000) / 10;
 }
 
+// Proporción de los rolls totales del disco que cayeron en substats que el
+// usuario marcó como deseados. rollCount(stat) = valor_observado / valor_fijo
+// (válido al ser el modelo fijo de ZZZ). Si el goal está vacío o no existe,
+// utilityRV = 0 por definición. Solo aplica a perfiles con substatRollModel
+// 'fixed' (el RV clásico siempre da 100% ahí y no discrimina calidad).
+function calcUtilityRV(profile, substats, goal, totalRolls) {
+    if (!goal || typeof goal.isDesired !== 'function' || !totalRolls) return 0;
+    let utilityRolls = 0;
+    for (const [key, value] of Object.entries(substats)) {
+        if (!goal.isDesired(profile.stat[key])) continue;
+        utilityRolls += value / profile.stat[key].tiers[0];
+    }
+    return Math.round((utilityRolls / totalRolls) * 1000) / 10;
+}
+
 // Una tirada completa: revela el 4to substat (si aplica, con el stat FIJO
 // que ya se le mostró al usuario -- solo el tier es random) y aplica cada
 // upgrade restante a un substat elegido al azar entre los existentes.
-function runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthStat, rng) {
+function runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthStat, rng, goal) {
     const keyOf = statKeyOf.bind(null, profile);
     const substats = copySubstats(artifact.substats, keyOf);
 
@@ -159,19 +175,32 @@ function runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthSt
         cvTotal: calcCVTotal(substats, artifact, profile),
         cvSub:   calcCVSubstats(substats),
         rv:      calcRV(profile, substats, totalRolls),
+        utilityRV: calcUtilityRV(profile, substats, goal, totalRolls),
     };
 }
 
 // Devuelve solo la categoría del veredicto: el texto visible lo construye
 // la capa de UI con i18n, no el motor.
-function verdict(profile, artifact, cv, cvSub, rv, thresholds) {
+//
+// En perfiles con substatRollModel 'fixed' (ZZZ), el RV clásico siempre da
+// 100% y no discrimina calidad. Cuando la pieza no tiene crit (cv/cvSub 0),
+// la decisión cae en utilityFallback (proporción de rolls en stats deseados)
+// en lugar del fallback de RV. En perfiles tiered (Genshin/HSR) se mantiene
+// el fallback de RV original.
+function verdict(profile, artifact, cv, cvSub, rv, thresholds, utilityRV) {
     if (isVariableMainPiece(profile, artifact)) {
         const t = thresholds.VARIABLE_MAIN;
+        const fallback = t.utilityFallback;
 
         if (cv >= t.cv.INVEST)   return "INVERTIR";
         if (cv >= t.cv.CONSIDER) return "CONSIDERAR";
 
         if (cv === 0) {
+            if (profile.substatRollModel === 'fixed' && fallback) {
+                if (utilityRV >= fallback.INVEST)   return "INVERTIR";
+                if (utilityRV >= fallback.CONSIDER) return "CONSIDERAR";
+                return "DESCARTAR";
+            }
             if (rv >= t.rv.INVEST)   return "INVERTIR";
             if (rv >= t.rv.CONSIDER) return "CONSIDERAR";
             return "DESCARTAR";
@@ -181,11 +210,17 @@ function verdict(profile, artifact, cv, cvSub, rv, thresholds) {
     }
 
     const t = thresholds.FIXED_MAIN;
+    const fallback = t.utilityFallback;
 
     if (cvSub >= t.cvSub.INVEST)   return "INVERTIR";
     if (cvSub >= t.cvSub.CONSIDER) return "CONSIDERAR";
 
     if (cvSub === 0) {
+        if (profile.substatRollModel === 'fixed' && fallback) {
+            if (utilityRV >= fallback.INVEST)   return "INVERTIR";
+            if (utilityRV >= fallback.CONSIDER) return "CONSIDERAR";
+            return "DESCARTAR";
+        }
         if (rv >= t.rv.INVEST)   return "INVERTIR";
         if (rv >= t.rv.CONSIDER) return "CONSIDERAR";
         return "DESCARTAR";
@@ -228,10 +263,10 @@ export function simulate(
     let investCount = 0, considerCount = 0, discardCount = 0;
 
     for (let i = 0; i < iterations; i++) { // Corre una tirada completa del artefacto según el perfil y los substats existentes, proyectando el 4to substat si se pasa explícitamente
-        const trial = runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthStat, rng);
+        const trial = runOneTrial(profile, artifact, remaining, totalRolls, projectedFourthStat, rng, goal);
         trials.push(trial);
 
-        const category = verdict(profile, artifact, trial.cvTotal, trial.cvSub, trial.rv, thresholds);
+        const category = verdict(profile, artifact, trial.cvTotal, trial.cvSub, trial.rv, thresholds, trial.utilityRV);
         if (category === "INVERTIR") investCount++;
         else if (category === "CONSIDERAR") considerCount++;
         else discardCount++;

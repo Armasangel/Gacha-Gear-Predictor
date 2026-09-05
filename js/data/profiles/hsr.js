@@ -119,6 +119,7 @@ export function buildHsrProfile() {
     return Object.freeze({
         id: 'hsr',
         name: 'Honkai: Star Rail',
+        substatRollModel: 'tiered',
         // Reliquias que se mejoran (+15). Planar Sphere y Rope no se simulan
         // (no tienen mejoras), quedan para una iteración de scoring aparte.
         upgradeLevels: Object.freeze([3, 6, 9, 12, 15]),

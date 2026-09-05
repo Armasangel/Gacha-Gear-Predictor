@@ -16,6 +16,7 @@ export function buildGenshinProfile() {
     return Object.freeze({
         id: 'genshin',
         name: 'Genshin Impact',
+        substatRollModel: 'tiered',
         upgradeLevels: Object.freeze([4, 8, 12, 16, 20]),
         maxLevel: 20,
         maxTierIndex: 3,
