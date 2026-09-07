@@ -19,19 +19,18 @@
     <button id="lang-switch" class="lang-switch" aria-label="Cambiar idioma"><span class="globe">🌐</span><span class="lang-code">EN</span></button>
 
     <!-- SCREEN 1: LANDING -->
-    <section class="screen active" id="screen-landing">
+    <section class="screen active" id="screen-landing" data-game="neutral">
         <div class="stars"></div>
         <div class="landing-content">
             <p class="landing-eyebrow" id="landing-eyebrow"></p>
             <h1 class="landing-title">Gacha<br>Gear<br>Predictor</h1>
             <p class="landing-sub" data-i18n-html="landing.sub"></p>
-            <span class="landing-badge" id="landing-badge"></span>
-            <button class="btn-primary" onclick="showScreen('screen-form')" data-i18n="landing.cta">
-                Analizar Artefacto
-            </button>
-            <button class="btn-secondary landing-cta-secondary" onclick="showScreen('screen-import')" data-i18n="landing.ctaImport">
-                Importar Lote
-            </button>
+
+            <div class="game-pick-row" id="game-pick-row">
+                <button type="button" class="game-pick-btn game-pick-btn--genshin" data-game-id="genshin" data-i18n="landing.pick.genshin">Genshin Impact</button>
+                <button type="button" class="game-pick-btn game-pick-btn--hsr" data-game-id="hsr" data-i18n="landing.pick.hsr">Honkai: Star Rail</button>
+                <button type="button" class="game-pick-btn game-pick-btn--zzz" data-game-id="zzz" data-i18n="landing.pick.zzz">Zenless Zone Zero</button>
+            </div>
         </div>
     </section>
 
@@ -39,14 +38,6 @@
     <section class="screen" id="screen-form">
         <div class="screen-inner">
             <h2 class="screen-title" data-i18n="form.title">Ingresa tu Artefacto</h2>
-
-            <div class="form-group form-group--full game-select-group">
-                <label class="form-label" data-i18n="form.label.game">Juego</label>
-                <div class="custom-select-wrapper" id="game-select">
-                    <div class="custom-select-trigger"></div>
-                    <div class="custom-options"></div>
-                </div>
-            </div>
 
             <div class="form-grid">
 
@@ -130,6 +121,7 @@
 
             <div class="form-actions">
                 <button class="btn-secondary" onclick="showScreen('screen-landing')" data-i18n="form.button.back">← Volver</button>
+                <button class="btn-secondary" onclick="showScreen('screen-import')" data-i18n="landing.ctaImport">Importar Lote</button>
                 <button class="btn-primary" id="analyze-btn" data-i18n="form.button.analyze">Predecir Artefacto</button>
             </div>
 

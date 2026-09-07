@@ -1,7 +1,7 @@
 import {
     initCustomSelects, populateMainStats, populateLevelOptions,
     resetSubstatSelects, readForm, prefillForm, refreshForm,
-    setProfile, getCurrentProfileId
+    setProfile
 } from './form.js';
 import { displayResults, displayFourthSubstat } from './display.js';
 import { simulate } from '../engine/Simulator.js';
@@ -11,7 +11,6 @@ import { getProfile, getAvailableProfileIds } from '../data/profiles/index.js';
 import { initI18n, setLanguage, getLanguage, t } from '../i18n/i18n.js';
 import { renderStaticTexts } from './i18nRender.js';
 import { initImport, refreshImportTexts } from './importer.js';
-import { IconSelect } from './IconSelect.js';
 
 const GAME_STORAGE_KEY = 'gacha-game';
 
@@ -47,6 +46,10 @@ window.showScreen = function(id) {
     const target = document.getElementById(id);
     target.classList.add('active');
     window.scrollTo(0, 0);
+    // El landing siempre arranca en estado neutro, nunca "recuerda"
+    // el último juego previsualizado — eso es justamente lo que
+    // dispara el hover/touch, no algo persistente.
+    if (id === 'screen-landing') clearGamePreview();
 };
 
 window.toggleDetails = function() { // Muestra u oculta el bloque de detalles de la simulación, cambiando el texto del botón según el estado. Se obtiene el bloque y el botón por su id, se verifica si está abierto (display distinto de 'none'), se cambia el display del bloque y se actualiza el texto del botón usando la función t para traducir.
@@ -72,23 +75,38 @@ window.resetAndGoForm = function() { // Resetea el estado del formulario y vuelv
     showScreen('screen-form');
 };
 
-function initGameSelector() { // Inicializa el selector de juego en la UI, creando un IconSelect con las opciones de juegos disponibles según los perfiles. Se obtiene el contenedor por su id, se crean las opciones con el id y nombre del perfil, y se establece el valor inicial según el juego guardado. Al cambiar de juego, se aplica el nuevo perfil y se actualizan las etiquetas de la UI.
-    const wrapper = document.getElementById('game-select');
-    if (!wrapper) return;
+// ─── Selección de juego en el landing (hover en desktop, touch en mobile) ──
+// pointerenter/pointerleave cubren ambos casos con el mismo código: en mouse
+// se disparan con el simple hover (sin click), y en touch se disparan al
+// tocar y al soltar/arrastrar fuera — que es exactamente "mientras el dedo
+// está tocando el botón" que pedimos. El click (que dispara igual en mouse
+// y touch al soltar sobre el mismo elemento) confirma y navega.
+function previewGame(id) {
+    const landing = document.getElementById('screen-landing');
+    if (landing) landing.dataset.game = id;
+    const eyebrow = document.getElementById('landing-eyebrow');
+    if (eyebrow) eyebrow.textContent = t(`landing.eyebrow.${id}`) || t('landing.eyebrow');
+}
 
-    const options = getAvailableProfileIds().map(id => {
-        const p = getProfile(id);
-        return { value: p.id, label: p.name, icon: null };
-    });
+function clearGamePreview() {
+    const landing = document.getElementById('screen-landing');
+    if (landing) landing.dataset.game = 'neutral';
+    const eyebrow = document.getElementById('landing-eyebrow');
+    if (eyebrow) eyebrow.textContent = t('landing.eyebrow.neutral');
+}
 
-    const selector = new IconSelect(wrapper, {
-        options,
-        value: getStoredGameId(),
-        onChange: (id) => {
+function initGamePickRow() { // Conecta cada botón de juego del landing a su preview (hover/touch) y a la confirmación (click), que aplica el perfil y navega al form.
+    document.querySelectorAll('.game-pick-btn').forEach(btn => {
+        const id = btn.dataset.gameId;
+        btn.addEventListener('pointerenter', () => previewGame(id));
+        btn.addEventListener('pointerleave', () => clearGamePreview());
+        btn.addEventListener('pointercancel', () => clearGamePreview());
+        btn.addEventListener('click', () => {
             applyGame(id);
-        },
+            showScreen('screen-form');
+        });
     });
-    window.__gameSelector = selector;
+    clearGamePreview(); // estado inicial: neutro, nada elegido todavía
 }
 
 function getStoredGameId() { // Devuelve el id del juego guardado en localStorage, o 'genshin' si no hay ninguno o hay un error al acceder a localStorage. Se intenta obtener el valor de localStorage con la clave GAME_STORAGE_KEY, y si falla se devuelve 'genshin'.
@@ -99,7 +117,7 @@ function getStoredGameId() { // Devuelve el id del juego guardado en localStorag
     }
 }
 
-function applyGame(id) { // Aplica un juego por id, actualizando el perfil activo y guardando el id en localStorage. Si el id no corresponde a un perfil conocido, se usa 'genshin' como fallback. Se obtiene el constructor del perfil, se construye y cachea si es necesario, y se llama a setProfile con el perfil obtenido. Se limpian los bloques de resultados, se aplica el tema visual del juego y se actualizan las etiquetas de la UI.
+function applyGame(id) { // Aplica un juego por id, actualizando el perfil activo y guardando el id en localStorage. Si el id no corresponde a un perfil conocido, se usa 'genshin' como fallback. Se obtiene el constructor del perfil, se construye y cachea si es necesario, y se llama a setProfile con el perfil obtenido. Se limpian los bloques de resultados, se aplica el tema visual del juego (para el resto de la app, no para el landing que ya se resetea a neutro al volver).
     if (!getAvailableProfileIds().includes(id)) id = 'genshin';
     try { localStorage.setItem(GAME_STORAGE_KEY, id); } catch {}
     setProfile(getProfile(id));
@@ -107,29 +125,15 @@ function applyGame(id) { // Aplica un juego por id, actualizando el perfil activ
     // Limpiar pantalla de resultados si estamos viendo el análisis de otro juego
     document.getElementById('fourth-substat-block').style.display = 'none';
     document.getElementById('pending-block').style.display = 'none';
-    refreshGameLabels();
 }
 
 // Cambia el tema visual (colores/tipografía/motivos) leyendo data-game en <html>.
 // Todo el resto vive en style.css como bloques [data-game="..."]; este switch
 // es el único punto de entrada, así que retematizar la app es un solo atributo.
+// El landing tiene su PROPIO data-game (ver previewGame/clearGamePreview),
+// así que este cambio en <html> no le pega al landing, solo al resto.
 function applyGameTheme(id) {
     document.documentElement.dataset.game = id;
-}
-
-// Muestra el nombre del juego activo en el landing (eyebrow + badge).
-function refreshGameLabels() {
-    const profile = getProfile(getCurrentProfileId());
-
-    const eyebrow = document.getElementById('landing-eyebrow');
-    if (eyebrow) { // Si el elemento eyebrow existe, se actualiza su texto con la traducción correspondiente al id del perfil activo, usando la función t para traducir. Si no hay traducción específica, se usa un valor por defecto.
-        eyebrow.textContent = t(`landing.eyebrow.${profile.id}`) || t('landing.eyebrow');
-    }
-
-    const badge = document.getElementById('landing-badge');
-    if (badge) { // Si el elemento badge existe, se actualiza su texto con un emoji de control y el nombre del perfil activo. Se obtiene el nombre del perfil desde profile.name.
-        badge.textContent = '🎮 ' + profile.name;
-    }
 }
 
 // Init 
@@ -145,30 +149,21 @@ document.addEventListener('DOMContentLoaded', () => {
     initImport();
     initI18n();
     renderStaticTexts();
-    refreshGameLabels();
 
-    // Selector de juego (refleja el juego activo)
-    initGameSelector();
+    // Fila de selección de juego del landing (hover/touch preview + click confirma)
+    initGamePickRow();
 
     document.getElementById('lang-switch').addEventListener('click', () => {
         const next = getLanguage() === 'es' ? 'en' : 'es';
         setLanguage(next);
     });
 
-    window.addEventListener('languagechange', (e) => { // Cuando cambia el idioma, se re-renderizan los textos estáticos, se refresca el formulario y la importación, se actualiza el texto del switch de idioma, se re-sincroniza el selector de juego y se re-renderiza el contenido dinámico si estamos en la pantalla de resultados. Se usan las funciones renderStaticTexts, refreshForm, refreshImportTexts, refreshGameLabels y displayResults/displayFourthSubstat según corresponda.
+    window.addEventListener('languagechange', (e) => { // Cuando cambia el idioma, se re-renderizan los textos estáticos, se refresca el formulario y la importación, se actualiza el texto del switch de idioma y se re-renderiza el contenido dinámico si estamos en la pantalla de resultados.
         renderStaticTexts();
         refreshForm();
         refreshImportTexts();
-        refreshGameLabels();
+        clearGamePreview(); // re-traduce el eyebrow neutro del landing
         document.querySelector('#lang-switch .lang-code').textContent = e.detail.lang === 'es' ? 'EN' : 'ES';
-        // Re-sincronizar las etiquetas del selector de juego
-        if (window.__gameSelector) {
-            const profileId = getCurrentProfileId();
-            const options = getAvailableProfileIds().map(id => ({
-                value: id, label: getProfile(id).name, icon: null
-            }));
-            window.__gameSelector.setOptions(options, profileId);
-        }
 
         // Re-renderizar contenido dinámico si estamos en la pantalla de resultados
         const resultsScreen = document.getElementById('screen-results');

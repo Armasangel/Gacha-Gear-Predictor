@@ -7,76 +7,109 @@
     --red:         #D96B6B;
     --yellow:      #D5D96B;
     --transition:  200ms ease;
+    --transition-theme: 420ms cubic-bezier(.4,0,.2,1); /* el cross-fade del preview de tema */
 }
 
-/* ─── GENSHIN IMPACT (default) ───────────────────── */
-/* Azul pizarra + dorado + celeste — cálido, pictórico, elegante */
+/* ─── NEUTRO (estado ocioso del landing, antes de elegir) ── */
 :root,
+[data-game="neutral"] {
+    --btn-text:    #0B1020;
+    --bg:          #0B1020;
+    --panel:       #141A2C;
+    --panel2:      #1D2438;
+    --hover:       #29314A;
+    --gold1:       #B9BFCC;
+    --gold2:       #D8DCE4;
+    --gold3:       #8B93A0;
+    --accent-rgb:  216,220,228;
+    --panel-rgb:   20,26,44;
+    --text-rgb:    237,240,247;
+    --text:        #EDF0F7;
+    --text2:       #8E97AC;
+    --border:      rgba(216,220,228,.15);
+    --radius:      10px;
+    --shadow-gold: 0 0 15px rgba(216,220,228,.12);
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body:    'Inter', 'Noto Sans', sans-serif;
+    --font-accent:  'Space Grotesk', sans-serif;
+}
+
+/* ─── GENSHIN IMPACT ──────────────────────────────── */
+/* Marfil + dorado terroso — cálido, pictórico, luminoso. Tema CLARO. */
 [data-game="genshin"] {
-    --bg:          #172536;
-    --panel:       #1E3348;
-    --panel2:      #293B4D;
-    --hover:       #35506A;
-    --gold1:       #C89B3C;
-    --gold2:       #DDBB68;
-    --gold3:       #F6D67A;
-    --accent-rgb:  221,187,104;   /* --gold2 en rgb, para efectos con opacidad */
-    --panel-rgb:   30,51,72;      /* --panel en rgb */
-    --text-rgb:    247,243,232;   /* --text en rgb */
-    --text:        #F7F3E8;
-    --text2:       #AEB9BD;
-    --border:      rgba(221,187,104,.2);
+    --btn-text:    #FBF8EF;
+    --bg:          #F4F0E5;
+    --panel:       #FBF8EF;
+    --panel2:      #EDE4CC;
+    --hover:       #E3D6AE;
+    --gold1:       #8A6A28;
+    --gold2:       #C89B3C;
+    --gold3:       #76B89A;    /* acento jade secundario, detalles puntuales */
+    --accent-rgb:  200,155,60;
+    --panel-rgb:   251,248,239;
+    --text-rgb:    23,37,54;
+    --text:        #172536;
+    --text2:       #5B6B78;
+    --border:      rgba(200,155,60,.35);
     --radius:      12px;
-    --shadow-gold: 0 0 15px rgba(221,187,104,.2);
+    --shadow-gold: 0 0 15px rgba(200,155,60,.25);
     --font-display: 'Cinzel', serif;
     --font-body:    'Inter', 'Noto Sans', sans-serif;
     --font-accent:  'Cormorant Garamond', serif;
 }
 
 /* ─── HONKAI: STAR RAIL ──────────────────────────── */
-/* Azul noche + dorado frío + violeta/cian — consola de nave, técnico */
+/* Azul noche + PLATA fría dominante — consola de nave, técnico */
 [data-game="hsr"] {
+    --btn-text:    #0B1020;
     --bg:          #0B1020;
     --panel:       #151B2E;
     --panel2:      #202943;
     --hover:       #2B3658;
-    --gold1:       #C9A94E;
-    --gold2:       #E8C66A;
-    --gold3:       #6FA8FF;    /* acento cósmico secundario, usado en detalles puntuales */
-    --accent-rgb:  232,198,106;
+    --gold1:       #8B95AA;
+    --gold2:       #C9D2E0;
+    --gold3:       #9B7BFF;    /* acento violeta secundario, detalles puntuales */
+    --accent-rgb:  201,210,224;
     --panel-rgb:   21,27,46;
     --text-rgb:    238,243,255;
     --text:        #EEF3FF;
     --text2:       #9CA8C7;
-    --border:      rgba(111,168,255,.2);
+    --border:      rgba(201,210,224,.2);
     --radius:      4px;
-    --shadow-gold: 0 0 15px rgba(111,168,255,.18);
+    --shadow-gold: 0 0 15px rgba(201,210,224,.18);
     --font-display: 'Space Grotesk', sans-serif;
     --font-body:    'Inter', 'Noto Sans', sans-serif;
     --font-accent:  'Space Grotesk', sans-serif;
 }
 
 /* ─── ZENLESS ZONE ZERO ──────────────────────────── */
-/* Negro carbón + amarillo eléctrico + coral/cian — calle, glitch, duro */
+/* Negro carbón + VERDE LIMA/radioactivo dominante — calle, glitch, duro */
 [data-game="zzz"] {
+    --btn-text:    #111113;
     --bg:          #111113;
     --panel:       #1C1D21;
     --panel2:      #292C32;
     --hover:       #383B42;
-    --gold1:       #E9C93E;
-    --gold2:       #F5D547;
-    --gold3:       #E94B4B;    /* acento coral secundario, usado en detalles puntuales */
-    --accent-rgb:  245,213,71;
+    --gold1:       #8FB82E;
+    --gold2:       #A8D94B;
+    --gold3:       #F5D547;    /* acento amarillo secundario, detalles puntuales */
+    --accent-rgb:  168,217,75;
     --panel-rgb:   28,29,33;
     --text-rgb:    242,240,232;
     --text:        #F2F0E8;
     --text2:       #A7A9AE;
-    --border:      rgba(245,213,71,.25);
+    --border:      rgba(168,217,75,.3);
     --radius:      0px;
-    --shadow-gold: 0 0 15px rgba(245,213,71,.15);
+    --shadow-gold: 0 0 15px rgba(168,217,75,.18);
     --font-display: 'Big Shoulders Display', sans-serif;
     --font-body:    'Inter', 'Noto Sans', sans-serif;
     --font-accent:  'Big Shoulders Display', sans-serif;
+}
+
+/* Cross-fade suave cuando el preview del landing cambia de tema en vivo */
+#screen-landing, #screen-landing * {
+    transition: background-color var(--transition-theme), border-color var(--transition-theme),
+                color var(--transition-theme), box-shadow var(--transition-theme);
 }
 
 /* ─── BASE ───────────────────────────────────────── */
@@ -181,6 +214,22 @@ body {
     background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(155,123,255,.12) 0%, transparent 70%);
 }
 
+/* Genshin: nada de estrellas frías — motas doradas cálidas, más "polvo pictórico" */
+[data-game="genshin"] .stars {
+    background-image:
+        radial-gradient(1.5px 1.5px at 20% 30%, rgba(var(--accent-rgb),.35) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 60% 15%, rgba(var(--accent-rgb),.25) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 80% 55%, rgba(var(--accent-rgb),.30) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 40% 70%, rgba(var(--accent-rgb),.20) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 10% 80%, rgba(var(--accent-rgb),.25) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 90% 25%, rgba(var(--accent-rgb),.30) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 55% 85%, rgba(var(--accent-rgb),.20) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 30% 50%, rgba(var(--accent-rgb),.15) 0%, transparent 100%);
+}
+[data-game="genshin"] #screen-landing::before {
+    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(var(--accent-rgb),.12) 0%, transparent 70%);
+}
+
 .landing-content {
     position: relative;
     z-index: 1;
@@ -225,13 +274,64 @@ body {
     font-weight: 300;
 }
 
+/* ─── FILA DE SELECCIÓN DE JUEGO (landing) ──────────
+   Los 3 botones mantienen SU degradado fijo sin importar qué tema
+   esté previsualizándose en el resto del landing — así siempre se
+   identifican, aunque estés mirando la vista previa de otro juego. */
+.game-pick-row {
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.game-pick-btn {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    border: none;
+    border-radius: 10px;
+    padding: .8rem 1.5rem;
+    cursor: pointer;
+    line-height: 1.25;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.game-pick-btn:hover,
+.game-pick-btn:focus-visible {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+.game-pick-btn:active { transform: translateY(0); filter: brightness(.97); }
+
+.game-pick-btn--genshin {
+    color: #FBF8EF;
+    background: linear-gradient(160deg, #C89B3C 0%, #8A6A28 100%);
+    box-shadow: 0 4px 16px rgba(200,155,60,.3);
+}
+.game-pick-btn--hsr {
+    color: #0B1020;
+    background: linear-gradient(160deg, #C9D2E0 0%, #8B95AA 100%);
+    box-shadow: 0 4px 16px rgba(155,168,192,.3);
+}
+.game-pick-btn--zzz {
+    color: #111113;
+    background: linear-gradient(160deg, #E8F53E 0%, #A8D94B 100%);
+    box-shadow: 0 4px 16px rgba(168,217,75,.35);
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
 /* ─── BOTONES ────────────────────────────────────── */
 .btn-primary {
     font-family: var(--font-display);
     font-size: 15px;
     font-weight: 600;
     letter-spacing: .06em;
-    color: var(--bg);
+    color: var(--btn-text);
     background: linear-gradient(160deg, var(--gold2) 0%, var(--gold1) 100%);
     border: none;
     border-radius: var(--radius);
@@ -378,7 +478,7 @@ body {
 }
 
 .form-select { 
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B9C3D1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B93A0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right .75rem center;
     padding-right: 2.5rem;
@@ -882,7 +982,7 @@ body {
     height: 8px;
     margin-left: auto;
     flex-shrink: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B9C3D1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B93A0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -1017,25 +1117,6 @@ body {
 }
 
 /* ─── IMPORT BATCH ───────────────────────────────── */
-.game-select-group {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.game-select-group .custom-select-trigger {
-    font-family: var(--font-display);
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: .04em;
-    color: var(--gold2);
-    background: linear-gradient(160deg, var(--panel2), var(--panel));
-}
-
-.game-select-group .custom-select-trigger::after {
-    opacity: .8;
-}
-
 /* Sello / badge del juego en el landing */
 .landing-badge {
     display: inline-flex;
