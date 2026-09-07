@@ -99,14 +99,22 @@ function getStoredGameId() { // Devuelve el id del juego guardado en localStorag
     }
 }
 
-function applyGame(id) { // Aplica un juego por id, actualizando el perfil activo y guardando el id en localStorage. Si el id no corresponde a un perfil conocido, se usa 'genshin' como fallback. Se obtiene el constructor del perfil, se construye y cachea si es necesario, y se llama a setProfile con el perfil obtenido. Se limpian los bloques de resultados y se actualizan las etiquetas de la UI.
+function applyGame(id) { // Aplica un juego por id, actualizando el perfil activo y guardando el id en localStorage. Si el id no corresponde a un perfil conocido, se usa 'genshin' como fallback. Se obtiene el constructor del perfil, se construye y cachea si es necesario, y se llama a setProfile con el perfil obtenido. Se limpian los bloques de resultados, se aplica el tema visual del juego y se actualizan las etiquetas de la UI.
     if (!getAvailableProfileIds().includes(id)) id = 'genshin';
     try { localStorage.setItem(GAME_STORAGE_KEY, id); } catch {}
     setProfile(getProfile(id));
+    applyGameTheme(id);
     // Limpiar pantalla de resultados si estamos viendo el análisis de otro juego
     document.getElementById('fourth-substat-block').style.display = 'none';
     document.getElementById('pending-block').style.display = 'none';
     refreshGameLabels();
+}
+
+// Cambia el tema visual (colores/tipografía/motivos) leyendo data-game en <html>.
+// Todo el resto vive en style.css como bloques [data-game="..."]; este switch
+// es el único punto de entrada, así que retematizar la app es un solo atributo.
+function applyGameTheme(id) {
+    document.documentElement.dataset.game = id;
 }
 
 // Muestra el nombre del juego activo en el landing (eyebrow + badge).
@@ -128,6 +136,7 @@ function refreshGameLabels() {
 document.addEventListener('DOMContentLoaded', () => {
     // Aplicar el juego guardado ANTES de construir los selects del formulario.
     setProfile(getProfile(getStoredGameId()));
+    applyGameTheme(getStoredGameId());
 
     initCustomSelects();
     populateMainStats();
