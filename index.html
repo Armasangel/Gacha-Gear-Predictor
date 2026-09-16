@@ -29,17 +29,26 @@
 
             <div class="game-pick-row w-full" id="game-pick-row">
                 <button type="button" class="game-pick-card" data-game-id="genshin">
-                    <span class="scene scene--genshin"></span>
+                    <span class="scene scene--genshin">
+                        <!-- 📸 Coloca aquí tu imagen de Genshin: <img class="scene-photo" src="js/images/genshin.jpg" alt=""> -->
+                        <img class="scene-photo" src="" alt="">
+                    </span>
                     <span class="scrim"></span>
                     <span class="pick-label" data-i18n="landing.pick.genshin">Botón para Genshin</span>
                 </button>
                 <button type="button" class="game-pick-card" data-game-id="hsr">
-                    <span class="scene scene--hsr"></span>
+                    <span class="scene scene--hsr">
+                        <!-- 📸 Coloca aquí tu imagen de Star Rail: <img class="scene-photo" src="js/images/hsr.jpg" alt=""> -->
+                        <img class="scene-photo" src="" alt="">
+                    </span>
                     <span class="scrim"></span>
                     <span class="pick-label" data-i18n="landing.pick.hsr">Botón para Star Rail</span>
                 </button>
                 <button type="button" class="game-pick-card" data-game-id="zzz">
-                    <span class="scene scene--zzz"></span>
+                    <span class="scene scene--zzz">
+                        <!-- 📸 Coloca aquí tu imagen de Zenless: <img class="scene-photo" src="js/images/zzz.jpg" alt=""> -->
+                        <img class="scene-photo" src="" alt="">
+                    </span>
                     <span class="press-to-play">Press to Play</span>
                     <span class="scrim"></span>
                     <span class="pick-label" data-i18n="landing.pick.zzz">Botón para Zenless</span>
@@ -50,7 +59,12 @@
 
     <!-- SCREEN 2: FORM -->
     <section class="screen" id="screen-form">
+        <!-- 📸 Fondo de la pantalla: coloca tu captura del juego como <img class="scene-photo" src="..."> aquí dentro -->
+        <div class="screen-media" aria-hidden="true">
+            <img class="scene-photo" src="" alt="">
+        </div>
         <div class="screen-inner">
+          <div class="screen-panel">
             <h2 class="screen-title" data-i18n="form.title">Ingresa tu Artefacto</h2>
 
             <div class="form-grid">
@@ -140,12 +154,18 @@
             </div>
 
             <div id="form-error" class="form-error" style="display:none"></div>
+          </div>
         </div>
     </section>
 
     <!-- SCREEN 3: RESULTS -->
     <section class="screen" id="screen-results">
+        <!-- 📸 Fondo de la pantalla: coloca tu captura del juego como <img class="scene-photo" src="..."> aquí dentro -->
+        <div class="screen-media" aria-hidden="true">
+            <img class="scene-photo" src="" alt="">
+        </div>
         <div class="screen-inner">
+          <div class="screen-panel">
 
             <!-- 4to substat (solo si tiene 3) -->
             <div id="fourth-substat-block" style="display:none">
@@ -247,12 +267,18 @@
                 <button class="btn-primary" onclick="resetAndGoForm()" data-i18n="results.button.another">Predecir otro Artefacto</button>
             </div>
 
+          </div>
         </div>
     </section>
 
     <!-- SCREEN 4: IMPORT BATCH -->
     <section class="screen" id="screen-import">
+        <!-- 📸 Fondo de la pantalla: coloca tu captura del juego como <img class="scene-photo" src="..."> aquí dentro -->
+        <div class="screen-media" aria-hidden="true">
+            <img class="scene-photo" src="" alt="">
+        </div>
         <div class="screen-inner">
+          <div class="screen-panel">
             <h2 class="screen-title" data-i18n="import.title">Analizar un Lote de Artefactos</h2>
             <p class="section-hint" data-i18n="import.hint"></p>
 
@@ -293,6 +319,7 @@
                     <button class="btn-primary" id="import-export-btn" data-i18n="import.export">Exportar CSV</button>
                 </div>
             </div>
+          </div>
         </div>
     </section>
 

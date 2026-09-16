@@ -96,7 +96,7 @@ function clearGamePreview() {
 }
 
 function initGamePickRow() { // Conecta cada botón de juego del landing a su preview (hover/touch) y a la confirmación (click), que aplica el perfil y navega al form.
-    document.querySelectorAll('.game-pick-btn').forEach(btn => {
+    document.querySelectorAll('.game-pick-card').forEach(btn => {
         const id = btn.dataset.gameId;
         btn.addEventListener('pointerenter', () => previewGame(id));
         btn.addEventListener('pointerleave', () => clearGamePreview());
