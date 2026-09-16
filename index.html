@@ -19,17 +19,31 @@
     <button id="lang-switch" class="lang-switch" aria-label="Cambiar idioma"><span class="globe">🌐</span><span class="lang-code">EN</span></button>
 
     <!-- SCREEN 1: LANDING -->
-    <section class="screen active" id="screen-landing" data-game="neutral">
-        <div class="stars"></div>
-        <div class="landing-content">
-            <p class="landing-eyebrow" id="landing-eyebrow"></p>
-            <h1 class="landing-title">Gacha<br>Gear<br>Predictor</h1>
-            <p class="landing-sub" data-i18n-html="landing.sub"></p>
+    <section class="screen active items-center justify-center min-h-screen p-6" id="screen-landing" data-game="neutral">
+        <div class="w-full max-w-4xl mx-auto flex flex-col items-center gap-8">
+            <div class="text-center max-w-xl">
+                <p class="landing-eyebrow sr-only" id="landing-eyebrow"></p>
+                <h1 class="landing-title !text-3xl md:!text-4xl">Gacha-Gear-Predictor</h1>
+                <p class="landing-sub !text-sm md:!text-base !max-w-none mt-2 mx-auto" data-i18n-html="landing.sub"></p>
+            </div>
 
-            <div class="game-pick-row" id="game-pick-row">
-                <button type="button" class="game-pick-btn game-pick-btn--genshin" data-game-id="genshin" data-i18n="landing.pick.genshin">Genshin Impact</button>
-                <button type="button" class="game-pick-btn game-pick-btn--hsr" data-game-id="hsr" data-i18n="landing.pick.hsr">Honkai: Star Rail</button>
-                <button type="button" class="game-pick-btn game-pick-btn--zzz" data-game-id="zzz" data-i18n="landing.pick.zzz">Zenless Zone Zero</button>
+            <div class="game-pick-row w-full" id="game-pick-row">
+                <button type="button" class="game-pick-card" data-game-id="genshin">
+                    <span class="scene scene--genshin"></span>
+                    <span class="scrim"></span>
+                    <span class="pick-label" data-i18n="landing.pick.genshin">Botón para Genshin</span>
+                </button>
+                <button type="button" class="game-pick-card" data-game-id="hsr">
+                    <span class="scene scene--hsr"></span>
+                    <span class="scrim"></span>
+                    <span class="pick-label" data-i18n="landing.pick.hsr">Botón para Star Rail</span>
+                </button>
+                <button type="button" class="game-pick-card" data-game-id="zzz">
+                    <span class="scene scene--zzz"></span>
+                    <span class="press-to-play">Press to Play</span>
+                    <span class="scrim"></span>
+                    <span class="pick-label" data-i18n="landing.pick.zzz">Botón para Zenless</span>
+                </button>
             </div>
         </div>
     </section>
