@@ -8,7 +8,7 @@
     <title>Gacha Gear Predictor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800&family=Bowlby+One&family=Bowlby+One+SC&family=Bungee&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Spectral+SC&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800&family=Bowlby+One&family=Bowlby+One+SC&family=Bungee&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Spectral+SC:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -57,13 +57,13 @@
 
     <!-- SCREEN 2: FORM -->
     <section class="screen" id="screen-form">
-        <!-- 📸 Fondo de la pantalla: coloca tu captura del juego como <img class="scene-photo" src="..."> aquí dentro -->
+        <!-- 📸 Fondo de la pantalla: se intercambia por juego (ver FORM_BACKGROUNDS en main.js) -->
         <div class="screen-media" aria-hidden="true">
-            <img class="scene-photo" src="" alt="">
+            <img class="scene-photo" src="js/images/alchemy-table-background.webp" alt="">
         </div>
         <div class="screen-inner">
           <div class="screen-panel">
-            <h2 class="screen-title" data-i18n="form.title">Ingresa tu Artefacto</h2>
+            <h2 class="screen-title" data-i18n="form.title">Ingresa Tu Artefacto</h2>
 
             <div class="form-grid">
 
@@ -77,10 +77,13 @@
 
                 <div class="form-group">
                     <label class="form-label" data-i18n="form.label.mainstat">Main Stat</label>
-                    <select id="mainStat" class="form-select"></select>
+                    <div class="custom-select-wrapper" id="mainStat-select">
+                        <div class="custom-select-trigger"></div>
+                        <div class="custom-options"></div>
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group form-group--level">
                     <label class="form-label" data-i18n="form.label.level">Nivel</label>
                     <select id="level" class="form-select">
                         <option value="0">+0</option>
@@ -145,13 +148,22 @@
 
             </div>
 
-            <div class="form-actions">
-                <button class="btn-secondary" onclick="showScreen('screen-landing')" data-i18n="form.button.back">← Volver</button>
-                <button class="btn-secondary" onclick="showScreen('screen-import')" data-i18n="landing.ctaImport">Importar Lote</button>
-                <button class="btn-primary" id="analyze-btn" data-i18n="form.button.analyze">Predecir Artefacto</button>
-            </div>
-
             <div id="form-error" class="form-error" style="display:none"></div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="showScreen('screen-landing')">
+                <span class="btn-glyph glyph-x" aria-hidden="true">X</span>
+                <span class="btn-text" data-i18n="form.button.back">Volver</span>
+            </button>
+            <button type="button" class="btn-secondary" onclick="showScreen('screen-import')">
+                <span class="btn-glyph glyph-y" aria-hidden="true">Y</span>
+                <span class="btn-text" data-i18n="landing.ctaImport">Importar Lote</span>
+            </button>
+            <button type="button" class="btn-primary" id="analyze-btn">
+                <span class="btn-glyph glyph-o" aria-hidden="true">O</span>
+                <span class="btn-text" data-i18n="form.button.analyze">Predecir Artefacto</span>
+            </button>
           </div>
         </div>
     </section>
