@@ -106,12 +106,6 @@
     --font-accent:  'Big Shoulders Display', sans-serif;
 }
 
-/* Cross-fade suave cuando el preview del landing cambia de tema en vivo */
-#screen-landing, #screen-landing * {
-    transition: background-color var(--transition-theme), border-color var(--transition-theme),
-                color var(--transition-theme), box-shadow var(--transition-theme);
-}
-
 /* ─── BASE ───────────────────────────────────────── */
 html, body { height: 100%; }
 
@@ -228,69 +222,52 @@ body {
     position: relative;
     text-align: center;
     overflow: hidden;
+    background: #0B0E14;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5rem 1.5rem;
 }
 
-/* Gradiente radial sutil al centro, sigue el tema en preview */
-#screen-landing::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(var(--panel-rgb),.6) 0%, transparent 70%);
-    pointer-events: none;
-}
-
-[data-game="hsr"] #screen-landing::before {
-    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(155,123,255,.12) 0%, transparent 70%);
-}
-
-[data-game="genshin"] #screen-landing::before {
-    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(var(--accent-rgb),.12) 0%, transparent 70%);
-}
-
-.landing-eyebrow {
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--gold2);
-    opacity: .8;
+.landing-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
 }
 
 .landing-title {
-    font-family: var(--font-display);
-    font-size: clamp(48px, 10vw, 80px);
-    font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: .06em;
-    color: var(--text);
-    text-shadow: 0 2px 40px rgba(var(--accent-rgb),.15);
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(28px, 5.5vw, 64px);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: .02em;
+    color: #F3F1E8;
+    text-align: center;
 }
 
 .landing-sub {
-    font-family: var(--font-accent);
-    font-size: 20px;
-    font-style: italic;
-    color: var(--text2);
-    max-width: 380px;
-}
-
-/* HSR/ZZZ no usan itálica de manuscrito — no calza con su estética */
-[data-game="hsr"] .landing-sub,
-[data-game="zzz"] .landing-sub {
-    font-style: normal;
-    font-weight: 300;
+    font-family: 'Bowlby One SC', sans-serif;
+    font-size: clamp(13px, 2.2vw, 26px);
+    font-weight: 400;
+    line-height: 1.4;
+    color: #B9C3D1;
+    text-align: center;
+    max-width: 720px;
 }
 
 /* ─── CARTAS DE SELECCIÓN DE JUEGO (landing) ────────
-   Cada carta tiene su propia "escena" (arco/tren-planeta/TV) hecha
-   en CSS puro — sin fotos ni assets de los juegos reales, para no
-   pisar derechos de autor, pero manteniendo la sensación de "mundo
-   propio" por juego. Las escenas son fijas, no dependen del preview
-   del resto del landing. */
+   Cada carta es un botón con la imagen del login del juego como
+   fondo y un overlay revelado al hover/touch con la estética propia
+   de cada mundo (abyss / divergent universe / HDD system). */
 .game-pick-row {
     display: flex;
-    gap: .9rem;
+    gap: 1rem;
+    width: 100%;
 }
 
 @media (max-width: 640px) {
@@ -305,8 +282,10 @@ body {
     overflow: hidden;
     border: 1px solid rgba(255,255,255,.08);
     cursor: pointer;
+    padding: 0;
+    background: #1B212E;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 220ms ease, box-shadow 220ms ease;
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
 
 @media (min-width: 640px) {
@@ -316,18 +295,18 @@ body {
 .game-pick-card:hover,
 .game-pick-card:focus-visible {
     transform: translateY(-4px) scale(1.015);
-    box-shadow: 0 12px 32px rgba(0,0,0,.4);
+    box-shadow: 0 12px 32px rgba(0,0,0,.45);
+    outline: none;
 }
 
-.game-pick-card .scene {
+.game-pick-img,
+.overlay-bg {
     position: absolute;
     inset: 0;
-}
-
-.game-pick-card .scrim {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.15) 55%, transparent 100%);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .game-pick-card .pick-label {
@@ -340,89 +319,76 @@ body {
     font-size: 14px;
     letter-spacing: .02em;
     text-shadow: 0 1px 4px rgba(0,0,0,.5);
+    z-index: 1;
 }
 
-/* Escena Genshin: cielo cálido + arco de piedra */
-.scene--genshin {
-    background: linear-gradient(180deg, #BEE3F5 0%, #EAF6FB 55%, #F3EEDA 100%);
-}
-.scene--genshin::before {
-    content: '';
-    position: absolute; left: 50%; bottom: 0;
-    width: 52%; height: 68%;
-    transform: translateX(-50%);
-    background: #FFFDF6;
-    border-radius: 50% 50% 6px 6px / 32% 32% 0 0;
-    box-shadow: 0 0 70px rgba(255,238,190,.65);
-}
-.scene--genshin::after {
-    content: '';
-    position: absolute; left: 50%; bottom: 0;
-    width: 72%; height: 52%;
-    transform: translateX(-50%);
-    background:
-        linear-gradient(#FFFDF6, #FFFDF6) left / 13% 100% no-repeat,
-        linear-gradient(#FFFDF6, #FFFDF6) right / 13% 100% no-repeat;
+/* Overlay revelado al hover / tocar / enfocar la carta */
+.pick-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 240ms ease, visibility 240ms ease;
 }
 
-/* Escena HSR: espacio profundo + planeta + estela de tren */
-.scene--hsr {
-    background: radial-gradient(circle at 68% 28%, #2A3A6B 0%, #0B1020 62%), #0B1020;
-}
-.scene--hsr::before {
-    content: '';
-    position: absolute; top: 16%; right: 10%;
-    width: 40%; aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(circle at 34% 34%, #D3DAE8, #4B5A82 72%);
-    box-shadow: 0 0 44px rgba(201,210,224,.4);
-}
-.scene--hsr::after {
-    content: '';
-    position: absolute; left: -12%; bottom: 32%;
-    width: 124%; height: 2px;
-    background: linear-gradient(90deg, transparent, #C9D2E0 45%, #fff 55%, transparent);
-    transform: rotate(-9deg);
-    box-shadow: 0 0 16px rgba(201,210,224,.7);
+.game-pick-card:is(:hover, :focus-visible) .pick-overlay {
+    opacity: 1;
+    visibility: visible;
 }
 
-/* Escena ZZZ: pantalla de TV vieja, scanlines + señal buscando */
-.scene--zzz {
-    background: repeating-linear-gradient(0deg, #19191b 0px, #19191b 2px, #101012 2px, #101012 4px);
+/* Velo para que el título y el texto sigan siendo legibles sobre la imagen */
+.overlay-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.25) 55%, rgba(0,0,0,.4) 100%);
 }
-.scene--zzz::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,.65) 100%);
-}
-.scene--zzz::after {
-    content: '';
-    position: absolute; top: 32%; left: 50%;
-    width: 46%; aspect-ratio: 1;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 2px solid rgba(168,217,75,.55);
-    box-shadow: 0 0 0 12px rgba(168,217,75,.12), 0 0 0 24px rgba(168,217,75,.06);
-}
-.scene--zzz .press-to-play {
-    position: absolute; top: 58%; left: 0; right: 0;
+
+.overlay-title,
+.overlay-text {
+    position: relative;
+    z-index: 1;
     text-align: center;
-    font-family: var(--font-body);
-    font-size: 10px;
-    letter-spacing: .15em;
-    color: #A8D94B;
-    text-transform: uppercase;
-    animation: blink 1.4s steps(1) infinite;
+    text-shadow: 0 2px 8px rgba(0,0,0,.7);
 }
-@keyframes blink { 50% { opacity: 0; } }
+
+.overlay-title {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    line-height: 1.15;
+}
+
+.overlay-text {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: .02em;
+    line-height: 1.3;
+}
+
+/* Temática Genshin: abismo espectral dorado */
+.game-pick-card[data-game-id="genshin"] .overlay-title { font-family: 'Spectral', serif;    color: #D8A659; }
+.game-pick-card[data-game-id="genshin"] .overlay-text  { font-family: 'Spectral SC', serif;  color: #FFFFFF; }
+
+/* Temática Star Rail: universo divergente, HUD frío */
+.game-pick-card[data-game-id="hsr"] .overlay-title { font-family: 'Space Grotesk', sans-serif; color: #FFFFFF; }
+.game-pick-card[data-game-id="hsr"] .overlay-text  { font-family: 'Space Mono', monospace;     color: #FFFFFF; }
+
+/* Temática Zenless: sistema HDD, glitch urbano */
+.game-pick-card[data-game-id="zzz"] .overlay-title { font-family: 'Bungee', sans-serif; color: #FFFFFF; }
+.game-pick-card[data-game-id="zzz"] .overlay-text  { font-family: 'Bungee', sans-serif; color: #B9C3D1; }
 
 /* ─── SLOTS PARA IMÁGENES REALES ──────────────────
-   .scene-photo se usa tanto dentro de .scene (cards del landing)
-   como dentro de .screen-media (fondo de las demás pantallas).
-   Mientras no tenga "src", se oculta y se ve el degradado/color de
-   respaldo de abajo; en cuanto se le ponga una ruta de imagen real,
-   la cubre automáticamente. No hace falta tocar nada más del CSS
-   para "activarla", solo poner el src en el <img>. */
+   .scene-photo se usa dentro de .screen-media (fondo de las demás
+   pantallas). Mientras no tenga "src", se oculta y se ve el
+   degradado/color de respaldo de abajo; en cuanto se le ponga una ruta
+   de imagen real, la cubre automáticamente. No hace falta tocar nada
+   más del CSS para "activarla", solo poner el src en el <img>. */
 .scene-photo {
     position: absolute;
     inset: 0;

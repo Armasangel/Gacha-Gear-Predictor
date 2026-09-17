@@ -8,50 +8,48 @@
     <title>Gacha Gear Predictor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Big+Shoulders+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Tailwind vía CDN: capa aditiva para maquetar componentes nuevos del rediseño.
-         Los colores siguen viniendo de las CSS vars de style.css (ej. bg-[var(--bg)]),
-         no reemplaza el sistema de tokens existente. -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800&family=Bowlby+One&family=Bowlby+One+SC&family=Bungee&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Spectral+SC&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <button id="lang-switch" class="lang-switch" aria-label="Cambiar idioma"><span class="globe">🌐</span><span class="lang-code">EN</span></button>
 
     <!-- SCREEN 1: LANDING -->
-    <section class="screen active items-center justify-center min-h-screen p-6" id="screen-landing" data-game="neutral">
-        <div class="w-full max-w-4xl mx-auto flex flex-col items-center gap-8">
-            <div class="text-center max-w-xl">
-                <p class="landing-eyebrow sr-only" id="landing-eyebrow"></p>
-                <h1 class="landing-title !text-3xl md:!text-4xl">Gacha-Gear-Predictor</h1>
-                <p class="landing-sub !text-sm md:!text-base !max-w-none mt-2 mx-auto" data-i18n-html="landing.sub"></p>
-            </div>
+    <section class="screen active" id="screen-landing" data-game="neutral">
+        <div class="landing-inner">
+            <h1 class="landing-title">Gacha-Gear-Predictor</h1>
+            <p class="landing-sub" data-i18n-html="landing.sub"></p>
 
-            <div class="game-pick-row w-full" id="game-pick-row">
+            <div class="game-pick-row" id="game-pick-row">
                 <button type="button" class="game-pick-card" data-game-id="genshin">
-                    <span class="scene scene--genshin">
-                        <!-- 📸 Coloca aquí tu imagen de Genshin: <img class="scene-photo" src="js/images/genshin.jpg" alt=""> -->
-                        <img class="scene-photo" src="" alt="">
+                    <img class="game-pick-img" src="js/images/login-screen-genshin.webp" alt="" draggable="false">
+                    <span class="pick-label" data-i18n="landing.pick.genshin">Genshin Impact</span>
+                    <span class="pick-overlay">
+                        <img class="overlay-bg" src="js/images/abyss-background.webp" alt="" draggable="false">
+                        <span class="overlay-scrim"></span>
+                        <span class="overlay-title" data-i18n="landing.pick.genshin">Genshin Impact</span>
+                        <span class="overlay-text" data-i18n="landing.overlay.text.genshin">Análisis de Artefactos</span>
                     </span>
-                    <span class="scrim"></span>
-                    <span class="pick-label" data-i18n="landing.pick.genshin">Botón para Genshin</span>
                 </button>
                 <button type="button" class="game-pick-card" data-game-id="hsr">
-                    <span class="scene scene--hsr">
-                        <!-- 📸 Coloca aquí tu imagen de Star Rail: <img class="scene-photo" src="js/images/hsr.jpg" alt=""> -->
-                        <img class="scene-photo" src="" alt="">
+                    <img class="game-pick-img" src="js/images/login-screen-star-rail.webp" alt="" draggable="false">
+                    <span class="pick-label" data-i18n="landing.pick.hsr">Honkai: Star Rail</span>
+                    <span class="pick-overlay">
+                        <img class="overlay-bg" src="js/images/divergent-universe-background.webp" alt="" draggable="false">
+                        <span class="overlay-scrim"></span>
+                        <span class="overlay-title" data-i18n="landing.pick.hsr">Honkai: Star Rail</span>
+                        <span class="overlay-text" data-i18n="landing.overlay.text.hsr">Análisis de Reliquias</span>
                     </span>
-                    <span class="scrim"></span>
-                    <span class="pick-label" data-i18n="landing.pick.hsr">Botón para Star Rail</span>
                 </button>
                 <button type="button" class="game-pick-card" data-game-id="zzz">
-                    <span class="scene scene--zzz">
-                        <!-- 📸 Coloca aquí tu imagen de Zenless: <img class="scene-photo" src="js/images/zzz.jpg" alt=""> -->
-                        <img class="scene-photo" src="" alt="">
+                    <img class="game-pick-img" src="js/images/login-screen-zenless.webp" alt="" draggable="false">
+                    <span class="pick-label" data-i18n="landing.pick.zzz">Zenless Zone Zero</span>
+                    <span class="pick-overlay">
+                        <img class="overlay-bg" src="js/images/hdd-system-background.webp" alt="" draggable="false">
+                        <span class="overlay-scrim"></span>
+                        <span class="overlay-title" data-i18n="landing.pick.zzz">Zenless Zone Zero</span>
+                        <span class="overlay-text" data-i18n="landing.overlay.text.zzz">Análisis de Discos</span>
                     </span>
-                    <span class="press-to-play">Press to Play</span>
-                    <span class="scrim"></span>
-                    <span class="pick-label" data-i18n="landing.pick.zzz">Botón para Zenless</span>
                 </button>
             </div>
         </div>
