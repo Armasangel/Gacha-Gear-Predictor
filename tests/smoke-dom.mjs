@@ -71,7 +71,9 @@ async function main() {
     doc.querySelector('#pieceType-select .custom-option[data-value="SANDS"]').click();
     await wait(50);
 
-    doc.getElementById('mainStat').value = 'ENERGY_RECHARGE';
+    doc.getElementById('mainStat-select').querySelector('.custom-select-trigger').click();
+    doc.querySelector('#mainStat-select .custom-option[data-value="ENERGY_RECHARGE"]').click();
+    await wait(50);
 
     await setRow(doc, 0, 'CRIT_RATE', '2.722');
     await setRow(doc, 1, 'CRIT_DMG', '5.444');

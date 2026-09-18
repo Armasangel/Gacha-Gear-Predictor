@@ -8,41 +8,48 @@
     <title>Gacha Gear Predictor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Big+Shoulders+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Tailwind vía CDN: capa aditiva para maquetar componentes nuevos del rediseño.
-         Los colores siguen viniendo de las CSS vars de style.css (ej. bg-[var(--bg)]),
-         no reemplaza el sistema de tokens existente. -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800&family=Bowlby+One&family=Bowlby+One+SC&family=Bungee&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Spectral+SC:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <button id="lang-switch" class="lang-switch" aria-label="Cambiar idioma"><span class="globe">🌐</span><span class="lang-code">EN</span></button>
 
     <!-- SCREEN 1: LANDING -->
-    <section class="screen active items-center justify-center min-h-screen p-6" id="screen-landing" data-game="neutral">
-        <div class="w-full max-w-4xl mx-auto flex flex-col items-center gap-8">
-            <div class="text-center max-w-xl">
-                <p class="landing-eyebrow sr-only" id="landing-eyebrow"></p>
-                <h1 class="landing-title !text-3xl md:!text-4xl">Gacha-Gear-Predictor</h1>
-                <p class="landing-sub !text-sm md:!text-base !max-w-none mt-2 mx-auto" data-i18n-html="landing.sub"></p>
-            </div>
+    <section class="screen active" id="screen-landing" data-game="neutral">
+        <div class="landing-inner">
+            <h1 class="landing-title">Gacha-Gear-Predictor</h1>
+            <p class="landing-sub" data-i18n-html="landing.sub"></p>
 
-            <div class="game-pick-row w-full" id="game-pick-row">
+            <div class="game-pick-row" id="game-pick-row">
                 <button type="button" class="game-pick-card" data-game-id="genshin">
-                    <span class="scene scene--genshin"></span>
-                    <span class="scrim"></span>
-                    <span class="pick-label" data-i18n="landing.pick.genshin">Botón para Genshin</span>
+                    <img class="game-pick-img" src="js/images/login-screen-genshin.webp" alt="" draggable="false">
+                    <span class="pick-label" data-i18n="landing.pick.genshin">Genshin Impact</span>
+                    <span class="pick-overlay">
+                        <img class="overlay-bg" src="js/images/abyss-background.webp" alt="" draggable="false">
+                        <span class="overlay-scrim"></span>
+                        <span class="overlay-title" data-i18n="landing.pick.genshin">Genshin Impact</span>
+                        <span class="overlay-text" data-i18n="landing.overlay.text.genshin">Análisis de Artefactos</span>
+                    </span>
                 </button>
                 <button type="button" class="game-pick-card" data-game-id="hsr">
-                    <span class="scene scene--hsr"></span>
-                    <span class="scrim"></span>
-                    <span class="pick-label" data-i18n="landing.pick.hsr">Botón para Star Rail</span>
+                    <img class="game-pick-img" src="js/images/login-screen-star-rail.webp" alt="" draggable="false">
+                    <span class="pick-label" data-i18n="landing.pick.hsr">Honkai: Star Rail</span>
+                    <span class="pick-overlay">
+                        <img class="overlay-bg" src="js/images/divergent-universe-background.webp" alt="" draggable="false">
+                        <span class="overlay-scrim"></span>
+                        <span class="overlay-title" data-i18n="landing.pick.hsr">Honkai: Star Rail</span>
+                        <span class="overlay-text" data-i18n="landing.overlay.text.hsr">Análisis de Reliquias</span>
+                    </span>
                 </button>
                 <button type="button" class="game-pick-card" data-game-id="zzz">
-                    <span class="scene scene--zzz"></span>
-                    <span class="press-to-play">Press to Play</span>
-                    <span class="scrim"></span>
-                    <span class="pick-label" data-i18n="landing.pick.zzz">Botón para Zenless</span>
+                    <img class="game-pick-img" src="js/images/login-screen-zenless.webp" alt="" draggable="false">
+                    <span class="pick-label" data-i18n="landing.pick.zzz">Zenless Zone Zero</span>
+                    <span class="pick-overlay">
+                        <img class="overlay-bg" src="js/images/hdd-system-background.webp" alt="" draggable="false">
+                        <span class="overlay-scrim"></span>
+                        <span class="overlay-title" data-i18n="landing.pick.zzz">Zenless Zone Zero</span>
+                        <span class="overlay-text" data-i18n="landing.overlay.text.zzz">Análisis de Discos</span>
+                    </span>
                 </button>
             </div>
         </div>
@@ -50,8 +57,13 @@
 
     <!-- SCREEN 2: FORM -->
     <section class="screen" id="screen-form">
+        <!-- 📸 Fondo de la pantalla: se intercambia por juego (ver FORM_BACKGROUNDS en main.js) -->
+        <div class="screen-media" aria-hidden="true">
+            <img class="scene-photo" src="js/images/alchemy-table-background.webp" alt="">
+        </div>
         <div class="screen-inner">
-            <h2 class="screen-title" data-i18n="form.title">Ingresa tu Artefacto</h2>
+          <div class="screen-panel">
+            <h2 class="screen-title" data-i18n="form.title">Ingresa Tu Artefacto</h2>
 
             <div class="form-grid">
 
@@ -65,10 +77,13 @@
 
                 <div class="form-group">
                     <label class="form-label" data-i18n="form.label.mainstat">Main Stat</label>
-                    <select id="mainStat" class="form-select"></select>
+                    <div class="custom-select-wrapper" id="mainStat-select">
+                        <div class="custom-select-trigger"></div>
+                        <div class="custom-options"></div>
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group form-group--level">
                     <label class="form-label" data-i18n="form.label.level">Nivel</label>
                     <select id="level" class="form-select">
                         <option value="0">+0</option>
@@ -133,19 +148,34 @@
 
             </div>
 
-            <div class="form-actions">
-                <button class="btn-secondary" onclick="showScreen('screen-landing')" data-i18n="form.button.back">← Volver</button>
-                <button class="btn-secondary" onclick="showScreen('screen-import')" data-i18n="landing.ctaImport">Importar Lote</button>
-                <button class="btn-primary" id="analyze-btn" data-i18n="form.button.analyze">Predecir Artefacto</button>
-            </div>
-
             <div id="form-error" class="form-error" style="display:none"></div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="showScreen('screen-landing')">
+                <span class="btn-glyph glyph-x" aria-hidden="true">X</span>
+                <span class="btn-text" data-i18n="form.button.back">Volver</span>
+            </button>
+            <button type="button" class="btn-secondary" onclick="showScreen('screen-import')">
+                <span class="btn-glyph glyph-y" aria-hidden="true">Y</span>
+                <span class="btn-text" data-i18n="landing.ctaImport">Importar Lote</span>
+            </button>
+            <button type="button" class="btn-primary" id="analyze-btn">
+                <span class="btn-glyph glyph-o" aria-hidden="true">O</span>
+                <span class="btn-text" data-i18n="form.button.analyze">Predecir Artefacto</span>
+            </button>
+          </div>
         </div>
     </section>
 
     <!-- SCREEN 3: RESULTS -->
     <section class="screen" id="screen-results">
+        <!-- 📸 Fondo de la pantalla: coloca tu captura del juego como <img class="scene-photo" src="..."> aquí dentro -->
+        <div class="screen-media" aria-hidden="true">
+            <img class="scene-photo" src="" alt="">
+        </div>
         <div class="screen-inner">
+          <div class="screen-panel">
 
             <!-- 4to substat (solo si tiene 3) -->
             <div id="fourth-substat-block" style="display:none">
@@ -247,12 +277,18 @@
                 <button class="btn-primary" onclick="resetAndGoForm()" data-i18n="results.button.another">Predecir otro Artefacto</button>
             </div>
 
+          </div>
         </div>
     </section>
 
     <!-- SCREEN 4: IMPORT BATCH -->
     <section class="screen" id="screen-import">
+        <!-- 📸 Fondo de la pantalla: coloca tu captura del juego como <img class="scene-photo" src="..."> aquí dentro -->
+        <div class="screen-media" aria-hidden="true">
+            <img class="scene-photo" src="" alt="">
+        </div>
         <div class="screen-inner">
+          <div class="screen-panel">
             <h2 class="screen-title" data-i18n="import.title">Analizar un Lote de Artefactos</h2>
             <p class="section-hint" data-i18n="import.hint"></p>
 
@@ -293,6 +329,7 @@
                     <button class="btn-primary" id="import-export-btn" data-i18n="import.export">Exportar CSV</button>
                 </div>
             </div>
+          </div>
         </div>
     </section>
 

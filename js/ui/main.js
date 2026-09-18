@@ -96,7 +96,7 @@ function clearGamePreview() {
 }
 
 function initGamePickRow() { // Conecta cada botón de juego del landing a su preview (hover/touch) y a la confirmación (click), que aplica el perfil y navega al form.
-    document.querySelectorAll('.game-pick-btn').forEach(btn => {
+    document.querySelectorAll('.game-pick-card').forEach(btn => {
         const id = btn.dataset.gameId;
         btn.addEventListener('pointerenter', () => previewGame(id));
         btn.addEventListener('pointerleave', () => clearGamePreview());
@@ -122,6 +122,7 @@ function applyGame(id) { // Aplica un juego por id, actualizando el perfil activ
     try { localStorage.setItem(GAME_STORAGE_KEY, id); } catch {}
     setProfile(getProfile(id));
     applyGameTheme(id);
+    renderStaticTexts(); // El formulario tiene textos por juego (p. ej. "Reliquia" vs "Artefacto")
     // Limpiar pantalla de resultados si estamos viendo el análisis de otro juego
     document.getElementById('fourth-substat-block').style.display = 'none';
     document.getElementById('pending-block').style.display = 'none';
@@ -132,8 +133,18 @@ function applyGame(id) { // Aplica un juego por id, actualizando el perfil activ
 // es el único punto de entrada, así que retematizar la app es un solo atributo.
 // El landing tiene su PROPIO data-game (ver previewGame/clearGamePreview),
 // así que este cambio en <html> no le pega al landing, solo al resto.
+// Fondo temático del formulario por juego (se aplica a la imagen compartida
+// del #screen-form; cada tema ajusta además su filtro vía CSS).
+const FORM_BACKGROUNDS = {
+    genshin: 'js/images/alchemy-table-background.webp',
+    hsr: 'js/images/herta-space-station.webp',
+    zzz: 'js/images/zzz-pattern-background.webp',
+};
+
 function applyGameTheme(id) {
     document.documentElement.dataset.game = id;
+    const bg = document.querySelector('#screen-form .scene-photo');
+    if (bg && FORM_BACKGROUNDS[id] !== undefined) bg.src = FORM_BACKGROUNDS[id];
 }
 
 // Init 

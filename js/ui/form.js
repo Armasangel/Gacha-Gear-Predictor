@@ -3,7 +3,7 @@ import { Artifact } from '../models/Artifact.js';
 import { Substat } from '../models/Substat.js';
 import { BuildGoal } from '../models/BuildGoal.js';
 import { IconSelect } from './IconSelect.js';
-import { PIECE_ICONS, STAT_ICONS } from '../data/Icons.js';
+import { pieceIcon, statIcon } from '../data/Icons.js';
 import {t} from '../i18n/i18n.js';
 
 // Perfil de juego activo (por defecto Genshin). Se actualiza al cambiar de juego.
@@ -19,6 +19,7 @@ export function pieceLabel(key){ // Devuelve el label traducido de una pieza seg
 
 // ─── Instancias de los dropdowns con icono ─────────
 let pieceSelect = null;
+let mainStatSelect = null;
 const substatSelects = [];
 const substatValueSelects = [];
 
@@ -43,7 +44,7 @@ function buildPieceOptions() { // Devuelve un array de opciones para el select d
         .map(key => ({
             value: key,
             label: pieceLabel(key),
-            icon: PIECE_ICONS[key],
+            icon: pieceIcon(p.id, key),
         }));
 }
 
@@ -54,7 +55,7 @@ function buildSubstatOptions() { // Devuelve un array de opciones para el select
         ...Object.keys(p.stat).map(key => ({
             value: key,
             label: statLabel(key),
-            icon: STAT_ICONS[key],
+            icon: statIcon(p.id, key),
         })),
     ];
 }
@@ -67,6 +68,14 @@ export function initCustomSelects() { // Inicializa los selects de pieza y subst
         options: pieceOptions,
         value: pieceOptions[0]?.value ?? '',
         onChange: () => populateMainStats(),
+    });
+
+    // Dropdown de mainstat (ahora con icono, para bonos de daño incluidos)
+    const mainWrapper = document.getElementById('mainStat-select');
+    mainStatSelect = new IconSelect(mainWrapper, {
+        options: [],
+        value: '',
+        onChange: () => {},
     });
 
     // Dropdowns de substats (uno por fila)
@@ -176,22 +185,27 @@ function formatStatValue(typeKey, tier){ // Devuelve el label del valor de un su
     return esPorcentaje ? `${tier.toFixed(1)}%` : `${tier}`;
 }
 
-export function populateMainStats() { // Llena el select de mainstat según la pieza elegida y el perfil activo. Se llama al iniciar y cada vez que cambia de pieza o de juego.
+export function populateMainStats() { // Llena el select de mainstat según la pieza elegida y el perfil activo (con icono de substat/bono de daño). Se llama al iniciar y cada vez que cambia de pieza o de juego. Preserva la selección previa si sigue siendo válida para la pieza.
     const p = getActiveProfile();
-    const pieceKey   = pieceSelect.value;
-    const mainSelect = document.getElementById('mainStat');
-    const piece      = p.piece[pieceKey];
+    const pieceKey = pieceSelect.value;
+    const piece    = p.piece[pieceKey];
+    const prev     = mainStatSelect ? mainStatSelect.value : null;
 
-    mainSelect.innerHTML = '';
-    if (!piece) return; // Si no hay pieza seleccionada, vacía el select de mainstat
-    for (const [key, value] of Object.entries(p.mainStat)) { // Para cada mainstat del perfil, si es válido para la pieza elegida, se agrega como opción al select de mainstat
-        if (piece.validMainStats.includes(value)) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = statLabel(key);
-            mainSelect.appendChild(option);
+    // Para cada mainstat del perfil, si es válido para la pieza elegida se
+    // agrega como opción, siguiendo el orden de validMainStats de la pieza.
+    const options = [];
+    if (piece) {
+        const byValue = Object.entries(p.mainStat);
+        for (const mainValue of piece.validMainStats) {
+            const entry = byValue.find(([, v]) => v === mainValue);
+            if (!entry) continue; // mainstat válido para la pieza pero fuera del perfil
+            const key = entry[0];
+            options.push({ value: key, label: statLabel(key), icon: statIcon(p.id, key) });
         }
     }
+
+    const keep = prev && options.some(o => o.value === prev) ? prev : (options[0]?.value ?? '');
+    mainStatSelect.setOptions(options, keep);
 }
 
 export function populateGoalCheckboxes() { // Llena los checkboxes de substats deseados según los substats elegidos en el form y el perfil activo. Se llama al iniciar y cada vez que cambia un substat o de juego.
@@ -242,7 +256,7 @@ export function populateGoalCheckboxes() { // Llena los checkboxes de substats d
 export function readForm() { // Lee el form y devuelve un objeto {artifact, goal} según lo que eligió el usuario, usando el perfil activo. Lanza errores si hay datos inválidos.
     const p = getActiveProfile();
     const pieceKey = pieceSelect.value;
-    const mainKey  = document.getElementById('mainStat').value;
+    const mainKey  = mainStatSelect.value;
     const level    = parseInt(document.getElementById('level').value);
 
     const piece   = p.piece[pieceKey];
@@ -281,12 +295,6 @@ export function readForm() { // Lee el form y devuelve un objeto {artifact, goal
 export function refreshForm() {
     rebuildSelects();
 
-    const mainSelect = document.getElementById('mainStat');
-    const mainValue  = mainSelect.value;
-    // rebuildSelects ya llama populateMainStats; re-seleccionamos si sigue válido
-    const validMain = [...mainSelect.options].some(o => o.value === mainValue);
-    if (validMain) mainSelect.value = mainValue;
-
     document.querySelectorAll('#goal-checkboxes .goal-item').forEach(item => {
         item.querySelector('span').textContent = statLabel(item.dataset.key);
     });
@@ -307,7 +315,7 @@ export function resetSubstatSelects() { // Vacia los selects de substat y valor,
 export function prefillForm(snapshot) {
     pieceSelect.value = snapshot.pieceKey;
     populateMainStats();
-    document.getElementById('mainStat').value = snapshot.mainKey;
+    mainStatSelect.value = snapshot.mainKey;
     document.getElementById('level').value     = snapshot.level;
 
     const rows = document.querySelectorAll('.substat-row');
