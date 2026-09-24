@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button id="lang-switch" class="lang-switch" aria-label="Cambiar idioma"><span class="globe">🌐</span><span class="lang-code">EN</span></button>
+    <button id="lang-switch" class="lang-switch" aria-label="Cambiar idioma"><span class="globe" aria-hidden="true"></span><span class="lang-code">EN</span></button>
 
     <!-- SCREEN 1: LANDING -->
     <section class="screen active" id="screen-landing" data-game="neutral">
@@ -355,11 +355,7 @@
             </button>
             <button class="btn-primary" id="import-analyze-btn">
                 <span class="btn-glyph glyph-y" aria-hidden="true">Y</span>
-                <span class="btn-text" data-i18n="import.import">Importar Lote</span>
-            </button>
-            <button class="btn-secondary" onclick="showScreen('screen-form')">
-                <span class="btn-glyph glyph-o" aria-hidden="true">O</span>
-                <span class="btn-text" data-i18n="import.analyzeArtifact">Analizar Artefacto</span>
+                <span class="btn-text" data-i18n="import.analyzeBatch">Analizar Lote</span>
             </button>
           </div>
         </div>

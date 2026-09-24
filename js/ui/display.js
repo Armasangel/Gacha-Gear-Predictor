@@ -3,15 +3,15 @@ import { getProfile } from '../data/profiles/index.js';
 import { statLabel } from './form.js';
 
 const VERDICT_META = {
-    'INVERTIR':   { icon: '🔥', color: '#5FCB8A', key: 'invest'   },
-    'CONSIDERAR': { icon: '👍', color: '#D5D96B', key: 'consider' },
-    'DESCARTAR':  { icon: '🗑️', color: '#D96B6B', key: 'discard'  },
+    'INVERTIR':   { icon: '🔥', iconSvg: null,           color: '#5FCB8A', key: 'invest'   },
+    'CONSIDERAR': { icon: null, iconSvg: 'check.svg',    color: '#D5D96B', key: 'consider' },
+    'DESCARTAR':  { icon: null, iconSvg: 'remove.svg',   color: '#D96B6B', key: 'discard'  },
 };
 
 function verdictConfig(verdict) {
     const m = VERDICT_META[verdict] ?? VERDICT_META['CONSIDERAR'];
     return {
-        icon: m.icon, color: m.color,
+        icon: m.icon, iconSvg: m.iconSvg, color: m.color,
         potential: t(`verdict.potential.${m.key === 'invest' ? 'high' : m.key === 'consider' ? 'mid' : 'low'}`),
         headline: t(`verdict.${m.key}.headline`),
         action: t(`verdict.${m.key}.action`),
@@ -113,7 +113,17 @@ export function displayResults(artifact, result, projectedStat = null) {
 
     // ─── Veredicto (lenguaje humano primero) ──────
     const cfg = verdictConfig(result.verdict);
-    document.getElementById('verdict-icon').textContent  = cfg.icon;
+    const verdictIconEl = document.getElementById('verdict-icon');
+    if (cfg.iconSvg) {
+        verdictIconEl.textContent = '';
+        verdictIconEl.classList.add('verdict-icon--svg');
+        verdictIconEl.style.setProperty('--icon-mask', `url('js/images/${cfg.iconSvg}')`);
+        verdictIconEl.style.color = cfg.color;
+    } else {
+        verdictIconEl.classList.remove('verdict-icon--svg');
+        verdictIconEl.style.removeProperty('--icon-mask');
+        verdictIconEl.textContent = cfg.icon;
+    }
     document.getElementById('verdict-label').textContent = cfg.headline;
     document.getElementById('verdict-label').style.color = cfg.color;
     document.getElementById('verdict-potential-text').textContent = cfg.potential;

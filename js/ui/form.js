@@ -182,7 +182,7 @@ function formatStatValue(typeKey, tier){ // Devuelve el label del valor de un su
         typeKey === 'EFFECT_RES' ||
         typeKey === 'BREAK_EFFECT' ||
         typeKey === 'PEN';
-    return esPorcentaje ? `${tier.toFixed(1)}%` : `${tier}`;
+    return esPorcentaje ? `${tier.toFixed(1)}%` : `${tier.toFixed(1)}`;
 }
 
 export function populateMainStats() { // Llena el select de mainstat según la pieza elegida y el perfil activo (con icono de substat/bono de daño). Se llama al iniciar y cada vez que cambia de pieza o de juego. Preserva la selección previa si sigue siendo válida para la pieza.

@@ -532,8 +532,12 @@ body {
 }
 
 #lang-switch .globe {
-    font-size: 16px;
-    line-height: 1;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: currentColor;
+    -webkit-mask: url('js/images/world.svg') center / contain no-repeat;
+    mask: url('js/images/world.svg') center / contain no-repeat;
 }
 
 /* ─── FORM ───────────────────────────────────────── */
@@ -712,6 +716,15 @@ body {
 
 .verdict-icon { font-size: 28px; }
 
+.verdict-icon--svg {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background-color: currentColor;
+    -webkit-mask: var(--icon-mask) center / contain no-repeat;
+    mask: var(--icon-mask) center / contain no-repeat;
+}
+
 .verdict-label {
     font-family: var(--font-display);
     font-size: 22px;
@@ -880,6 +893,18 @@ body {
 .legend-avg   { color: var(--gold2); }
 .legend-worst { color: var(--red); }
 
+.legend-avg::before {
+    content: '';
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: .35em;
+    vertical-align: -1px;
+    background-color: currentColor;
+    -webkit-mask: url('js/images/average.svg') center / contain no-repeat;
+    mask: url('js/images/average.svg') center / contain no-repeat;
+}
+
 /* Cards de escenarios */
 .scenarios-grid {
     display: grid;
@@ -914,6 +939,26 @@ body {
 .scenario-card--best  .scenario-title { color: var(--green); }
 .scenario-card--avg   .scenario-title { color: var(--gold2); }
 .scenario-card--worst .scenario-title { color: var(--red); }
+
+.scenario-title::before {
+    content: '';
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: .4em;
+    vertical-align: -2px;
+    background-color: currentColor;
+}
+
+.scenario-card--best  .scenario-title::before {
+    -webkit-mask: url('js/images/favorites.svg') center / contain no-repeat;
+    mask: url('js/images/favorites.svg') center / contain no-repeat;
+}
+
+.scenario-card--avg   .scenario-title::before {
+    -webkit-mask: url('js/images/review.svg') center / contain no-repeat;
+    mask: url('js/images/review.svg') center / contain no-repeat;
+}
 
 .scenario-substat {
     display: flex;
@@ -1027,6 +1072,8 @@ body {
 .site-footer {
     padding: 1.5rem 1rem 2.5rem;
     text-align: center;
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
 }
 
 .footer-disclaimer {
@@ -1034,8 +1081,8 @@ body {
     margin: 0 auto;
     font-size: .8rem;
     line-height: 1.5;
-    color: var(--text-dim, inherit);
-    opacity: .7;
+    color: var(--text2);
+    opacity: .8;
 }
 
 /* ─── RESPONSIVE ─────────────────────────────────── */
@@ -3071,12 +3118,19 @@ body {
     color: #C9D2DE;
 }
 
+/* Separación real entre el cuadro de veredicto y las cards de escenarios:
+   verdict-shell y scenario-card comparten el mismo #3E4557, así que sin
+   espacio de sobra quedan visualmente pegados en un solo bloque. */
+[data-game="genshin"] #screen-results .verdict-panel {
+    margin-bottom: 2rem;
+}
+
 /* Grilla de 3 escenarios: cards pizarra con bloque interior oscuro */
 [data-game="genshin"] #screen-results .scenarios-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    margin-top: 1.5rem;
+    margin-top: 0;
     margin-bottom: 0;
 }
 
@@ -3397,23 +3451,17 @@ body {
 [data-game="hsr"] #screen-results .scenarios-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 0;
     width: 100%;
     margin-bottom: 0;
-}
-
-[data-game="hsr"] #screen-results .scenario-card {
     position: relative;
     z-index: 1;
-    background: #D5D5D8;
-    border: none;
-    border-top-right-radius: 12px;
-    padding: 1.1rem 1.05rem;
-    box-shadow: none;
 }
 
-/* Duplicado holográfico oscuro desplazado debajo de cada tarjeta clara */
-[data-game="hsr"] #screen-results .scenario-card::before {
+/* Un único duplicado holográfico para TODA la fila, no uno por card
+   (antes cada .scenario-card tenía el suyo y se veían como 3 tarjetas
+   sueltas en vez de un solo panel dividido, como en el prototipo). */
+[data-game="hsr"] #screen-results .scenarios-grid::before {
     content: '';
     position: absolute;
     left: -10px;
@@ -3426,8 +3474,26 @@ body {
     pointer-events: none;
 }
 
+[data-game="hsr"] #screen-results .scenario-card {
+    position: relative;
+    background: #D5D5D8;
+    border: none;
+    border-right: 1px solid rgba(15, 23, 42, .15);
+    border-radius: 0;
+    padding: 1.1rem 1.05rem;
+    box-shadow: none;
+    transition: background 150ms ease;
+}
+
+/* Solo la columna de la derecha (Peor caso) lleva el corte de esquina,
+   igual que en el prototipo — no cada card por separado. */
+[data-game="hsr"] #screen-results .scenario-card--worst {
+    border-right: none;
+    border-top-right-radius: 12px;
+}
+
 [data-game="hsr"] #screen-results .scenario-card:hover {
-    transform: translateY(-2px);
+    background: #DBDBDE;
 }
 
 /* Etiquetas: Space Mono con mayúscula inicial, color #4B4848 */
@@ -3527,6 +3593,13 @@ body {
     [data-game="hsr"] #screen-results .screen-panel { gap: 1.5rem; }
     [data-game="hsr"] #screen-results .screen-title.results-title { font-size: 20px; }
     [data-game="hsr"] #screen-results .scenarios-grid { grid-template-columns: 1fr; }
+    [data-game="hsr"] #screen-results .scenario-card {
+        border-right: none;
+        border-bottom: 1px solid rgba(15, 23, 42, .15);
+    }
+    [data-game="hsr"] #screen-results .scenario-card--worst {
+        border-bottom: none;
+    }
     [data-game="hsr"] #screen-results .results-actions .btn-secondary { width: 100%; }
     [data-game="hsr"] #screen-results .results-actions .btn-text { width: 100%; text-align: center; }
 }
