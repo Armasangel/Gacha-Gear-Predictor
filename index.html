@@ -170,141 +170,158 @@
 
     <!-- SCREEN 3: RESULTS -->
     <section class="screen" id="screen-results">
-        <!-- 📸 Fondo de la pantalla: coloca tu captura del juego como <img class="scene-photo" src="..."> aquí dentro -->
+        <!-- 📸 Fondo de la pantalla: misma imagen compartida del FORM / LOTES (ver FORM_BACKGROUNDS en main.js) -->
         <div class="screen-media" aria-hidden="true">
-            <img class="scene-photo" src="" alt="">
+            <img class="scene-photo" src="js/images/alchemy-table-background.webp" alt="">
         </div>
         <div class="screen-inner">
           <div class="screen-panel">
 
+          <!-- Panel superior: tarjeta clara del veredicto y sus detalles -->
+          <div class="verdict-panel">
+
+            <!-- Título del panel: veredicto y sus detalles -->
+            <h2 class="screen-title results-title" data-i18n="results.title">Veredicto y sus detalles</h2>
+
             <!-- 4to substat (solo si tiene 3) -->
             <div id="fourth-substat-block" style="display:none">
-                <h2 class="screen-title"><span data-i18n="results.fourth.title">4to Substat</span> <button type="button" class="info-tip" data-tip-key="fourth" aria-label="Más información">?</button></h2>
+                <h2 class="screen-title results-subtitle"><span data-i18n="results.fourth.title">4to Substat</span> <button type="button" class="info-tip" data-tip-key="fourth" aria-label="Más información">?</button></h2>
                 <p class="section-hint" data-i18n="results.fourth.hint">Aún no revelado — aparece al llegar a +4</p>
                 <div id="fourth-substat-content" class="fourth-content"></div>
-                <div class="divider"></div>
             </div>
 
-            <!-- Pendiente de revelar 4to substat (solo si el artefacto tiene 3) -->
-            <div id="pending-block" class="verdict-card verdict-card--pending" style="display:none">
-                <div class="verdict-header">
-                    <span class="verdict-icon">🎲</span>
-                    <span class="verdict-label" style="color:var(--gold2)" data-i18n="results.pending.label">Aún no hay veredicto final</span>
+            <!-- Panel de veredicto: cáscara pizarra #3E4557 con bloque interior oscuro #2F3847 -->
+            <div class="verdict-shell">
+
+                <!-- Pendiente de revelar 4to substat (solo si el artefacto tiene 3) -->
+                <div id="pending-block" class="verdict-card verdict-card--pending" style="display:none">
+                    <div class="verdict-header">
+                        <span class="verdict-icon">🎲</span>
+                        <span class="verdict-label" style="color:var(--gold2)" data-i18n="results.pending.label">Aún no hay veredicto final</span>
+                    </div>
+                    <p class="verdict-action" data-i18n="results.pending.text">
+                        Este artefacto salió con 3 substats — el 4to se revela al llegar a +4.
+                        Subir hasta ahí es relativamente barato, así que vale la pena intentarlo.
+                        Las cards de abajo son una referencia con el stat más probable, no el resultado real.
+                    </p>
+                    <button class="btn-primary" id="reveal-cta" data-i18n="results.pending.cta">Ya se reveló el 4to substat →</button>
                 </div>
-                <p class="verdict-action" data-i18n="results.pending.text">
-                    Este artefacto salió con 3 substats — el 4to se revela al llegar a +4.
-                    Subir hasta ahí es relativamente barato, así que vale la pena intentarlo.
-                    Las cards de abajo son una referencia con el stat más probable, no el resultado real.
-                </p>
-                <button class="btn-primary" id="reveal-cta" data-i18n="results.pending.cta">Ya se reveló el 4to substat →</button>
-            </div>
 
-            <!-- Veredicto -->
-            <div id="verdict-block" class="verdict-card">
-                <div class="verdict-header">
-                    <span id="verdict-icon" class="verdict-icon"></span>
-                    <span id="verdict-label" class="verdict-label"></span>
+                <!-- Veredicto -->
+                <div id="verdict-block" class="verdict-card">
+                    <div class="verdict-header">
+                        <span id="verdict-icon" class="verdict-icon"></span>
+                        <span id="verdict-label" class="verdict-label"></span>
+                    </div>
+                    <p class="verdict-potential"><span data-i18n="results.potential">Potencial</span>: <span id="verdict-potential-text"></span></p>
+                    <p class="verdict-action">
+                        <span id="verdict-action-text"></span>
+                        <button type="button" class="info-tip" data-tip-key="crit" aria-label="Más información">?</button>
+                    </p>
+                    <ul id="verdict-reasons" class="verdict-reasons"></ul>
+                    <div id="verdict-probability" class="verdict-probability"></div>
+                    <button class="btn-details" id="details-toggle" onclick="toggleDetails()" data-i18n="results.details.show">
+                        Ver detalles técnicos ▼
+                    </button>
                 </div>
-                <p class="verdict-potential"><span data-i18n="results.potential">Potencial</span>: <span id="verdict-potential-text"></span></p>
-                <p class="verdict-action">
-                    <span id="verdict-action-text"></span>
-                    <button type="button" class="info-tip" data-tip-key="crit" aria-label="Más información">?</button>
-                </p>
-                <ul id="verdict-reasons" class="verdict-reasons"></ul>
-                <div id="verdict-probability" class="verdict-probability"></div>
-                <button class="btn-details" id="details-toggle" onclick="toggleDetails()" data-i18n="results.details.show">
-                    Ver detalles técnicos ▼
-                </button>
-            </div>
 
-            <!-- Detalles técnicos (accordion) -->
-            <div id="details-block" class="details-block" style="display:none">
-                <p id="verdict-reason-technical" class="verdict-reason-technical"></p>
-                <div class="details-grid">
-                    <div class="detail-item">
-                        <span class="detail-label"><span data-i18n="results.detail.cvSub">CV (substats)</span> <button type="button" class="info-tip" data-tip-key="cv-sub" aria-label="Más información">?</button></span>
-                        <div class="detail-values">
-                            <span class="val-best" id="d-best-cv-sub"></span>
-                            <span class="val-avg"  id="d-avg-cv-sub"></span>
-                            <span class="val-worst" id="d-worst-cv-sub"></span>
+                <!-- Detalles técnicos (accordion) -->
+                <div id="details-block" class="details-block" style="display:none">
+                    <p id="verdict-reason-technical" class="verdict-reason-technical"></p>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label"><span data-i18n="results.detail.cvSub">CV (substats)</span> <button type="button" class="info-tip" data-tip-key="cv-sub" aria-label="Más información">?</button></span>
+                            <div class="detail-values">
+                                <span class="val-best" id="d-best-cv-sub"></span>
+                                <span class="val-avg"  id="d-avg-cv-sub"></span>
+                                <span class="val-worst" id="d-worst-cv-sub"></span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><span data-i18n="results.detail.cvMain">CV (con mainstat)</span> <button type="button" class="info-tip" data-tip-key="cv-main" aria-label="Más información">?</button></span>
+                            <div class="detail-values">
+                                <span class="val-best" id="d-best-cv"></span>
+                                <span class="val-avg"  id="d-avg-cv"></span>
+                                <span class="val-worst" id="d-worst-cv"></span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><span data-i18n="results.detail.rv">Roll Value %</span> <button type="button" class="info-tip" data-tip-key="rv" aria-label="Más información">?</button></span>
+                            <div class="detail-values">
+                                <span class="val-best" id="d-best-rv"></span>
+                                <span class="val-avg"  id="d-avg-rv"></span>
+                                <span class="val-worst" id="d-worst-rv"></span>
+                            </div>
                         </div>
                     </div>
-                    <div class="detail-item">
-                        <span class="detail-label"><span data-i18n="results.detail.cvMain">CV (con mainstat)</span> <button type="button" class="info-tip" data-tip-key="cv-main" aria-label="Más información">?</button></span>
-                        <div class="detail-values">
-                            <span class="val-best" id="d-best-cv"></span>
-                            <span class="val-avg"  id="d-avg-cv"></span>
-                            <span class="val-worst" id="d-worst-cv"></span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label"><span data-i18n="results.detail.rv">Roll Value %</span> <button type="button" class="info-tip" data-tip-key="rv" aria-label="Más información">?</button></span>
-                        <div class="detail-values">
-                            <span class="val-best" id="d-best-rv"></span>
-                            <span class="val-avg"  id="d-avg-rv"></span>
-                            <span class="val-worst" id="d-worst-rv"></span>
-                        </div>
+                    <div class="detail-legend">
+                        <span class="legend-best" data-i18n="results.legend.best">● Mejor</span>
+                        <span class="legend-avg" data-i18n="results.legend.avg">● Promedio</span>
+                        <span class="legend-worst" data-i18n="results.legend.worst">● Peor</span>
                     </div>
                 </div>
-                <div class="detail-legend">
-                    <span class="legend-best" data-i18n="results.legend.best">● Mejor</span>
-                    <span class="legend-avg" data-i18n="results.legend.avg">● Promedio</span>
-                    <span class="legend-worst" data-i18n="results.legend.worst">● Peor</span>
-                </div>
+
             </div>
 
-            <!-- Cards de escenarios -->
+          </div><!-- /.verdict-panel -->
+
+            <!-- Cards de escenarios: grilla de 3 columnas -->
             <div class="scenarios-grid" id="scenarios-grid">
 
                 <div class="scenario-card scenario-card--best">
-                    <h3 class="scenario-title" data-i18n="results.scenario.best">✨ Mejor Caso</h3>
-                    <div class="scenario-substats" id="best-substats"></div>
+                    <h3 class="scenario-title" data-i18n="results.scenario.best">Mejor caso</h3>
+                    <div class="scenario-box">
+                        <div class="scenario-substats" id="best-substats"></div>
+                    </div>
                 </div>
 
                 <div class="scenario-card scenario-card--avg">
-                    <h3 class="scenario-title" data-i18n="results.scenario.avg">⚖️ Caso Promedio</h3>
-                    <div class="scenario-substats" id="avg-substats"></div>
+                    <h3 class="scenario-title" data-i18n="results.scenario.avg">Caso promedio</h3>
+                    <div class="scenario-box">
+                        <div class="scenario-substats" id="avg-substats"></div>
+                    </div>
                 </div>
 
                 <div class="scenario-card scenario-card--worst">
-                    <h3 class="scenario-title" data-i18n="results.scenario.worst">💀 Peor Caso</h3>
-                    <div class="scenario-substats" id="worst-substats"></div>
+                    <h3 class="scenario-title" data-i18n="results.scenario.worst">Peor caso</h3>
+                    <div class="scenario-box">
+                        <div class="scenario-substats" id="worst-substats"></div>
+                    </div>
                 </div>
 
             </div>
 
-            <div class="results-actions">
-                <button class="btn-primary" onclick="resetAndGoForm()" data-i18n="results.button.another">Predecir otro Artefacto</button>
-            </div>
-
           </div>
+
+          <!-- Footer de acción: esquina inferior derecha, único botón de salida -->
+          <div class="results-actions">
+            <button type="button" class="btn-secondary" onclick="showScreen('screen-form')">
+                <span class="btn-glyph glyph-x" aria-hidden="true">X</span>
+                <span class="btn-text" data-i18n="results.button.back">Volver</span>
+            </button>
+          </div>
+
         </div>
     </section>
 
     <!-- SCREEN 4: IMPORT BATCH -->
     <section class="screen" id="screen-import">
-        <!-- 📸 Fondo de la pantalla: coloca tu captura del juego como <img class="scene-photo" src="..."> aquí dentro -->
+        <!-- 📸 Fondo de la pantalla: misma imagen oscurecida que el formulario (ver applyGameTheme en main.js) -->
         <div class="screen-media" aria-hidden="true">
-            <img class="scene-photo" src="" alt="">
+            <img class="scene-photo" src="js/images/alchemy-table-background.webp" alt="">
         </div>
         <div class="screen-inner">
           <div class="screen-panel">
             <h2 class="screen-title" data-i18n="import.title">Analizar un Lote de Artefactos</h2>
-            <p class="section-hint" data-i18n="import.hint"></p>
 
-            <div class="form-group form-group--full">
-                <label class="form-label" data-i18n="import.file.label">Archivos JSON</label>
+            <div class="import-file-row">
+                <label class="import-file-label" for="import-file" data-i18n="import.file.label">Archivos JSON</label>
                 <input type="file" id="import-file" class="form-file" accept=".json,application/json" multiple>
             </div>
 
-            <div class="form-group form-group--full">
-                <label class="form-label" for="import-paste" data-i18n="import.paste.label">...o pega el JSON aquí</label>
-                <textarea id="import-paste" class="form-textarea" rows="6" data-i18n-placeholder="import.paste.placeholder"></textarea>
-            </div>
-
-            <div class="form-actions">
-                <button class="btn-secondary" onclick="resetImportAndGoLanding()" data-i18n="import.back">← Volver</button>
-                <button class="btn-primary" id="import-analyze-btn" data-i18n="import.analyze">Analizar Lote</button>
+            <div class="import-paste-grid">
+                <label class="import-paste-label" for="import-paste" data-i18n="import.paste.label">Pegar lote aquí</label>
+                <textarea id="import-paste" class="import-textarea" data-i18n-placeholder="import.paste.placeholder"></textarea>
             </div>
 
             <div id="import-error" class="form-error" style="display:none"></div>
@@ -329,6 +346,21 @@
                     <button class="btn-primary" id="import-export-btn" data-i18n="import.export">Exportar CSV</button>
                 </div>
             </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="resetImportAndGoLanding()">
+                <span class="btn-glyph glyph-x" aria-hidden="true">X</span>
+                <span class="btn-text" data-i18n="import.back">Volver</span>
+            </button>
+            <button class="btn-primary" id="import-analyze-btn">
+                <span class="btn-glyph glyph-y" aria-hidden="true">Y</span>
+                <span class="btn-text" data-i18n="import.import">Importar Lote</span>
+            </button>
+            <button class="btn-secondary" onclick="showScreen('screen-form')">
+                <span class="btn-glyph glyph-o" aria-hidden="true">O</span>
+                <span class="btn-text" data-i18n="import.analyzeArtifact">Analizar Artefacto</span>
+            </button>
           </div>
         </div>
     </section>

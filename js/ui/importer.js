@@ -257,8 +257,13 @@ export function initImport() { // Inicializa los elementos de la UI de importaci
     document.getElementById('import-export-btn').addEventListener('click', () => downloadCsv(lastRows));
 }
 
-export function refreshImportTexts() { // Actualiza los textos de la UI de importación según el idioma activo, usando la función t para traducir los textos. Se actualizan los placeholders, los títulos y los labels de los elementos HTML.
-    document.getElementById('import-paste').placeholder = t('import.paste.placeholder');
+export function refreshImportTexts() { // Actualiza los textos de la UI de importación según el idioma activo, usando la función t para traducir los textos. Se actualizan placeholders y se re-renderizan los resultados si ya hay filas. El placeholder admite variante por juego (p. ej. ZZZ usa "PEGAR LOTE AQUÍ" en vez del ejemplo JSON).
+    const game = document.documentElement.dataset.game;
+    const placeholderKey =
+        game && t(`import.paste.placeholder.${game}`) !== `import.paste.placeholder.${game}`
+            ? `import.paste.placeholder.${game}`
+            : 'import.paste.placeholder';
+    document.getElementById('import-paste').placeholder = t(placeholderKey);
     if (!lastRows.length) return;
     renderTable(lastRows);
 }

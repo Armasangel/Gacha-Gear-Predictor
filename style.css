@@ -2103,3 +2103,1686 @@ body {
     }
     [data-game="zzz"] #screen-form .screen-inner { gap: 1.5rem; }
 }
+
+/* ═══ TEMÁTICA GENSHIN: IMPORT BATCH (lote de artefactos) ═══
+   Misma pizarra oscura que el formulario: modal gris #3E4557 translúcido
+   con borde dorado tenue, título Spectral dorado, y un textarea que domina
+   casi todo el interior del modal. El footer de mando X/Y/O queda por
+   fuera del modal con píldoras beige, igual que en la pantalla de form. */
+[data-game="genshin"] #screen-import.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+}
+
+[data-game="genshin"] #screen-import .screen-media::before,
+[data-game="genshin"] #screen-import .screen-media::after {
+    content: none;
+}
+
+[data-game="genshin"] #screen-import .screen-media .scene-photo {
+    filter: brightness(.6);
+}
+
+[data-game="genshin"] #screen-import .screen-inner {
+    max-width: none;
+    width: min(92vw, 760px);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+/* Modal pizarra: gris #3E4557 translúcido + borde dorado tenue */
+[data-game="genshin"] #screen-import .screen-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: rgba(62, 69, 87, .93);
+    border: 1.5px solid #DBB256;
+    border-radius: 16px;
+    padding: 2rem clamp(1.25rem, 3vw, 2.5rem) 2.25rem;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .45);
+}
+
+/* Título al borde superior izquierdo del modal, dorado cálido */
+[data-game="genshin"] #screen-import .screen-title {
+    font-family: 'Spectral', serif;
+    font-weight: 800;
+    font-size: 27px;
+    letter-spacing: .03em;
+    color: #D8A659;
+    text-align: left;
+    margin-bottom: 1.75rem;
+}
+
+/* Fila de archivos JSON: secundaria y discreta, sobre el textarea */
+[data-game="genshin"] #screen-import .import-file-row {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    margin-bottom: 1.25rem;
+}
+
+[data-game="genshin"] #screen-import .import-file-label {
+    font-family: 'Spectral SC', serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #EAD9B8;
+    white-space: nowrap;
+}
+
+[data-game="genshin"] #screen-import .form-file {
+    flex: 1;
+    min-width: 0;
+    color: #C9D2DE;
+    font-size: 13px;
+}
+
+[data-game="genshin"] #screen-import .form-file::file-selector-button {
+    background: #ECE5D7;
+    color: #2F2E3C;
+    border: none;
+    border-radius: 9999px;
+    padding: .4rem 1.1rem;
+    margin-right: .6rem;
+    font-family: 'Spectral SC', serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: .05em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+    cursor: pointer;
+    transition: filter 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+}
+
+[data-game="genshin"] #screen-import .form-file::file-selector-button:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
+}
+
+/* Etiqueta interior "PEGAR LOTE AQUÍ": salmón dorado, centrada */
+[data-game="genshin"] #screen-import .import-paste-grid {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+}
+
+[data-game="genshin"] #screen-import .import-paste-label {
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: #CE6758;
+    text-align: center;
+}
+
+/* Textarea: domina el modal, gris azulado profundo, monospace, sin resize */
+[data-game="genshin"] #screen-import .import-textarea {
+    width: 100%;
+    min-height: 42vh;
+    background: #2F3847;
+    border: 1px solid rgba(180, 190, 205, .18);
+    border-radius: 5px;
+    color: #E7E4DA;
+    font-family: 'Space Mono', 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.5;
+    padding: .9rem 1rem;
+    resize: none;
+    outline: none;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+[data-game="genshin"] #screen-import .import-textarea::placeholder {
+    color: rgba(231, 228, 218, .3);
+}
+
+/* Al enfocar: resplandor dorado suave en vez de borde verde genérico */
+[data-game="genshin"] #screen-import .import-textarea:focus {
+    border-color: #DBB256;
+    box-shadow: 0 0 0 3px rgba(219, 178, 86, .22);
+}
+
+/* Resultados dentro del modal: conservan la pizarra oscura */
+[data-game="genshin"] #screen-import .import-progress {
+    color: #D8A659;
+}
+
+[data-game="genshin"] #screen-import .section-hint {
+    color: #C9D2DE;
+    opacity: .9;
+}
+
+[data-game="genshin"] #screen-import .import-skipped summary {
+    color: #D8A659;
+}
+
+[data-game="genshin"] #screen-import .import-skipped ul {
+    color: #C9D2DE;
+}
+
+[data-game="genshin"] #screen-import .table-wrap {
+    background: #2F3847;
+    border-color: rgba(219, 178, 86, .25);
+    max-height: 44vh;
+    overflow-y: auto;
+}
+
+[data-game="genshin"] #screen-import .import-table thead th {
+    position: sticky;
+    background: #3E4557;
+    color: #D8A659;
+}
+
+[data-game="genshin"] #screen-import .import-table tbody tr {
+    border-top: 1px solid rgba(219, 178, 86, .12);
+    color: #E7E4DA;
+}
+
+[data-game="genshin"] #screen-import .import-table tbody tr:hover {
+    background: rgba(219, 178, 86, .08);
+}
+
+[data-game="genshin"] #screen-import .cell-name {
+    color: #C9D2DE;
+}
+
+/* Footer de mando X/Y/O: píldoras beige, igual que el formulario */
+[data-game="genshin"] #screen-import .form-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin-top: 0;
+}
+
+[data-game="genshin"] #screen-import .btn-primary,
+[data-game="genshin"] #screen-import .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #ece6d8;
+    color: #2F2E3C;
+    border: none;
+    border-radius: 9999px;
+    padding: 6px 24px 6px 6px;
+    font-family: 'Spectral SC', serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    line-height: 1;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    transition: transform 200ms ease, filter 200ms ease, box-shadow 200ms ease;
+}
+
+[data-game="genshin"] #screen-import .btn-primary:hover,
+[data-game="genshin"] #screen-import .btn-secondary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .45);
+}
+
+[data-game="genshin"] #screen-import .btn-primary:active,
+[data-game="genshin"] #screen-import .btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Círculo oscuro con la letra del mando */
+[data-game="genshin"] #screen-import .btn-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #2F2E3C;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 15px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+[data-game="genshin"] #screen-import .glyph-x { color: #45848B; }
+[data-game="genshin"] #screen-import .glyph-y { color: #FF4343; }
+[data-game="genshin"] #screen-import .glyph-o { color: #94A579; }
+
+/* Ajustes para pantallas chicas */
+@media (max-width: 600px) {
+    [data-game="genshin"] #screen-import .screen-inner { gap: 1.5rem; }
+    [data-game="genshin"] #screen-import .screen-title { font-size: 24px; }
+    [data-game="genshin"] #screen-import .import-textarea { min-height: 34vh; }
+    [data-game="genshin"] #screen-import .import-file-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .4rem;
+    }
+    [data-game="genshin"] #screen-import .form-actions {
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+    }
+    [data-game="genshin"] #screen-import .btn-primary,
+    [data-game="genshin"] #screen-import .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ═══ TEMÁTICA HSR: IMPORT BATCH (lote de reliquias) ═══
+   Tarjeta sci-fi "consola espacial": bloque claro #E3E1E2 arriba con la
+   esquina superior derecha achaflanada, franja oscura #262626 abajo (peso
+   visual) y una sombra/duplicado holográfico desplazado abajo-izquierda.
+   Los botones del footer reusan el estilo de píldoras blancas del form HSR. */
+[data-game="hsr"] #screen-import.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+}
+
+[data-game="hsr"] #screen-import .screen-media::before,
+[data-game="hsr"] #screen-import .screen-media::after {
+    content: none;
+}
+
+[data-game="hsr"] #screen-import .screen-media .scene-photo {
+    filter: contrast(1.1) brightness(.5);
+}
+
+[data-game="hsr"] #screen-import .screen-inner {
+    max-width: none;
+    width: min(92vw, 760px);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0; /* panel claro + franja oscura forman una sola tarjeta */
+}
+
+/* Duplicado holográfico detrás de la tarjeta (profundidad de panel flotante) */
+[data-game="hsr"] #screen-import .screen-inner::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 14px;
+    width: 100%;
+    height: 100%;
+    background: rgba(18, 22, 32, .5);
+    border-top-right-radius: 16px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Bloque claro superior: gris #E3E1E2, esquina superior derecha achaflanada */
+[data-game="hsr"] #screen-import .screen-panel {
+    width: 100%;
+    background: #E3E1E2;
+    border: none;
+    border-radius: 0;
+    border-top-right-radius: 16px;
+    padding: 2rem clamp(1.5rem, 3vw, 2.5rem) 1.75rem;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+}
+
+/* Título arriba a la izquierda con línea blanca fina que corta el panel */
+[data-game="hsr"] #screen-import .screen-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: .02em;
+    color: #0F172A;
+    text-align: left;
+    width: 100%;
+    padding-bottom: .9rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, .4);
+}
+
+/* Fila de archivos JSON: discretamente integrada */
+[data-game="hsr"] #screen-import .import-file-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+[data-game="hsr"] #screen-import .import-file-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #334155;
+    white-space: nowrap;
+}
+
+[data-game="hsr"] #screen-import .form-file {
+    flex: 1;
+    min-width: 0;
+    color: #334155;
+    font-size: 13px;
+}
+
+[data-game="hsr"] #screen-import .form-file::file-selector-button {
+    background: #FFFFFF;
+    color: #0F172A;
+    border: 1px solid rgba(15, 23, 42, .2);
+    border-radius: 0;
+    padding: .4rem 1rem;
+    margin-right: .6rem;
+    font-family: 'Inter', 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: border-color 200ms ease, background 200ms ease;
+}
+
+[data-game="hsr"] #screen-import .form-file::file-selector-button:hover {
+    border-color: #9AD9E6;
+    background: #F1F5F9;
+}
+
+/* Etiqueta "Pegar lote aquí": centrada, con línea separadora slate */
+[data-game="hsr"] #screen-import .import-paste-grid {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+[data-game="hsr"] #screen-import .import-paste-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: .06em;
+    text-transform: none;
+    color: #0F172A;
+    text-align: center;
+    width: 100%;
+    padding-bottom: .55rem;
+    margin-bottom: .5rem;
+    border-bottom: 1px solid #CBD5E1;
+}
+
+/* Textarea: gris medio #BFBFBF al 80%, sin redondeo, espaciado amplio */
+[data-game="hsr"] #screen-import .import-textarea {
+    width: 100%;
+    min-height: 42vh;
+    background: rgba(191, 191, 191, .8);
+    border: 1px solid rgba(15, 23, 42, .15);
+    border-radius: 0;
+    color: #111827;
+    font-family: 'Space Mono', 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+    padding: 1.1rem 1.25rem;
+    resize: none;
+    outline: none;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+[data-game="hsr"] #screen-import .import-textarea::placeholder {
+    color: rgba(17, 24, 39, .4);
+}
+
+/* Al enfocar: acento cian HSR */
+[data-game="hsr"] #screen-import .import-textarea:focus {
+    border-color: #9AD9E6;
+    box-shadow: 0 0 0 2px rgba(154, 217, 230, .45);
+}
+
+/* Resultados dentro del bloque claro */
+[data-game="hsr"] #screen-import .import-progress {
+    color: #334155;
+}
+
+[data-game="hsr"] #screen-import .section-hint {
+    color: #334155;
+    opacity: .85;
+}
+
+[data-game="hsr"] #screen-import .import-skipped summary {
+    color: #1E3A8A;
+}
+
+[data-game="hsr"] #screen-import .import-skipped ul {
+    color: #334155;
+}
+
+[data-game="hsr"] #screen-import .table-wrap {
+    border-color: rgba(15, 23, 42, .18);
+    max-height: 44vh;
+    overflow-y: auto;
+}
+
+/* Franja inferior fija: gris oscuro #262626 que da peso a la tarjeta */
+[data-game="hsr"] #screen-import .form-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 1.15rem 2rem;
+    background: #262626;
+    margin-top: 0;
+    border-radius: 0;
+}
+
+/* Píldoras blancas: mismo estilo que los botones del FORM de HSR */
+[data-game="hsr"] #screen-import .form-actions .btn-primary,
+[data-game="hsr"] #screen-import .form-actions .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: none;
+    border-radius: 9999px;
+    padding: 5px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+    transition: box-shadow 220ms ease, filter 220ms ease;
+}
+
+[data-game="hsr"] #screen-import .form-actions .btn-text {
+    display: inline-block;
+    background: transparent;
+    border: 1.5px solid rgba(0, 0, 0, .3);
+    border-radius: 9999px;
+    padding: 10px 28px;
+    color: #0F172A;
+    font-family: 'Inter', 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: .03em;
+    text-transform: none;
+    white-space: nowrap;
+}
+
+[data-game="hsr"] #screen-import .form-actions .btn-primary:hover,
+[data-game="hsr"] #screen-import .form-actions .btn-secondary:hover {
+    filter: brightness(1.03);
+    box-shadow: 0 0 22px rgba(255, 255, 255, .55), 0 8px 24px rgba(0, 0, 0, .35);
+}
+
+[data-game="hsr"] #screen-import .form-actions .btn-primary:active,
+[data-game="hsr"] #screen-import .form-actions .btn-secondary:active {
+    box-shadow: 0 0 12px rgba(255, 255, 255, .4);
+}
+
+/* Ajustes para pantallas chicas */
+@media (max-width: 600px) {
+    [data-game="hsr"] #screen-import .screen-title { font-size: 20px; }
+    [data-game="hsr"] #screen-import .import-textarea { min-height: 34vh; }
+    [data-game="hsr"] #screen-import .import-file-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .4rem;
+    }
+    [data-game="hsr"] #screen-import .form-actions {
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+    }
+    [data-game="hsr"] #screen-import .form-actions .btn-primary,
+    [data-game="hsr"] #screen-import .form-actions .btn-secondary {
+        width: 100%;
+    }
+    [data-game="hsr"] #screen-import .form-actions .btn-text {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ═══ TEMÁTICA ZZZ: IMPORT BATCH (lote de discos) ═══
+   Sin tarjeta: el propio textarea se vuelve una cápsula grafito
+   ultra-redondeada con marco negro mate y sombra dura, flotando sobre
+   el patrón diagonal urbano. Título Bungee en mayúsculas sostenidas y
+   footer de botones-píldora negros iguales a los del FORM de ZZZ. */
+[data-game="zzz"] #screen-import.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+}
+
+[data-game="zzz"] #screen-import .screen-media::before {
+    background: repeating-linear-gradient(
+        135deg,
+        #0A0A0C 0px, #0A0A0C 16px,
+        #151519 16px, #151519 32px
+    );
+}
+
+[data-game="zzz"] #screen-import .screen-media::after {
+    content: none;
+}
+
+[data-game="zzz"] #screen-import .screen-media .scene-photo {
+    filter: brightness(.55) contrast(1.05);
+}
+
+[data-game="zzz"] #screen-import .screen-inner {
+    max-width: none;
+    width: min(92vw, 760px);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+/* Sin panel de cristal: los controles flotan sobre el patrón de fondo */
+[data-game="zzz"] #screen-import .screen-panel {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+}
+
+/* Título estilo cartel/graffiti, mayúsculas sostenidas */
+[data-game="zzz"] #screen-import .screen-title {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: clamp(22px, 4vw, 34px);
+    letter-spacing: .02em;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: #F3F1E8;
+    text-align: left;
+    margin-bottom: 1.75rem;
+}
+
+/* Fila de archivos JSON: cápsula negra compacta */
+[data-game="zzz"] #screen-import .import-file-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+[data-game="zzz"] #screen-import .import-file-label {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #F3F1E8;
+    white-space: nowrap;
+}
+
+[data-game="zzz"] #screen-import .form-file {
+    flex: 1;
+    min-width: 0;
+    color: #A7A9AE;
+    font-size: 13px;
+}
+
+[data-game="zzz"] #screen-import .form-file::file-selector-button {
+    background: #111113;
+    color: #F3F1E8;
+    border: none;
+    border-radius: 9999px;
+    padding: .55rem 1.2rem;
+    font-family: 'Inter', 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    box-shadow: 4px 4px 0 0 #000000;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+[data-game="zzz"] #screen-import .form-file::file-selector-button:hover {
+    background: #A8D94B;
+    color: #111113;
+    box-shadow: 2px 2px 0 0 #000000;
+    transform: translate(2px, 2px);
+}
+
+/* Cápsula de entrada: texto como único bloque redondeado hipergrueso */
+[data-game="zzz"] #screen-import .import-textarea {
+    width: 100%;
+    min-height: 42vh;
+    background: #111113;
+    border: 3px solid #000000;
+    border-radius: 44px;
+    color: #F3F1E8;
+    font-family: 'Space Mono', 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 1.5rem 1.75rem;
+    resize: none;
+    outline: none;
+    box-shadow: 8px 8px 0 0 #000000;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+[data-game="zzz"] #screen-import .import-textarea::placeholder {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: rgba(243, 241, 232, .42);
+    text-align: left;
+}
+
+[data-game="zzz"] #screen-import .import-textarea:focus {
+    border-color: #A8D94B;
+    box-shadow: 8px 8px 0 0 #000000, 0 0 0 2px rgba(168, 217, 75, .35);
+}
+
+/* Resultados: sobre fondo oscuro, el estilo base con acento lima alcanza */
+[data-game="zzz"] #screen-import .table-wrap {
+    border-color: rgba(168, 217, 75, .25);
+    max-height: 44vh;
+    overflow-y: auto;
+}
+
+[data-game="zzz"] #screen-import .import-progress {
+    color: #A8D94B;
+}
+
+/* Footer urban: botones-píldora negros con sombra dura, igual que el FORM */
+[data-game="zzz"] #screen-import .form-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 22px;
+    margin-top: 0;
+}
+
+[data-game="zzz"] #screen-import .btn-primary,
+[data-game="zzz"] #screen-import .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #111113;
+    color: #F3F1E8;
+    border: none;
+    border-radius: 9999px;
+    padding: .85rem 2rem;
+    box-shadow: 5px 5px 0 0 #000000;
+    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+[data-game="zzz"] #screen-import .btn-text,
+[data-game="zzz"] #screen-import #import-export-btn {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: inherit;
+}
+
+[data-game="zzz"] #screen-import .btn-primary:hover,
+[data-game="zzz"] #screen-import .btn-secondary:hover {
+    background: #A8D94B;
+    color: #111113;
+    box-shadow: 3px 3px 0 0 #000000;
+    transform: translate(2px, 2px);
+}
+
+[data-game="zzz"] #screen-import .btn-primary:active,
+[data-game="zzz"] #screen-import .btn-secondary:active {
+    transform: translate(5px, 5px);
+    box-shadow: 0 0 0 0 #000000;
+}
+
+/* Ajustes para pantallas chicas */
+@media (max-width: 600px) {
+    [data-game="zzz"] #screen-import .screen-inner { gap: 1.5rem; }
+    [data-game="zzz"] #screen-import .import-textarea { min-height: 36vh; border-radius: 36px; }
+    [data-game="zzz"] #screen-import .import-file-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .4rem;
+    }
+    [data-game="zzz"] #screen-import .form-actions {
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+    }
+    [data-game="zzz"] #screen-import .btn-primary,
+    [data-game="zzz"] #screen-import .btn-secondary {
+        width: 100%;
+    }
+}
+
+/* ═══ TEMÁTICA GENSHIN: RESULTS (panel de veredicto) ═══
+   Misma pizarra gris del formulario y del lote: modal #3E4557 translúcido
+   con borde dorado tenue, título Spectral dorado en el centro, caja de
+   contenido principal en #2F3847, grilla de 3 escenarios al pie y un único
+   botón de salida "(X) VOLVER" en la cápsula beige clásica a la derecha. */
+[data-game="genshin"] #screen-results.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+}
+
+[data-game="genshin"] #screen-results .screen-media::before,
+[data-game="genshin"] #screen-results .screen-media::after {
+    content: none;
+}
+
+[data-game="genshin"] #screen-results .screen-media .scene-photo {
+    filter: brightness(.6);
+}
+
+[data-game="genshin"] #screen-results .screen-inner {
+    max-width: none;
+    width: min(92vw, 760px);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+/* Modal pizarra: gris #3E4557 translúcido + borde dorado tenue */
+[data-game="genshin"] #screen-results .screen-panel {
+    width: 100%;
+    background: rgba(62, 69, 87, .93);
+    border: 1.5px solid #DBB256;
+    border-radius: 16px;
+    padding: 2.25rem clamp(1.25rem, 3vw, 2.5rem) 2.5rem;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .45);
+}
+
+/* Título del panel: "Veredicto y sus detalles", centrado, Spectral dorado */
+[data-game="genshin"] #screen-results .screen-title.results-title {
+    font-family: 'Spectral', serif;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: .04em;
+    color: #D8A659;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Subtítulo del 4to substat (más discreto que el título del panel) */
+[data-game="genshin"] #screen-results .screen-title.results-subtitle {
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: .06em;
+    color: #D8A659;
+    text-align: left;
+    margin-bottom: .5rem;
+}
+
+[data-game="genshin"] #screen-results .section-hint {
+    color: #C9D2DE;
+    opacity: .85;
+}
+
+/* Distribución del 4to substat: bloque interior oscuro */
+[data-game="genshin"] #screen-results .fourth-content {
+    background: #2F3847;
+    border: 1px solid rgba(180, 190, 205, .16);
+    border-radius: 12px;
+    margin-top: 1rem;
+}
+
+[data-game="genshin"] #screen-results .fourth-assumption {
+    background: #3E4557;
+    border: 1px dashed rgba(219, 178, 86, .4);
+}
+
+[data-game="genshin"] #screen-results .fourth-assumption-text,
+[data-game="genshin"] #screen-results .fourth-chance,
+[data-game="genshin"] #screen-results .fourth-bar-label {
+    color: #C9D2DE;
+}
+
+[data-game="genshin"] #screen-results .fourth-chance strong { color: #E7E4DA; }
+
+[data-game="genshin"] #screen-results .fourth-bar-track {
+    background: rgba(0, 0, 0, .28);
+}
+
+/* Cáscara del veredicto: caja pizarra #3E4557 que resguarda el bloque oscuro */
+[data-game="genshin"] #screen-results .verdict-shell {
+    background: rgba(62, 69, 87, .92);
+    border: 1px solid rgba(219, 178, 86, .25);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+    z-index: 3;
+}
+
+/* Tarjeta interior del veredicto (y versión "pendiente"): bloque #2F3847 */
+[data-game="genshin"] #screen-results .verdict-card {
+    background: #2F3847;
+    border: 1px solid rgba(180, 190, 205, .12);
+    border-radius: 12px;
+    margin-bottom: 0;
+    padding: 1.5rem;
+}
+
+[data-game="genshin"] #screen-results .verdict-card--pending {
+    border-style: dashed;
+    border-color: rgba(216, 166, 89, .45);
+}
+
+/* Contenido del veredicto: claro sobre la pizarra oscura */
+[data-game="genshin"] #screen-results .verdict-potential,
+[data-game="genshin"] #screen-results .verdict-action,
+[data-game="genshin"] #screen-results .verdict-reasons li {
+    color: #E7E4DA;
+}
+
+[data-game="genshin"] #screen-results .verdict-potential span {
+    color: #F7F3E6;
+    font-weight: 600;
+}
+
+[data-game="genshin"] #screen-results .verdict-reasons li::before {
+    color: #D8A659;
+}
+
+[data-game="genshin"] #screen-results .verdict-probability .fourth-assumption-text {
+    color: #C9D2DE;
+}
+
+[data-game="genshin"] #screen-results .info-tip {
+    color: #C9D2DE;
+    border-color: rgba(231, 228, 218, .35);
+}
+
+[data-game="genshin"] #screen-results .info-tip:hover,
+[data-game="genshin"] #screen-results .info-tip:focus-visible {
+    color: #D8A659;
+    border-color: #D8A659;
+}
+
+[data-game="genshin"] #screen-results .btn-details {
+    color: #D8A659;
+}
+
+/* CTA del estado "pendiente": cápsula beige clásica */
+[data-game="genshin"] #screen-results .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ece6d8;
+    color: #2F2E3C;
+    border: none;
+    border-radius: 9999px;
+    padding: 12px 26px;
+    font-family: 'Spectral SC', serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    line-height: 1;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    transition: transform 200ms ease, filter 200ms ease, box-shadow 200ms ease;
+}
+
+[data-game="genshin"] #screen-results .btn-primary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .45);
+}
+
+/* Detalles técnicos: bloque interior oscuro */
+[data-game="genshin"] #screen-results .details-block {
+    background: #2F3847;
+    border: 1px solid rgba(180, 190, 205, .12);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 0;
+}
+
+[data-game="genshin"] #screen-results .verdict-reason-technical,
+[data-game="genshin"] #screen-results .detail-label,
+[data-game="genshin"] #screen-results .detail-legend {
+    color: #C9D2DE;
+}
+
+/* Grilla de 3 escenarios: cards pizarra con bloque interior oscuro */
+[data-game="genshin"] #screen-results .scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+}
+
+[data-game="genshin"] #screen-results .scenario-card {
+    background: #3E4557;
+    border: 1px solid rgba(219, 178, 86, .22);
+    border-radius: 16px;
+    padding: 1.1rem;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .18);
+}
+
+/* Etiqueta del escenario: Spectral blanca, mediana, mayúsculas sostenidas */
+[data-game="genshin"] #screen-results .scenario-title {
+    font-family: 'Spectral', serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #FFFFFF;
+    margin-bottom: .9rem;
+}
+
+/* Caja interior con los substats resultantes */
+[data-game="genshin"] #screen-results .scenario-box {
+    background: #2F3847;
+    border: 1px solid rgba(180, 190, 205, .1);
+    border-radius: 12px;
+    padding: .45rem .9rem;
+}
+
+[data-game="genshin"] #screen-results .scenario-substat {
+    border-bottom-color: rgba(231, 228, 218, .07);
+}
+
+[data-game="genshin"] #screen-results .scenario-substat-name {
+    color: #C9D2DE;
+}
+
+[data-game="genshin"] #screen-results .scenario-substat-value {
+    color: #E7E4DA;
+}
+
+[data-game="genshin"] #screen-results .projected-tag {
+    color: #D8A659;
+    border-color: rgba(216, 166, 89, .55);
+}
+
+/* Footer de acción: única salida, alineada a la esquina inferior derecha */
+[data-game="genshin"] #screen-results .results-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0;
+}
+
+[data-game="genshin"] #screen-results .results-actions .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #ece6d8;
+    color: #2F2E3C;
+    border: none;
+    border-radius: 9999px;
+    padding: 6px 24px 6px 6px;
+    font-family: 'Spectral SC', serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    line-height: 1;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    transition: transform 200ms ease, filter 200ms ease, box-shadow 200ms ease;
+}
+
+[data-game="genshin"] #screen-results .results-actions .btn-secondary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .45);
+}
+
+[data-game="genshin"] #screen-results .results-actions .btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Círculo oscuro con la letra del mando (X) a la izquierda */
+[data-game="genshin"] #screen-results .results-actions .btn-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #2F2E3C;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 15px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+[data-game="genshin"] #screen-results .results-actions .glyph-x { color: #45848B; }
+
+/* Ajustes para pantallas chicas */
+@media (max-width: 600px) {
+    [data-game="genshin"] #screen-results .screen-inner { gap: 1.5rem; }
+    [data-game="genshin"] #screen-results .screen-title.results-title { font-size: 24px; }
+    [data-game="genshin"] #screen-results .scenarios-grid { grid-template-columns: 1fr; }
+    [data-game="genshin"] #screen-results .results-actions .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ═══ TEMÁTICA HSR: RESULTS (panel de veredicto) ═══
+   Tarjetas sci-fi "consola espacial": panel claro #D5D5D8 con la esquina
+   superior derecha achaflanada para el veredicto y tres cards modulares
+   independientes iguales para los escenarios. Cada tarjeta clara lleva su
+   duplicado holográfico oscuro desplazado debajo. La botonera inferior
+   queda a la derecha con la píldora blanca característica del FORM/LOTES. */
+[data-game="hsr"] #screen-results.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+}
+
+[data-game="hsr"] #screen-results .screen-media::before,
+[data-game="hsr"] #screen-results .screen-media::after {
+    content: none;
+}
+
+[data-game="hsr"] #screen-results .screen-media .scene-photo {
+    filter: contrast(1.1) brightness(.5);
+}
+
+[data-game="hsr"] #screen-results .screen-inner {
+    max-width: none;
+    width: min(92vw, 760px);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* El panel deja de ser una caja: las tarjetas claras flotan sobre el fondo */
+[data-game="hsr"] #screen-results .screen-panel {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* ── Panel superior: tarjeta clara del veredicto ── */
+
+[data-game="hsr"] #screen-results .verdict-panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    background: #D5D5D8;
+    border-top-right-radius: 16px;
+    padding: 1.75rem clamp(1.25rem, 3vw, 2rem) 1.5rem;
+}
+
+/* Duplicado holográfico oscuro desplazado debajo del panel claro */
+[data-game="hsr"] #screen-results .verdict-panel::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 14px;
+    width: 100%;
+    height: 100%;
+    background: rgba(18, 22, 32, .5);
+    border-top-right-radius: 16px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Título: Space Mono en negro, alineado a la izquierda */
+[data-game="hsr"] #screen-results .screen-title.results-title {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: .02em;
+    color: #0F172A;
+    text-align: left;
+    width: 100%;
+    padding-bottom: .9rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(15, 23, 42, .25);
+}
+
+[data-game="hsr"] #screen-results .screen-title.results-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: .03em;
+    color: #1E293B;
+    text-align: left;
+    margin-bottom: .5rem;
+}
+
+[data-game="hsr"] #screen-results .section-hint {
+    color: #4B4848;
+    opacity: .75;
+}
+
+/* Caja de contenido: bloque gris medio #BFBFBF al 80% para métricas/graphs */
+[data-game="hsr"] #screen-results .verdict-card,
+[data-game="hsr"] #screen-results .fourth-content,
+[data-game="hsr"] #screen-results .details-block {
+    background: rgba(191, 191, 191, .8);
+    border: 1px solid rgba(15, 23, 42, .12);
+    border-radius: 0;
+    padding: 1.25rem 1.35rem;
+    box-shadow: none;
+}
+
+[data-game="hsr"] #screen-results .verdict-card {
+    margin-bottom: 1.25rem;
+}
+
+[data-game="hsr"] #screen-results .verdict-card--pending {
+    border-style: dashed;
+    border-color: rgba(15, 23, 42, .3);
+}
+
+[data-game="hsr"] #screen-results .details-block {
+    margin-bottom: 0;
+}
+
+/* Texto en tono gris medio sobre las cajas claras */
+[data-game="hsr"] #screen-results .verdict-label,
+[data-game="hsr"] #screen-results .verdict-action,
+[data-game="hsr"] #screen-results .verdict-potential,
+[data-game="hsr"] #screen-results .verdict-reasons li,
+[data-game="hsr"] #screen-results .verdict-reason-technical,
+[data-game="hsr"] #screen-results .detail-label,
+[data-game="hsr"] #screen-results .detail-legend,
+[data-game="hsr"] #screen-results .fourth-chance,
+[data-game="hsr"] #screen-results .fourth-assumption-text,
+[data-game="hsr"] #screen-results .fourth-bar-label,
+[data-game="hsr"] #screen-results .fourth-bar-pct--bad,
+[data-game="hsr"] #screen-results .verdict-probability .fourth-assumption-text {
+    color: #4B4848;
+}
+
+[data-game="hsr"] #screen-results .verdict-potential span,
+[data-game="hsr"] #screen-results .fourth-chance strong,
+[data-game="hsr"] #screen-results .fourth-assumption-text strong {
+    color: #0F172A;
+}
+
+[data-game="hsr"] #screen-results .verdict-reasons li::before {
+    color: #334155;
+}
+
+[data-game="hsr"] #screen-results .verdict-card--pending .verdict-label {
+    color: #0F172A !important;
+}
+
+[data-game="hsr"] #screen-results .verdict-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+}
+
+/* Barras de probabilidad y distribución del 4to substat */
+[data-game="hsr"] #screen-results .fourth-bar-track {
+    background: rgba(15, 23, 42, .18);
+}
+
+[data-game="hsr"] #screen-results .fourth-bar-fill--bad {
+    background: rgba(15, 23, 42, .28);
+}
+
+[data-game="hsr"] #screen-results .fourth-assumption {
+    background: rgba(255, 255, 255, .45);
+    border: 1px dashed rgba(15, 23, 42, .35);
+    border-radius: 0;
+}
+
+[data-game="hsr"] #screen-results .info-tip {
+    color: #4B4848;
+    border-color: rgba(15, 23, 42, .35);
+}
+
+[data-game="hsr"] #screen-results .info-tip:hover,
+[data-game="hsr"] #screen-results .info-tip:focus-visible {
+    color: #0F172A;
+    border-color: #0F172A;
+}
+
+[data-game="hsr"] #screen-results .btn-details {
+    font-family: 'Space Mono', monospace;
+    color: #0F172A;
+}
+
+/* Valores de los detalles técnicos: tonos ajustados al fondo claro */
+[data-game="hsr"] #screen-results .val-best { color: #2F9E5F; }
+[data-game="hsr"] #screen-results .val-avg  { color: #0F172A; }
+[data-game="hsr"] #screen-results .val-worst { color: #C0392B; }
+
+[data-game="hsr"] #screen-results .legend-best { color: #2F9E5F; }
+[data-game="hsr"] #screen-results .legend-avg  { color: #0F172A; }
+[data-game="hsr"] #screen-results .legend-worst { color: #C0392B; }
+
+/* ── Grilla inferior: 3 cards modulares de escenarios ── */
+
+[data-game="hsr"] #screen-results .scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+[data-game="hsr"] #screen-results .scenario-card {
+    position: relative;
+    z-index: 1;
+    background: #D5D5D8;
+    border: none;
+    border-top-right-radius: 12px;
+    padding: 1.1rem 1.05rem;
+    box-shadow: none;
+}
+
+/* Duplicado holográfico oscuro desplazado debajo de cada tarjeta clara */
+[data-game="hsr"] #screen-results .scenario-card::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 10px;
+    width: 100%;
+    height: 100%;
+    background: rgba(18, 22, 32, .5);
+    border-top-right-radius: 12px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+[data-game="hsr"] #screen-results .scenario-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Etiquetas: Space Mono con mayúscula inicial, color #4B4848 */
+[data-game="hsr"] #screen-results .scenario-title {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: .04em;
+    text-transform: none;
+    text-align: left;
+    color: #4B4848;
+    margin-bottom: .75rem;
+}
+
+/* Caja interior con las reliquias calculadas: #BFBFBF al 80% */
+[data-game="hsr"] #screen-results .scenario-box {
+    background: rgba(191, 191, 191, .8);
+    border: 1px solid rgba(15, 23, 42, .12);
+    border-radius: 0;
+    padding: .5rem .8rem;
+}
+
+[data-game="hsr"] #screen-results .scenario-substat {
+    border-bottom: 1px solid rgba(15, 23, 42, .14);
+    padding: .5rem 0;
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+}
+
+[data-game="hsr"] #screen-results .scenario-substat--projected {
+    border-bottom-style: dashed;
+}
+
+[data-game="hsr"] #screen-results .scenario-substat-name {
+    color: #4B4848;
+}
+
+[data-game="hsr"] #screen-results .scenario-substat-value {
+    color: #0F172A;
+    font-weight: 700;
+}
+
+[data-game="hsr"] #screen-results .projected-tag {
+    color: #0F172A;
+    border-color: rgba(15, 23, 42, .35);
+    background: rgba(255, 255, 255, .35);
+}
+
+/* ── Botonera inferior: única píldora blanca a la derecha ── */
+
+[data-game="hsr"] #screen-results .results-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0;
+}
+
+[data-game="hsr"] #screen-results .results-actions .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 1px solid rgba(15, 23, 42, .3);
+    border-radius: 9999px;
+    padding: 5px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+    transition: box-shadow 220ms ease, filter 220ms ease;
+}
+
+[data-game="hsr"] #screen-results .results-actions .btn-text {
+    display: inline-block;
+    background: transparent;
+    border: 1.5px solid rgba(0, 0, 0, .3);
+    border-radius: 9999px;
+    padding: 10px 28px;
+    color: #0F172A;
+    font-family: 'Inter', 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: .03em;
+    text-transform: none;
+    white-space: nowrap;
+}
+
+[data-game="hsr"] #screen-results .results-actions .btn-secondary:hover {
+    filter: brightness(1.03);
+    box-shadow: 0 0 22px rgba(255, 255, 255, .55), 0 8px 24px rgba(0, 0, 0, .35);
+}
+
+[data-game="hsr"] #screen-results .results-actions .btn-secondary:active {
+    box-shadow: 0 0 12px rgba(255, 255, 255, .4);
+}
+
+/* Ajustes para pantallas chicas */
+@media (max-width: 600px) {
+    [data-game="hsr"] #screen-results .screen-inner { gap: 1.5rem; }
+    [data-game="hsr"] #screen-results .screen-panel { gap: 1.5rem; }
+    [data-game="hsr"] #screen-results .screen-title.results-title { font-size: 20px; }
+    [data-game="hsr"] #screen-results .scenarios-grid { grid-template-columns: 1fr; }
+    [data-game="hsr"] #screen-results .results-actions .btn-secondary { width: 100%; }
+    [data-game="hsr"] #screen-results .results-actions .btn-text { width: 100%; text-align: center; }
+}
+
+/* ═══ TEMÁTICA ZZZ: RESULTS (panel de veredicto) ═══
+   Neobrutalismo urbano como en FORM/LOTES: bloque negro mate #111113 con
+   trazo grueso #000 y radios súper redondeados para el veredicto, y tres
+   cápsulas cuadradas independientes para los escenarios. Cada tarjeta
+   flota directamente sobre el patrón diagonal del fondo (sin contenedores
+   por detrás). Botonera inferior a la derecha: cápsula negra "VOLVER"
+   blanca con la misma estética que los botones del resto de pantallas. */
+[data-game="zzz"] #screen-results.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+}
+
+/* Textura diagonal urbana del fondo: misma que FORM y LOTES */
+[data-game="zzz"] #screen-results .screen-media::before {
+    background: repeating-linear-gradient(
+        135deg,
+        #0A0A0C 0px, #0A0A0C 16px,
+        #151519 16px, #151519 32px
+    );
+}
+
+[data-game="zzz"] #screen-results .screen-media::after {
+    content: none;
+}
+
+[data-game="zzz"] #screen-results .screen-media .scene-photo {
+    filter: brightness(.55) contrast(1.05);
+}
+
+[data-game="zzz"] #screen-results .screen-inner {
+    max-width: none;
+    width: min(92vw, 760px);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+/* Sin contenedor transparente: las tarjetas flotan sobre el fondo */
+[data-game="zzz"] #screen-results .screen-panel {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+/* ── Panel superior: bloque rectangular negro mate del veredicto ── */
+
+[data-game="zzz"] #screen-results .verdict-panel {
+    width: 100%;
+    background: #111113;
+    border: 3px solid #000000;
+    border-radius: 32px;
+    padding: 2rem clamp(1.25rem, 3vw, 2.25rem) 2rem;
+    box-shadow: 6px 6px 0 0 #000000;
+}
+
+/* Título: Bungee pesado en mayúsculas sostenidas, centrado */
+[data-game="zzz"] #screen-results .screen-title.results-title {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: clamp(22px, 4.5vw, 32px);
+    letter-spacing: .02em;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: #F3F1E8;
+    text-align: center;
+    margin-bottom: 1.75rem;
+}
+
+[data-game="zzz"] #screen-results .screen-title.results-subtitle {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: 16px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #F3F1E8;
+    text-align: left;
+    margin-bottom: .6rem;
+}
+
+[data-game="zzz"] #screen-results .section-hint {
+    color: #A7A9AE;
+    opacity: 1;
+}
+
+/* Cajas internas de métricas y detalles: grafito con trazo negro duro */
+[data-game="zzz"] #screen-results .verdict-card,
+[data-game="zzz"] #screen-results .fourth-content,
+[data-game="zzz"] #screen-results .details-block {
+    background: #1C1D21;
+    border: 2px solid #000000;
+    border-radius: 18px;
+    padding: 1.35rem 1.5rem;
+    box-shadow: 4px 4px 0 0 #000000;
+}
+
+[data-game="zzz"] #screen-results .verdict-card {
+    margin-bottom: 1.25rem;
+}
+
+[data-game="zzz"] #screen-results .verdict-card--pending {
+    border-style: solid;
+}
+
+[data-game="zzz"] #screen-results .details-block {
+    margin-bottom: 0;
+}
+
+/* Veredicto: etiqueta display pesada a juego con el título */
+[data-game="zzz"] #screen-results .verdict-label {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: 19px;
+    letter-spacing: .03em;
+}
+
+/* ── Grilla inferior: 3 cápsulas cuadradas independientes ── */
+
+[data-game="zzz"] #screen-results .scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+[data-game="zzz"] #screen-results .scenario-card {
+    background: #111113;
+    border: 3px solid #000000;
+    border-radius: 28px;
+    padding: 1.4rem 1.2rem 1.6rem;
+    box-shadow: 6px 6px 0 0 #000000;
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+[data-game="zzz"] #screen-results .scenario-card:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 0 #000000;
+    border-color: #A8D94B;
+}
+
+[data-game="zzz"] #screen-results .scenario-card--best { border-color: #000000; }
+[data-game="zzz"] #screen-results .scenario-card--avg  { border-color: #000000; }
+[data-game="zzz"] #screen-results .scenario-card--worst { border-color: #000000; }
+
+/* Etiquetas: Bungee ultra-bold en mayúsculas, centradas en dos líneas */
+[data-game="zzz"] #screen-results .scenario-title {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: 19px;
+    letter-spacing: .02em;
+    line-height: 1.08;
+    text-transform: uppercase;
+    color: #F3F1E8;
+    text-align: center;
+    max-width: 6.8ch;
+    margin: 0 auto .9rem;
+}
+
+/* Caja interior con las reliquias calculadas */
+[data-game="zzz"] #screen-results .scenario-box {
+    background: #1C1D21;
+    border: 2px solid #000000;
+    border-radius: 16px;
+    padding: .6rem .9rem;
+    box-shadow: 4px 4px 0 0 #000000;
+}
+
+[data-game="zzz"] #screen-results .scenario-substat {
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    padding: .55rem 0;
+    font-size: 13px;
+}
+
+[data-game="zzz"] #screen-results .scenario-substat-name {
+    color: #A7A9AE;
+}
+
+[data-game="zzz"] #screen-results .scenario-substat-value {
+    color: #F3F1E8;
+    font-weight: 700;
+}
+
+[data-game="zzz"] #screen-results .projected-tag {
+    color: #A8D94B;
+    border-color: rgba(168, 217, 75, .5);
+}
+
+/* ── Botonera inferior: única cápsula negra "VOLVER" a la derecha ── */
+
+[data-game="zzz"] #screen-results .results-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0;
+}
+
+[data-game="zzz"] #screen-results .results-actions .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #111113;
+    color: #F3F1E8;
+    border: none;
+    border-radius: 9999px;
+    padding: 12px 36px;
+    box-shadow: 5px 5px 0 0 #000000;
+    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+[data-game="zzz"] #screen-results .results-actions .btn-text {
+    font-family: 'Bungee', cursive;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: inherit;
+}
+
+[data-game="zzz"] #screen-results .results-actions .btn-secondary:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 0 #000000;
+    background: #A8D94B;
+    color: #111113;
+}
+
+[data-game="zzz"] #screen-results .results-actions .btn-secondary:active {
+    transform: translate(5px, 5px);
+    box-shadow: 0 0 0 0 #000000;
+}
+
+/* Ajustes para pantallas chicas */
+@media (max-width: 600px) {
+    [data-game="zzz"] #screen-results .screen-inner { gap: 1.5rem; }
+    [data-game="zzz"] #screen-results .screen-panel { gap: 1.5rem; }
+    [data-game="zzz"] #screen-results .screen-title.results-title { font-size: 24px; }
+    [data-game="zzz"] #screen-results .scenarios-grid { grid-template-columns: 1fr; }
+    [data-game="zzz"] #screen-results .scenario-title { max-width: none; }
+    [data-game="zzz"] #screen-results .scenario-card { border-radius: 32px; }
+    [data-game="zzz"] #screen-results .results-actions .btn-secondary { width: 100%; }
+    [data-game="zzz"] #screen-results .results-actions .btn-text { width: 100%; text-align: center; }
+}

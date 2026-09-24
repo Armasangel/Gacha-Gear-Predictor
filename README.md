@@ -137,6 +137,20 @@ Gacha-Gear-Predictor/
 
 ---
 
+## Diseño visual
+
+Cada juego tiene una identidad visual propia, aplicada consistentemente a las tres pantallas (FORM, LOTES y RESULTS) mediante selectores `[data-game]` sobre los tokens CSS del tema activo:
+
+| Juego | Tema | Lenguaje visual |
+|-------|------|-----------------|
+| **Genshin Impact** | Alquimia fantástica | Mesa de alquimia con orbes y runas, dorados y violetas, panel contenedor translúcido |
+| **Honkai: Star Rail** | Laboratorio alquímico monocromo | Tarjetas claras `#D5D5D8` con esquina superior derecha redondeada, cajas de contenido `#BFBFBF` al 80% y efecto holográfico del duplicado oscuro desplazado | 
+| **Zenless Zone Zero** | Neobrutalismo urbano | Fondo de patrón diagonal, cápsulas negras mate `#111113` con trazo grueso `#000`, radios súper redondeados y sombras duras |
+
+El título, la botonera (cápsulas) y la tipografía *display* cambian según el juego (p. ej. `Bungee` en ZZZ, `Space Mono` en HSR). La interfaz es responsive y se puede alternar entre Español e Inglés.
+
+---
+
 ## Cómo usarlo
 
 1. Abre la herramienta en el navegador
@@ -162,6 +176,7 @@ La selección de juego se guarda y se recuerda entre visitas.
 - [x] Soporte multi-juego (Star Rail, ZZZ)
 - [x] Selector de juego con perfiles configurables (Genshin / Star Rail / ZZZ)
 - [x] Iconos SVG por juego
+- [x] Temas visuales por juego en FORM / LOTES / RESULTS (Genshin, HSR, ZZZ)
 
 ---
 

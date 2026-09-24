@@ -123,6 +123,7 @@ function applyGame(id) { // Aplica un juego por id, actualizando el perfil activ
     setProfile(getProfile(id));
     applyGameTheme(id);
     renderStaticTexts(); // El formulario tiene textos por juego (p. ej. "Reliquia" vs "Artefacto")
+    refreshImportTexts(); // El placeholder del lote también puede variar por juego (p. ej. ZZZ)
     // Limpiar pantalla de resultados si estamos viendo el análisis de otro juego
     document.getElementById('fourth-substat-block').style.display = 'none';
     document.getElementById('pending-block').style.display = 'none';
@@ -143,8 +144,14 @@ const FORM_BACKGROUNDS = {
 
 function applyGameTheme(id) {
     document.documentElement.dataset.game = id;
+    // El fondo temático se comparte entre el formulario, el lote de
+    // importación y la pantalla de resultados.
     const bg = document.querySelector('#screen-form .scene-photo');
     if (bg && FORM_BACKGROUNDS[id] !== undefined) bg.src = FORM_BACKGROUNDS[id];
+    const importBg = document.querySelector('#screen-import .scene-photo');
+    if (importBg && FORM_BACKGROUNDS[id] !== undefined) importBg.src = FORM_BACKGROUNDS[id];
+    const resultsBg = document.querySelector('#screen-results .scene-photo');
+    if (resultsBg && FORM_BACKGROUNDS[id] !== undefined) resultsBg.src = FORM_BACKGROUNDS[id];
 }
 
 // Init 
@@ -160,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initImport();
     initI18n();
     renderStaticTexts();
+    refreshImportTexts();
 
     // Fila de selección de juego del landing (hover/touch preview + click confirma)
     initGamePickRow();
